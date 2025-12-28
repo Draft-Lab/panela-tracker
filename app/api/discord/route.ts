@@ -15,7 +15,6 @@ interface SessionEndPayload {
   discord_ids: string[];
   game_title: string;
   session_type: "solo" | "group";
-  started_at: string;
   ended_at: string;
   duration_minutes: number;
 }
@@ -207,7 +206,6 @@ export async function PUT(request: Request) {
       discord_ids,
       game_title,
       session_type,
-      started_at,
       ended_at,
       duration_minutes,
     } = body;
@@ -269,6 +267,7 @@ export async function PUT(request: Request) {
       .select(
         `
         id,
+        started_at,
         jogatina_players!inner(player_id)
       `,
       )
@@ -276,7 +275,7 @@ export async function PUT(request: Request) {
       .eq("session_type", session_type)
       .eq("is_current", true)
       .eq("source", "discord_bot")
-      .gte("started_at", started_at);
+      .is("ended_at", null);
 
     // Encontrar a jogatina que tem todos os jogadores
     let matchingJogatina = null;
@@ -310,7 +309,8 @@ export async function PUT(request: Request) {
         duration_minutes:
           duration_minutes ||
           Math.floor(
-            (new Date(ended_at).getTime() - new Date(started_at).getTime()) /
+            (new Date(ended_at).getTime() -
+              new Date(matchingJogatina.started_at).getTime()) /
               60000,
           ),
         is_current: false,
