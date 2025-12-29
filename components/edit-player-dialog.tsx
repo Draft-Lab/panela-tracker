@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,50 +11,80 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
-import type { Player } from "@/lib/types"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import type { Player } from "@/lib/types";
 
 interface EditPlayerDialogProps {
-  player: Player
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  player: Player;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function EditPlayerDialog({ player, open, onOpenChange }: EditPlayerDialogProps) {
-  const [name, setName] = useState(player.name)
-  const [avatarUrl, setAvatarUrl] = useState(player.avatar_url || "")
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+export function EditPlayerDialog({
+  player,
+  open,
+  onOpenChange,
+}: EditPlayerDialogProps) {
+  const [name, setName] = useState(player.name);
+  const [discordId, setDiscordId] = useState(player.discord_id || "");
+  const [avatarUrl, setAvatarUrl] = useState(player.avatar_url || "");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) return
+    e.preventDefault();
+    if (!name.trim()) {
+      alert("Nome é obrigatório");
+      return;
+    }
 
-    setIsLoading(true)
-    const supabase = createClient()
+    if (!discordId.trim()) {
+      alert("Discord ID é obrigatório");
+      return;
+    }
+
+    setIsLoading(true);
+    const supabase = createClient();
+
+    // Verificar se o discord_id já existe em outro jogador
+    if (discordId.trim() !== player.discord_id) {
+      const { data: existing } = await supabase
+        .from("players")
+        .select("id")
+        .eq("discord_id", discordId.trim())
+        .neq("id", player.id)
+        .single();
+
+      if (existing) {
+        alert("Este Discord ID já está cadastrado em outro jogador");
+        setIsLoading(false);
+        return;
+      }
+    }
 
     const { error } = await supabase
       .from("players")
       .update({
         name: name.trim(),
+        discord_id: discordId.trim(),
         avatar_url: avatarUrl.trim() || null,
       })
-      .eq("id", player.id)
+      .eq("id", player.id);
 
     if (error) {
-      console.error("[v0] Error updating player:", error)
-      alert("Erro ao atualizar jogador")
+      console.error("[v0] Error updating player:", error);
+      alert("Erro ao atualizar jogador: " + error.message);
     } else {
-      onOpenChange(false)
-      router.refresh()
+      onOpenChange(false);
+      router.refresh();
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,7 +92,9 @@ export function EditPlayerDialog({ player, open, onOpenChange }: EditPlayerDialo
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Editar Jogador</DialogTitle>
-            <DialogDescription>Atualize as informações do jogador</DialogDescription>
+            <DialogDescription>
+              Atualize as informações do jogador
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -76,6 +108,19 @@ export function EditPlayerDialog({ player, open, onOpenChange }: EditPlayerDialo
               />
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="edit-discord">Discord ID *</Label>
+              <Input
+                id="edit-discord"
+                value={discordId}
+                onChange={(e) => setDiscordId(e.target.value)}
+                placeholder="Ex: @saudades ou 123456789"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Usado para integração com o bot do Discord
+              </p>
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="edit-avatar">URL do Avatar (opcional)</Label>
               <Input
                 id="edit-avatar"
@@ -87,7 +132,11 @@ export function EditPlayerDialog({ player, open, onOpenChange }: EditPlayerDialo
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
@@ -97,5 +146,5 @@ export function EditPlayerDialog({ player, open, onOpenChange }: EditPlayerDialo
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
