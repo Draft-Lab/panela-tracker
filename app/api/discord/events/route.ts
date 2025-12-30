@@ -1,3 +1,4 @@
+// app/api/discord/events/route.ts
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -16,6 +17,45 @@ function verifyAuth(request: Request) {
   }
   const token = authHeader.substring(7);
   return token === DISCORD_BOT_API_KEY;
+}
+
+// NOVA FUNÇÃO: Associar jogatina à temporada ativa
+async function associateToActiveSeason(
+  supabase: any,
+  jogatinaId: string,
+  gameId: string,
+) {
+  try {
+    const now = new Date().toISOString();
+
+    // Buscar temporada ativa para este jogo
+    const { data: activeSeason } = await supabase
+      .from("seasons")
+      .select("id")
+      .eq("game_id", gameId)
+      .eq("is_active", true)
+      .lte("started_at", now)
+      .or(`ended_at.is.null,ended_at.gte.${now}`)
+      .single();
+
+    if (activeSeason) {
+      // Associar jogatina à temporada
+      await supabase
+        .from("jogatinas")
+        .update({ season_id: activeSeason.id })
+        .eq("id", jogatinaId);
+
+      console.log(
+        `[Discord Events] Jogatina ${jogatinaId} associada à temporada ${activeSeason.id}`,
+      );
+      return activeSeason.id;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("[Discord Events] Erro ao associar temporada:", error);
+    return null;
+  }
 }
 
 // POST /api/discord/events - Registrar evento de jogo
@@ -92,7 +132,7 @@ export async function POST(request: Request) {
     }
 
     // 3. Processar evento baseado no tipo
-    const timestamp = new Date().toISOString(); // Usar timestamp do servidor
+    const timestamp = new Date().toISOString();
 
     if (event_type === "player_joined") {
       return await handlePlayerJoined(
@@ -162,6 +202,9 @@ async function handlePlayerJoined(
       );
     }
     jogatina = newJogatina;
+
+    // NOVA LÓGICA: Associar à temporada ativa (se existir)
+    await associateToActiveSeason(supabase, jogatina.id, gameId);
   }
 
   // Verificar se o jogador já está na jogatina
@@ -248,6 +291,7 @@ async function handlePlayerJoined(
     game_title: gameTitle,
     active_players: newActiveCount,
     session_type: newSessionType,
+    season_id: jogatina.season_id || null,
   });
 }
 
@@ -359,6 +403,15 @@ async function handlePlayerLeft(
       );
     }
 
+    // NOVA LÓGICA: Atualizar métricas da temporada (se associada)
+    if (activeJogatina.season_id) {
+      await updateSeasonMetrics(
+        supabase,
+        activeJogatina.season_id,
+        activeJogatina.id,
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: "Player left and jogatina finished",
@@ -367,6 +420,7 @@ async function handlePlayerLeft(
       active_players: 0,
       session_finished: true,
       total_duration_minutes: durationMinutes,
+      season_id: activeJogatina.season_id || null,
     });
   } else {
     const { error: updateError } = await supabase
@@ -393,12 +447,82 @@ async function handlePlayerLeft(
       active_players: newActiveCount,
       session_type: newSessionType,
       session_finished: false,
+      season_id: activeJogatina.season_id || null,
     });
   }
 }
 
+// NOVA FUNÇÃO: Atualizar métricas consolidadas da temporada
+async function updateSeasonMetrics(
+  supabase: any,
+  seasonId: string,
+  jogatinaId: string,
+) {
+  try {
+    // Buscar todos os participantes da jogatina finalizada
+    const { data: jogatinaPlayers } = await supabase
+      .from("jogatina_players")
+      .select(
+        "player_id, total_duration_minutes, solo_duration_minutes, group_duration_minutes",
+      )
+      .eq("jogatina_id", jogatinaId);
+
+    if (!jogatinaPlayers || jogatinaPlayers.length === 0) return;
+
+    // Atualizar cada participante da temporada
+    for (const jp of jogatinaPlayers) {
+      // Buscar participante atual da temporada
+      const { data: participant } = await supabase
+        .from("season_participants")
+        .select("*")
+        .eq("season_id", seasonId)
+        .eq("player_id", jp.player_id)
+        .single();
+
+      if (participant) {
+        // Atualizar métricas acumuladas
+        await supabase
+          .from("season_participants")
+          .update({
+            total_sessions: participant.total_sessions + 1,
+            total_duration_minutes:
+              participant.total_duration_minutes +
+              (jp.total_duration_minutes || 0),
+            solo_duration_minutes:
+              participant.solo_duration_minutes +
+              (jp.solo_duration_minutes || 0),
+            group_duration_minutes:
+              participant.group_duration_minutes +
+              (jp.group_duration_minutes || 0),
+          })
+          .eq("id", participant.id);
+      } else {
+        // Criar participante se ainda não existe (caso jogador não foi adicionado manualmente)
+        await supabase.from("season_participants").insert({
+          season_id: seasonId,
+          player_id: jp.player_id,
+          status: "Em andamento",
+          total_sessions: 1,
+          total_duration_minutes: jp.total_duration_minutes || 0,
+          solo_duration_minutes: jp.solo_duration_minutes || 0,
+          group_duration_minutes: jp.group_duration_minutes || 0,
+        });
+      }
+    }
+
+    console.log(
+      `[Discord Events] Métricas da temporada ${seasonId} atualizadas`,
+    );
+  } catch (error) {
+    console.error(
+      "[Discord Events] Erro ao atualizar métricas da temporada:",
+      error,
+    );
+  }
+}
+
 async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
-  // Buscar todos os eventos da jogatina ordenados por timestamp
+  // [Código existente permanece o mesmo]
   const { data: events, error: eventsError } = await supabase
     .from("jogatina_events")
     .select("*")
@@ -413,7 +537,6 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
     return;
   }
 
-  // Buscar todos os jogadores da jogatina
   const { data: jogatinaPlayers, error: playersError } = await supabase
     .from("jogatina_players")
     .select("id, player_id")
@@ -427,11 +550,8 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
     return;
   }
 
-  // Calcular estatísticas para cada jogador
   for (const jp of jogatinaPlayers) {
     const playerId = jp.player_id;
-
-    // Filtrar eventos deste jogador
     const playerEvents = events.filter((e: any) => e.player_id === playerId);
 
     if (playerEvents.length === 0) continue;
@@ -440,14 +560,11 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
     let soloTime = 0;
     let groupTime = 0;
 
-    // Processar cada par de eventos (joined -> left)
     for (let i = 0; i < playerEvents.length; i++) {
       const event = playerEvents[i];
 
       if (event.event_type === "player_joined") {
         const joinTime = new Date(event.timestamp);
-
-        // Procurar o próximo evento de saída deste jogador
         const nextLeaveEvent = playerEvents
           .slice(i + 1)
           .find((e: any) => e.event_type === "player_left");
@@ -455,19 +572,16 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
         if (nextLeaveEvent) {
           const leaveTime = new Date(nextLeaveEvent.timestamp);
           const sessionDuration =
-            (leaveTime.getTime() - joinTime.getTime()) / 60000; // em minutos
+            (leaveTime.getTime() - joinTime.getTime()) / 60000;
 
           totalTime += sessionDuration;
 
-          // Verificar quantos outros jogadores estavam ativos durante este período
           const otherActivePlayers = events.filter((e: any) => {
             if (e.player_id === playerId) return false;
 
             const eventTime = new Date(e.timestamp);
 
-            // Verificar se há um evento "joined" de outro jogador que estava ativo neste período
             if (e.event_type === "player_joined" && eventTime <= leaveTime) {
-              // Procurar se ele saiu antes ou depois
               const otherLeaveEvent = events.find(
                 (le: any) =>
                   le.player_id === e.player_id &&
@@ -475,7 +589,6 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
                   new Date(le.timestamp) >= joinTime,
               );
 
-              // Se ele não tem evento de saída OU saiu depois do nosso join, ele estava ativo
               return (
                 !otherLeaveEvent ||
                 new Date(otherLeaveEvent.timestamp) > joinTime
@@ -485,7 +598,6 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
             return false;
           });
 
-          // Se tinha pelo menos 1 outro jogador ativo, conta como grupo
           if (otherActivePlayers.length > 0) {
             groupTime += sessionDuration;
           } else {
@@ -495,7 +607,6 @@ async function calculatePlayerDurations(supabase: any, jogatinaId: string) {
       }
     }
 
-    // Atualizar o jogador com as durações calculadas
     const { error: updateError } = await supabase
       .from("jogatina_players")
       .update({

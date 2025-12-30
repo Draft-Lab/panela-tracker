@@ -32,21 +32,36 @@ WHERE is_current IS NULL OR source IS NULL;
 -- Enable RLS on new table
 ALTER TABLE public.jogatina_events ENABLE ROW LEVEL SECURITY;
 
--- Create policies for jogatina_events
+DROP POLICY IF EXISTS "Allow public read access on jogatina_events"
+  ON public.jogatina_events;
+
 CREATE POLICY "Allow public read access on jogatina_events"
-  ON public.jogatina_events FOR SELECT
+  ON public.jogatina_events
+  FOR SELECT
   USING (true);
+
+DROP POLICY IF EXISTS "Allow public insert on jogatina_events"
+  ON public.jogatina_events;
 
 CREATE POLICY "Allow public insert on jogatina_events"
-  ON public.jogatina_events FOR INSERT
+  ON public.jogatina_events
+  FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow public update on jogatina_events"
+  ON public.jogatina_events;
+
 CREATE POLICY "Allow public update on jogatina_events"
-  ON public.jogatina_events FOR UPDATE
+  ON public.jogatina_events
+  FOR UPDATE
   USING (true);
 
+DROP POLICY IF EXISTS "Allow public delete on jogatina_events"
+  ON public.jogatina_events;
+
 CREATE POLICY "Allow public delete on jogatina_events"
-  ON public.jogatina_events FOR DELETE
+  ON public.jogatina_events
+  FOR DELETE
   USING (true);
 
 -- Add comments for documentation
@@ -73,27 +88,9 @@ ALTER TABLE public.jogatina_players
 -- Create index for performance
 CREATE INDEX IF NOT EXISTS idx_jogatina_players_is_active ON public.jogatina_players(is_active) WHERE is_active = true;
 
--- Create a view for player statistics per jogatina
-CREATE OR REPLACE VIEW public.jogatina_player_stats AS
-SELECT 
-  jp.jogatina_id,
-  jp.player_id,
-  jp.is_active,
-  jp.solo_duration_minutes,
-  jp.group_duration_minutes,
-  jp.total_duration_minutes,
-  p.name as player_name,
-  COUNT(CASE WHEN je.event_type = 'player_joined' THEN 1 END) as join_count,
-  COUNT(CASE WHEN je.event_type = 'player_left' THEN 1 END) as leave_count,
-  MIN(CASE WHEN je.event_type = 'player_joined' THEN je.timestamp END) as first_join,
-  MAX(CASE WHEN je.event_type = 'player_left' THEN je.timestamp END) as last_leave
-FROM public.jogatina_players jp
-JOIN public.players p ON jp.player_id = p.id
-LEFT JOIN public.jogatina_events je ON je.jogatina_id = jp.jogatina_id AND je.player_id = jp.player_id
-GROUP BY jp.jogatina_id, jp.player_id, jp.is_active, jp.solo_duration_minutes, jp.group_duration_minutes, jp.total_duration_minutes, p.name;
-
 -- Add comments
 COMMENT ON COLUMN public.jogatina_players.is_active IS 'Indica se o jogador está atualmente ativo na jogatina (true) ou já saiu (false)';
 COMMENT ON COLUMN public.jogatina_players.solo_duration_minutes IS 'Tempo total jogado sozinho (calculado ao finalizar)';
 COMMENT ON COLUMN public.jogatina_players.group_duration_minutes IS 'Tempo total jogado em grupo (calculado ao finalizar)';
 COMMENT ON COLUMN public.jogatina_players.total_duration_minutes IS 'Tempo total jogado (solo + grupo)';
+

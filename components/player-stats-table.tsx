@@ -1,81 +1,68 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { useMemo } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { calculatePlayerStats } from "@/lib/status-helpers";
 
 interface JogatinaPlayerWithDetails {
-  id: string
-  status: "Dropo" | "Zero" | "Dava pra jogar"
+  id: string;
+  status: "Dropo" | "Zero" | "Dava pra jogar";
   player: {
-    id: string
-    name: string
-    avatar_url: string | null
-  }
+    id: string;
+    name: string;
+    avatar_url: string | null;
+  };
+  jogatina: {
+    season_id: string | null;
+  };
+}
+
+interface SeasonParticipant {
+  id: string;
+  player_id: string;
+  season_id: string;
+  status: "Dropo" | "Zero" | "Dava pra jogar" | "Em andamento" | null;
+  total_sessions: number;
+  player?: {
+    id: string;
+    name: string;
+    avatar_url: string | null;
+  };
 }
 
 interface PlayerStatsTableProps {
-  jogatinaPlayers: JogatinaPlayerWithDetails[]
+  jogatinaPlayers: JogatinaPlayerWithDetails[];
+  seasonParticipants?: SeasonParticipant[];
 }
 
-interface PlayerStats {
-  playerId: string
-  playerName: string
-  avatarUrl: string | null
-  totalJogatinas: number
-  dropos: number
-  zeros: number
-  davaPraJogar: number
-  dropoPercentage: number
-}
-
-export function PlayerStatsTable({ jogatinaPlayers }: PlayerStatsTableProps) {
+export function PlayerStatsTable({
+  jogatinaPlayers,
+  seasonParticipants = [],
+}: PlayerStatsTableProps) {
   const stats = useMemo(() => {
-    const playerMap = new Map<string, PlayerStats>()
-
-    jogatinaPlayers.forEach((jp) => {
-      const playerId = jp.player.id
-
-      if (!playerMap.has(playerId)) {
-        playerMap.set(playerId, {
-          playerId,
-          playerName: jp.player.name,
-          avatarUrl: jp.player.avatar_url,
-          totalJogatinas: 0,
-          dropos: 0,
-          zeros: 0,
-          davaPraJogar: 0,
-          dropoPercentage: 0,
-        })
-      }
-
-      const stats = playerMap.get(playerId)!
-      stats.totalJogatinas++
-
-      if (jp.status === "Dropo") stats.dropos++
-      else if (jp.status === "Zero") stats.zeros++
-      else if (jp.status === "Dava pra jogar") stats.davaPraJogar++
-    })
-
-    // Calculate percentages and sort by dropos
-    const statsArray = Array.from(playerMap.values()).map((stat) => ({
-      ...stat,
-      dropoPercentage: stat.totalJogatinas > 0 ? (stat.dropos / stat.totalJogatinas) * 100 : 0,
-    }))
-
-    return statsArray.sort((a, b) => b.dropos - a.dropos)
-  }, [jogatinaPlayers])
+    return calculatePlayerStats(jogatinaPlayers, seasonParticipants);
+  }, [jogatinaPlayers, seasonParticipants]);
 
   if (stats.length === 0) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">Nenhuma estatística disponível ainda.</p>
+          <p className="text-muted-foreground">
+            Nenhuma estatística disponível ainda.
+          </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -103,24 +90,41 @@ export function PlayerStatsTable({ jogatinaPlayers }: PlayerStatsTableProps) {
                       </Badge>
                     )}
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={stat.avatarUrl || undefined} alt={stat.playerName} />
-                      <AvatarFallback>{stat.playerName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarImage
+                        src={stat.avatarUrl || undefined}
+                        alt={stat.playerName}
+                      />
+                      <AvatarFallback>
+                        {stat.playerName.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
                     <span className="font-medium">{stat.playerName}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center">{stat.totalJogatinas}</TableCell>
                 <TableCell className="text-center">
-                  <span className="text-red-500 font-semibold">{stat.dropos}</span>
+                  {stat.totalJogatinas}
                 </TableCell>
                 <TableCell className="text-center">
-                  <span className="text-green-500 font-semibold">{stat.zeros}</span>
+                  <span className="text-red-500 font-semibold">
+                    {stat.dropos}
+                  </span>
                 </TableCell>
                 <TableCell className="text-center">
-                  <span className="text-yellow-500 font-semibold">{stat.davaPraJogar}</span>
+                  <span className="text-green-500 font-semibold">
+                    {stat.zeros}
+                  </span>
                 </TableCell>
                 <TableCell className="text-center">
-                  <span className={stat.dropoPercentage > 50 ? "text-red-500 font-bold" : ""}>
+                  <span className="text-yellow-500 font-semibold">
+                    {stat.davaPraJogar}
+                  </span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span
+                    className={
+                      stat.dropoPercentage > 50 ? "text-red-500 font-bold" : ""
+                    }
+                  >
                     {stat.dropoPercentage.toFixed(1)}%
                   </span>
                 </TableCell>
@@ -130,5 +134,5 @@ export function PlayerStatsTable({ jogatinaPlayers }: PlayerStatsTableProps) {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

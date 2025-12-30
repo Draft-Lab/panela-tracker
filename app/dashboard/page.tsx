@@ -1,39 +1,72 @@
-import { createClient } from "@/lib/supabase/server"
-import { StatsCards } from "@/components/stats-cards"
-import { PlayerStatsTable } from "@/components/player-stats-table"
-import { GameStatsTable } from "@/components/game-stats-table"
-import { QuickActions } from "@/components/quick-actions"
-import { RecentActivity } from "@/components/recent-activity"
-import { TopPlayers } from "@/components/top-players"
-import { TopGames } from "@/components/top-games"
-import { ActivityChart } from "@/components/activity-chart"
+import { createClient } from "@/lib/supabase/server";
+import { StatsCards } from "@/components/stats-cards";
+import { PlayerStatsTable } from "@/components/player-stats-table";
+import { GameStatsTable } from "@/components/game-stats-table";
+import { QuickActions } from "@/components/quick-actions";
+import { RecentActivity } from "@/components/recent-activity";
+import { TopPlayers } from "@/components/top-players";
+import { TopGames } from "@/components/top-games";
+import { ActivityChart } from "@/components/activity-chart";
+import { ActiveSeasonsWidget } from "@/components/active-seasons-widget";
+import { calculateStatusStats } from "@/lib/status-helpers";
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: players } = await supabase.from("players").select("*").order("created_at", { ascending: false })
-  const { data: games } = await supabase.from("games").select("*").order("created_at", { ascending: false })
+  const { data: players } = await supabase
+    .from("players")
+    .select("*")
+    .order("created_at", { ascending: false });
+  const { data: games } = await supabase
+    .from("games")
+    .select("*")
+    .order("created_at", { ascending: false });
   const { data: jogatinas } = await supabase
     .from("jogatinas")
     .select("*, game:games(*)")
-    .order("date", { ascending: false })
-  const { data: jogatinaPlayers } = await supabase.from("jogatina_players").select(`
+    .order("date", { ascending: false });
+  const { data: jogatinaPlayers } = await supabase.from("jogatina_players")
+    .select(`
       *,
       player:players(*),
       jogatina:jogatinas(*, game:games(*))
-    `)
+    `);
 
-  const dropCount = jogatinaPlayers?.filter((jp) => jp.status === "Dropo").length || 0
-  const zeroCount = jogatinaPlayers?.filter((jp) => jp.status === "Zero").length || 0
-  const davaCount = jogatinaPlayers?.filter((jp) => jp.status === "Dava pra jogar").length || 0
-  const dropRate = jogatinaPlayers?.length ? ((dropCount / jogatinaPlayers.length) * 100).toFixed(1) : "0"
+  // Buscar temporadas ativas
+  const { data: activeSeasons } = await supabase
+    .from("seasons")
+    .select(
+      `
+      *,
+      game:games(*),
+      season_participants(
+        *,
+        player:players(*)
+      )
+    `,
+    )
+    .eq("is_active", true)
+    .order("started_at", { ascending: false });
+
+  // Buscar todos os season_participants para cálculos
+  const { data: allSeasonParticipants } = await supabase
+    .from("season_participants")
+    .select("*");
+
+  // Calcular estatísticas usando a nova lógica
+  const stats = calculateStatusStats(
+    jogatinaPlayers || [],
+    allSeasonParticipants || [],
+  );
 
   return (
     <div className="space-y-6">
       {/* Header Section */}
       <div>
         <div className="mb-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 text-balance">Dashboard</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 text-balance">
+            Dashboard
+          </h1>
           <p className="text-lg text-muted-foreground text-balance">
             Visão completa das suas sessões de jogo e estatísticas dos jogadores
           </p>
@@ -49,13 +82,21 @@ export default async function DashboardPage() {
           totalPlayers={players?.length || 0}
           totalGames={games?.length || 0}
           totalJogatinas={jogatinas?.length || 0}
-          totalParticipations={jogatinaPlayers?.length || 0}
-          dropRate={dropRate}
-          dropCount={dropCount}
-          zeroCount={zeroCount}
-          davaCount={davaCount}
+          totalParticipations={stats.totalParticipations}
+          dropRate={stats.dropRate}
+          dropCount={stats.dropos}
+          zeroCount={stats.zeros}
+          davaCount={stats.davaJogar}
         />
       </div>
+
+      {/* Active Seasons Widget */}
+      {activeSeasons && activeSeasons.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-bold mb-4">Temporadas em Andamento</h2>
+          <ActiveSeasonsWidget seasons={activeSeasons} />
+        </div>
+      )}
 
       {/* Activity Chart */}
       <div>
@@ -67,12 +108,18 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <h2 className="text-2xl font-bold mb-4">Top Jogadores</h2>
-          <TopPlayers jogatinaPlayers={jogatinaPlayers || []} />
+          <TopPlayers
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasonParticipants={allSeasonParticipants || []}
+          />
         </div>
 
         <div>
           <h2 className="text-2xl font-bold mb-4">Jogos Mais Jogados</h2>
-          <TopGames jogatinas={jogatinas || []} jogatinaPlayers={jogatinaPlayers || []} />
+          <TopGames
+            jogatinas={jogatinas || []}
+            jogatinaPlayers={jogatinaPlayers || []}
+          />
         </div>
       </div>
 
@@ -86,14 +133,20 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div>
           <h2 className="text-2xl font-bold mb-4">Estatísticas por Jogador</h2>
-          <PlayerStatsTable jogatinaPlayers={jogatinaPlayers || []} />
+          <PlayerStatsTable
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasonParticipants={allSeasonParticipants || []}
+          />
         </div>
 
         <div>
           <h2 className="text-2xl font-bold mb-4">Estatísticas por Jogo</h2>
-          <GameStatsTable jogatinas={jogatinas || []} jogatinaPlayers={jogatinaPlayers || []} />
+          <GameStatsTable
+            jogatinas={jogatinas || []}
+            jogatinaPlayers={jogatinaPlayers || []}
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }

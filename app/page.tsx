@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Lock, Gamepad2 } from "lucide-react";
 import { CurrentGames } from "@/components/current-games";
+import { calculateStatusStats } from "@/lib/status-helpers";
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -33,15 +34,19 @@ export default async function LandingPage() {
       jogatina:jogatinas(*, game:games(*))
     `);
 
-  const dropCount =
-    jogatinaPlayers?.filter((jp) => jp.status === "Dropo").length || 0;
-  const zeroCount =
-    jogatinaPlayers?.filter((jp) => jp.status === "Zero").length || 0;
-  const davaCount =
-    jogatinaPlayers?.filter((jp) => jp.status === "Dava pra jogar").length || 0;
-  const dropRate = jogatinaPlayers?.length
-    ? ((dropCount / jogatinaPlayers.length) * 100).toFixed(1)
-    : "0";
+  // Buscar todos os season_participants para cálculos
+  const { data: allSeasonParticipants } = await supabase.from(
+    "season_participants",
+  ).select(`
+      *,
+      player:players(*)
+    `);
+
+  // Calcular estatísticas usando a nova lógica
+  const stats = calculateStatusStats(
+    jogatinaPlayers || [],
+    allSeasonParticipants || [],
+  );
 
   return (
     <div className="min-h-screen">
@@ -79,7 +84,10 @@ export default async function LandingPage() {
         </div>
 
         {/* Hall of Shame Section */}
-        <HallOfShame jogatinaPlayers={jogatinaPlayers || []} />
+        <HallOfShame
+          jogatinaPlayers={jogatinaPlayers || []}
+          seasonParticipants={allSeasonParticipants || []}
+        />
 
         {/* Welcome Section */}
         <div className="text-center space-y-4 py-8">
@@ -99,11 +107,11 @@ export default async function LandingPage() {
             totalPlayers={players?.length || 0}
             totalGames={games?.length || 0}
             totalJogatinas={jogatinas?.length || 0}
-            totalParticipations={jogatinaPlayers?.length || 0}
-            dropRate={dropRate}
-            dropCount={dropCount}
-            zeroCount={zeroCount}
-            davaCount={davaCount}
+            totalParticipations={stats.totalParticipations}
+            dropRate={stats.dropRate}
+            dropCount={stats.dropos}
+            zeroCount={stats.zeros}
+            davaCount={stats.davaJogar}
           />
         </div>
 
@@ -119,7 +127,10 @@ export default async function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <h3 className="text-2xl font-bold mb-4">Top Jogadores</h3>
-            <TopPlayers jogatinaPlayers={jogatinaPlayers || []} />
+            <TopPlayers
+              jogatinaPlayers={jogatinaPlayers || []}
+              seasonParticipants={allSeasonParticipants || []}
+            />
           </div>
 
           <div>
@@ -140,7 +151,10 @@ export default async function LandingPage() {
         {/* Detailed Stats - Player Stats Only */}
         <div>
           <h3 className="text-2xl font-bold mb-4">Estatísticas por Jogador</h3>
-          <PlayerStatsTable jogatinaPlayers={jogatinaPlayers || []} />
+          <PlayerStatsTable
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasonParticipants={allSeasonParticipants || []}
+          />
         </div>
       </main>
 
