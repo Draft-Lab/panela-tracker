@@ -8,12 +8,14 @@
  * Isso mantém compatibilidade com sistema antigo (pré-temporadas)
  */
 
+import { JogatinaWithDetails, JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types";
+
 /**
  * Agrupa jogatinaPlayers por fonte de status
  */
-export function groupJogatinaPlayersByStatusSource(jogatinaPlayers: any[]) {
-  const withSeason: any[] = [];
-  const withoutSeason: any[] = [];
+export function groupJogatinaPlayersByStatusSource(jogatinaPlayers: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[]) {
+  const withSeason: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[] = [];
+  const withoutSeason: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[] = [];
 
   jogatinaPlayers.forEach((jp) => {
     if (jp.jogatina?.season_id) {
@@ -30,8 +32,8 @@ export function groupJogatinaPlayersByStatusSource(jogatinaPlayers: any[]) {
  * Calcula estatísticas considerando ambas as fontes
  */
 export function calculateStatusStats(
-  jogatinaPlayers: any[],
-  seasonParticipants: any[] = [],
+  jogatinaPlayers: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[],
+  seasonParticipants: (SeasonParticipant & { player?: Player })[] = [],
 ) {
   const { withoutSeason } = groupJogatinaPlayersByStatusSource(jogatinaPlayers);
 
@@ -79,8 +81,8 @@ export function calculateStatusStats(
  * Calcula estatísticas por jogador considerando ambas fontes
  */
 export function calculatePlayerStats(
-  jogatinaPlayers: any[],
-  seasonParticipants: any[] = [],
+  jogatinaPlayers: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[],
+  seasonParticipants: (SeasonParticipant & { player?: Player })[] = [],
 ) {
   const playerMap = new Map<
     string,
@@ -171,14 +173,14 @@ export function calculatePlayerStats(
  * Retorna o status correto para uma jogatina_player
  */
 export function getPlayerStatusForJogatina(
-  jogatinaPlayer: any,
-  seasonParticipants: any[] = [],
+  jogatinaPlayer: JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails },
+  seasonParticipants: SeasonParticipant[] = [],
 ): string {
   // Se a jogatina tem season_id, buscar status de season_participants
   if (jogatinaPlayer.jogatina?.season_id) {
     const seasonParticipant = seasonParticipants.find(
       (sp) =>
-        sp.season_id === jogatinaPlayer.jogatina.season_id &&
+        sp.season_id === jogatinaPlayer.jogatina!.season_id &&
         sp.player_id === jogatinaPlayer.player_id,
     );
     return seasonParticipant?.status || "Em andamento";

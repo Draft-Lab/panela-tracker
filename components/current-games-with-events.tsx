@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Gamepad2, Users, Clock, Activity } from "lucide-react";
+import type { JogatinaWithDetails } from "@/lib/types";
 
 function formatDuration(startedAt: string | null) {
   if (!startedAt) return null;
@@ -62,13 +63,13 @@ export async function CurrentGamesWithEvents() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {currentJogatinas.map((jogatina: any) => {
+       {currentJogatinas.map((jogatina: JogatinaWithDetails) => {
         const duration = formatDuration(jogatina.first_event_at);
 
-        // Filtrar apenas jogadores ativos
-        const activePlayers = jogatina.jogatina_players.filter(
-          (jp: any) => jp.is_active === true,
-        );
+         // Filtrar apenas jogadores ativos
+         const activePlayers = jogatina.jogatina_players.filter(
+           (jp) => jp.is_active === true,
+         );
 
         // Todos os jogadores que já participaram (ativos ou não)
         const allPlayers = jogatina.jogatina_players;
@@ -138,7 +139,7 @@ export async function CurrentGamesWithEvents() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {activePlayers.length > 0 ? (
-                    activePlayers.map((jp: any) => (
+                     activePlayers.map((jp) => (
                       <div
                         key={jp.id}
                         className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 rounded-md px-2 py-1"
@@ -171,8 +172,8 @@ export async function CurrentGamesWithEvents() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {allPlayers
-                      .filter((jp: any) => !jp.is_active)
-                      .map((jp: any) => (
+                       .filter((jp) => !jp.is_active)
+                       .map((jp) => (
                         <div
                           key={jp.id}
                           className="flex items-center gap-1.5 bg-muted/50 rounded-md px-2 py-1 opacity-60"

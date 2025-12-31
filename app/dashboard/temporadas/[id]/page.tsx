@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { JogatinaList } from "@/components/jogatina-list";
+import type { SeasonParticipant } from "@/lib/types";
 
 export default async function SeasonDetailPage({
   params,
@@ -67,18 +68,18 @@ export default async function SeasonDetailPage({
       );
 
   const totalSessions = season.season_participants?.reduce(
-    (sum: number, p: any) => sum + (p.total_sessions || 0),
+    (sum: number, p: SeasonParticipant) => sum + (p.total_sessions || 0),
     0,
   );
 
   const totalDuration = season.season_participants?.reduce(
-    (sum: number, p: any) => sum + (p.total_duration_minutes || 0),
+    (sum: number, p: SeasonParticipant) => sum + (p.total_duration_minutes || 0),
     0,
   );
 
   // Contar status
   const statusCounts = season.season_participants?.reduce(
-    (acc: any, p: any) => {
+    (acc: Record<string, number>, p: SeasonParticipant) => {
       acc[p.status || "Em andamento"] =
         (acc[p.status || "Em andamento"] || 0) + 1;
       return acc;
@@ -203,7 +204,7 @@ export default async function SeasonDetailPage({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {season.season_participants?.map((sp: any) => (
+            {season.season_participants?.map((sp: SeasonParticipant & { player: any }) => (
               <div
                 key={sp.id}
                 className="flex items-center justify-between p-4 border rounded-lg"

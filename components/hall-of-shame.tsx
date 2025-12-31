@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, Flame } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculatePlayerStats } from "@/lib/status-helpers";
+import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types";
 
 interface HallOfShameProps {
-  jogatinaPlayers: any[];
-  seasonParticipants?: any[];
+  jogatinaPlayers: (JogatinaPlayer & { player: Player })[];
+  seasonParticipants?: (SeasonParticipant & { player: Player })[];
 }
 
 export function HallOfShame({

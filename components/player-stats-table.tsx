@@ -13,36 +13,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { calculatePlayerStats } from "@/lib/status-helpers";
-
-interface JogatinaPlayerWithDetails {
-  id: string;
-  status: "Dropo" | "Zero" | "Dava pra jogar";
-  player: {
-    id: string;
-    name: string;
-    avatar_url: string | null;
-  };
-  jogatina: {
-    season_id: string | null;
-  };
-}
-
-interface SeasonParticipant {
-  id: string;
-  player_id: string;
-  season_id: string;
-  status: "Dropo" | "Zero" | "Dava pra jogar" | "Em andamento" | null;
-  total_sessions: number;
-  player?: {
-    id: string;
-    name: string;
-    avatar_url: string | null;
-  };
-}
+import type { JogatinaPlayer, SeasonParticipant, Player, JogatinaWithDetails } from "@/lib/types";
 
 interface PlayerStatsTableProps {
-  jogatinaPlayers: JogatinaPlayerWithDetails[];
-  seasonParticipants?: SeasonParticipant[];
+  jogatinaPlayers: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[];
+  seasonParticipants?: (SeasonParticipant & { player: Player })[];
 }
 
 export function PlayerStatsTable({

@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Flame } from "lucide-react";
+import type { SeasonWithDetails } from "@/lib/types";
 
 interface ActiveSeasonsBannerProps {
-  seasons: any[];
+  seasons: SeasonWithDetails[];
 }
 
 export function ActiveSeasonsBanner({ seasons }: ActiveSeasonsBannerProps) {

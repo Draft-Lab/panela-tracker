@@ -80,7 +80,7 @@ export default async function LandingPage() {
           <p className="text-muted-foreground mb-6">
             Veja quais jogos estão sendo jogados agora pela galera
           </p>
-          <CurrentGames />
+           <CurrentGames />
         </div>
 
         {/* Hall of Shame Section */}
@@ -167,3 +167,5 @@ export default async function LandingPage() {
     </div>
   );
 }
+
+

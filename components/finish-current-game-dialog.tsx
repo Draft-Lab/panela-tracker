@@ -58,7 +58,7 @@ export function FinishCurrentGameDialog({ jogatinaId, gameTitle, open, onOpenCha
       console.error("[v0] Error loading player statuses:", error)
     } else {
       setPlayerStatuses(
-        (data || []).map((jp: any) => ({
+        (data || []).map((jp) => ({
           id: jp.id,
           player: jp.player,
           status: jp.status,

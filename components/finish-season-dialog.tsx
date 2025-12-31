@@ -25,9 +25,10 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Clock, Users } from "lucide-react";
+import { SeasonWithDetails } from "@/lib/types";
 
 interface FinishSeasonDialogProps {
-  season: any;
+  season: SeasonWithDetails;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -52,9 +53,9 @@ export function FinishSeasonDialog({
   useEffect(() => {
     if (open && season.season_participants) {
       setParticipantStatuses(
-        season.season_participants.map((sp: any) => ({
+        season.season_participants.map((sp) => ({
           id: sp.id,
-          status: sp.status === "Em andamento" ? "Dava pra jogar" : sp.status,
+          status: (sp.status === "Em andamento" ? "Dava pra jogar" : sp.status) as "Dropo" | "Zero" | "Dava pra jogar",
           notes: sp.notes || "",
         })),
       );
@@ -109,12 +110,12 @@ export function FinishSeasonDialog({
   };
 
   const totalSessions = season.season_participants?.reduce(
-    (sum: number, p: any) => sum + (p.total_sessions || 0),
+    (sum: number, p) => sum + (p.total_sessions || 0),
     0,
   );
   const totalHours = Math.floor(
     (season.season_participants?.reduce(
-      (sum: number, p: any) => sum + (p.total_duration_minutes || 0),
+      (sum: number, p) => sum + (p.total_duration_minutes || 0),
       0,
     ) || 0) / 60,
   );
@@ -156,7 +157,7 @@ export function FinishSeasonDialog({
           </div>
 
           <div className="space-y-4 py-4">
-            {season.season_participants?.map((sp: any) => {
+            {season.season_participants?.map((sp) => {
               const ps = participantStatuses.find((p) => p.id === sp.id);
               if (!ps) return null;
 

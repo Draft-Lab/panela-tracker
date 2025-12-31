@@ -7,9 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Gamepad2, Users, CheckCircle2 } from "lucide-react"
 import { FinishCurrentGameDialog } from "./finish-current-game-dialog"
+import type { JogatinaWithDetails } from "@/lib/types"
 
 interface ManageCurrentGamesProps {
-  currentJogatinas: any[]
+  currentJogatinas: JogatinaWithDetails[]
 }
 
 export function ManageCurrentGames({ currentJogatinas }: ManageCurrentGamesProps) {
@@ -29,7 +30,7 @@ export function ManageCurrentGames({ currentJogatinas }: ManageCurrentGamesProps
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentJogatinas.map((jogatina: any) => (
+        {currentJogatinas.map((jogatina) => (
           <Card key={jogatina.id} className="overflow-hidden">
             <div className="relative h-32 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
               {jogatina.game?.cover_url ? (
@@ -52,7 +53,7 @@ export function ManageCurrentGames({ currentJogatinas }: ManageCurrentGamesProps
                 <span>{jogatina.jogatina_players?.length || 0} jogadores</span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {jogatina.jogatina_players?.map((jp: any) => (
+                {jogatina.jogatina_players?.map((jp) => (
                   <div key={jp.id} className="flex items-center gap-1.5">
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={jp.player?.avatar_url || undefined} />

@@ -16,12 +16,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import type { Player } from "@/lib/types";
+import type { Player, SeasonWithDetails } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface EditSeasonDialogProps {
-  season: any;
+  season: SeasonWithDetails;
   players: Player[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,7 +44,7 @@ export function EditSeasonDialog({
       setName(season.name);
       setDescription(season.description || "");
       setSelectedPlayers(
-        season.season_participants?.map((sp: any) => sp.player_id) || [],
+        season.season_participants?.map((sp) => sp.player_id) || [],
       );
     }
   }, [open, season]);

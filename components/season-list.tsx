@@ -16,16 +16,16 @@ import {
 import Link from "next/link";
 import { EditSeasonDialog } from "@/components/edit-season-dialog";
 import { FinishSeasonDialog } from "@/components/finish-season-dialog";
-import type { Player } from "@/lib/types";
+import type { Player, SeasonWithDetails } from "@/lib/types";
 
 interface SeasonListProps {
-  seasons: any[];
+  seasons: SeasonWithDetails[];
   players: Player[];
 }
 
 export function SeasonList({ seasons, players }: SeasonListProps) {
-  const [editingSeason, setEditingSeason] = useState<any>(null);
-  const [finishingSeason, setFinishingSeason] = useState<any>(null);
+  const [editingSeason, setEditingSeason] = useState<SeasonWithDetails | null>(null);
+  const [finishingSeason, setFinishingSeason] = useState<SeasonWithDetails | null>(null);
 
   if (seasons.length === 0) {
     return null;
@@ -48,7 +48,7 @@ export function SeasonList({ seasons, players }: SeasonListProps) {
 
           const totalDuration =
             season.season_participants?.reduce(
-              (sum: number, p: any) => sum + (p.total_duration_minutes || 0),
+              (sum: number, p) => sum + (p.total_duration_minutes || 0),
               0,
             ) || 0;
 
@@ -109,7 +109,7 @@ export function SeasonList({ seasons, players }: SeasonListProps) {
                 <div>
                   <p className="text-sm font-medium mb-2">Participantes:</p>
                   <div className="flex flex-wrap gap-2">
-                    {season.season_participants?.map((sp: any) => (
+                    {season.season_participants?.map((sp) => (
                       <div
                         key={sp.id}
                         className="flex items-center gap-1.5 bg-muted rounded-md px-2 py-1"

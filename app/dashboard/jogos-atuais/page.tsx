@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
-import { AddCurrentGameDialog } from "@/components/add-current-game-dialog"
 import { ManageCurrentGames } from "@/components/manage-current-games"
+import { AddGameButton } from "@/components/add-game-button"
 
 export default async function JogosAtuaisPage() {
   const supabase = await createClient()
@@ -27,7 +27,7 @@ export default async function JogosAtuaisPage() {
           <h1 className="text-3xl font-bold">Jogos Atuais</h1>
           <p className="text-muted-foreground mt-1">Gerencie os jogos que estão sendo jogados agora</p>
         </div>
-        <AddCurrentGameDialog />
+        <AddGameButton />
       </div>
 
       <ManageCurrentGames currentJogatinas={currentJogatinas || []} />

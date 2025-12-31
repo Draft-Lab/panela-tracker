@@ -26,10 +26,10 @@ import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
-import type { Player } from "@/lib/types";
+import type { Player, JogatinaWithDetails } from "@/lib/types";
 
 interface EditJogatinaDialogProps {
-  jogatina: any;
+  jogatina: JogatinaWithDetails;
   allPlayers: Player[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -60,7 +60,7 @@ export function EditJogatinaDialog({
     if (open && jogatina.jogatina_players) {
       setNotes(jogatina.notes || "");
       setPlayerStatuses(
-        jogatina.jogatina_players.map((jp: any) => ({
+        jogatina.jogatina_players.map((jp) => ({
           id: jp.id,
           player_id: jp.player_id,
           status: jp.status,
@@ -155,9 +155,9 @@ export function EditJogatinaDialog({
 
       // 4. Remover jogadores que foram deletados
       const currentPlayerIds = playerStatuses.map((ps) => ps.player_id);
-      const originalPlayerIds = jogatina.jogatina_players.map(
-        (jp: any) => jp.player_id,
-      );
+       const originalPlayerIds = jogatina.jogatina_players.map(
+         (jp) => jp.player_id,
+       );
       const removedPlayerIds = originalPlayerIds.filter(
         (id: string) => !currentPlayerIds.includes(id),
       );

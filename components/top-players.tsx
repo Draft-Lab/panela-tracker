@@ -3,10 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, TrendingDown, Award } from "lucide-react";
 import { calculatePlayerStats } from "@/lib/status-helpers";
+import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types";
 
 interface TopPlayersProps {
-  jogatinaPlayers: any[];
-  seasonParticipants?: any[];
+  jogatinaPlayers: (JogatinaPlayer & { player: Player })[];
+  seasonParticipants?: (SeasonParticipant & { player: Player })[];
 }
 
 export function TopPlayers({

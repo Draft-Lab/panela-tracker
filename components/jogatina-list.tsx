@@ -38,7 +38,7 @@ export function JogatinaList({
   allPlayers = [],
 }: JogatinaListProps) {
   const router = useRouter();
-  const [editingJogatina, setEditingJogatina] = useState<any>(null);
+  const [editingJogatina, setEditingJogatina] = useState<JogatinaWithDetails | null>(null);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir esta jogatina?")) return;

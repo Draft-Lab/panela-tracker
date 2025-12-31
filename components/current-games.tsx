@@ -1,8 +1,32 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Gamepad2, Users, Clock, Activity } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+interface CurrentJogatina {
+  id: string;
+  game_id: string;
+  game: {
+    title: string;
+    cover_url: string | null;
+  };
+  jogatina_players: Array<{
+    id: string;
+    is_active: boolean;
+    player: {
+      name: string;
+      avatar_url: string | null;
+    };
+  }>;
+  session_type: string;
+  source: string;
+  notes: string | null;
+  first_event_at: string | null;
+}
 
 function formatDuration(startedAt: string | null) {
   if (!startedAt) return null;
@@ -21,24 +45,49 @@ function formatDuration(startedAt: string | null) {
   return `${hours}h ${mins}min`;
 }
 
-export async function CurrentGames() {
-  const supabase = await createClient();
+export function CurrentGames() {
+  const [currentJogatinas, setCurrentJogatinas] = useState<CurrentJogatina[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Buscar todas as jogatinas ativas
-  const { data: currentJogatinas } = await supabase
-    .from("jogatinas")
-    .select(
-      `
-      *,
-      game:games(*),
-      jogatina_players(
-        *,
-        player:players(*)
-      )
-    `,
-    )
-    .eq("is_current", true)
-    .order("first_event_at", { ascending: false });
+  useEffect(() => {
+    const loadCurrentGames = async () => {
+      const supabase = createClient();
+
+      // Buscar todas as jogatinas ativas
+      const { data } = await supabase
+        .from("jogatinas")
+        .select(
+          `
+          *,
+          game:games(*),
+          jogatina_players(
+            *,
+            player:players(*)
+          )
+        `,
+        )
+        .eq("is_current", true)
+        .order("first_event_at", { ascending: false });
+
+      setCurrentJogatinas(data || []);
+      setLoading(false);
+    };
+
+    loadCurrentGames();
+  }, []);
+
+  if (loading) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <Gamepad2 className="h-12 w-12 text-muted-foreground mb-4 animate-pulse" />
+          <p className="text-lg font-medium text-muted-foreground">
+            Carregando...
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!currentJogatinas || currentJogatinas.length === 0) {
     return (
@@ -58,17 +107,17 @@ export async function CurrentGames() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {currentJogatinas.map((jogatina: any) => {
+      {currentJogatinas.map((jogatina) => {
         const duration = formatDuration(jogatina.first_event_at);
 
         // Filtrar apenas jogadores ativos
         const activePlayers = jogatina.jogatina_players.filter(
-          (jp: any) => jp.is_active === true,
+          (jp) => jp.is_active === true,
         );
 
         // Todos os jogadores que já participaram
         const allPlayers = jogatina.jogatina_players;
-        const inactivePlayers = allPlayers.filter((jp: any) => !jp.is_active);
+        const inactivePlayers = allPlayers.filter((jp) => !jp.is_active);
 
         return (
           <Card
@@ -127,7 +176,7 @@ export async function CurrentGames() {
                     🎮 Jogando Agora
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {activePlayers.map((jp: any) => (
+                    {activePlayers.map((jp) => (
                       <div
                         key={jp.id}
                         className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/30 rounded-md px-2.5 py-1.5 transition-colors hover:bg-green-500/20"
@@ -156,7 +205,7 @@ export async function CurrentGames() {
                     Jogaram antes ({inactivePlayers.length})
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {inactivePlayers.map((jp: any) => (
+                    {inactivePlayers.map((jp) => (
                       <div
                         key={jp.id}
                         className="flex items-center gap-1 bg-muted/50 rounded-md px-2 py-1 opacity-60"
