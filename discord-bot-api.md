@@ -6,9 +6,9 @@ API baseada em eventos para rastreamento de jogatinas via Discord Bot.
 
 Todas as requisições devem incluir o header de autenticação:
 
-```
+\`\`\`
 Authorization: Bearer YOUR_API_KEY
-```
+\`\`\`
 
 Configure a variável de ambiente `DISCORD_BOT_API_KEY` no servidor.
 
@@ -44,13 +44,13 @@ Registra um evento de entrada ou saída de um jogador em um jogo.
 
 #### Request Body
 
-```json
+\`\`\`json
 {
   "discord_id": "@usuario1",
   "game_title": "Minecraft",
   "event_type": "player_joined"
 }
-```
+\`\`\`
 
 #### Campos
 
@@ -62,7 +62,7 @@ Registra um evento de entrada ou saída de um jogador em um jogo.
 
 #### Response - Player Joined (200 OK)
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Player joined event registered",
@@ -71,11 +71,11 @@ Registra um evento de entrada ou saída de um jogador em um jogo.
   "active_players": 2,
   "session_type": "group"
 }
-```
+\`\`\`
 
 #### Response - Player Left (200 OK)
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Player left event registered",
@@ -85,11 +85,11 @@ Registra um evento de entrada ou saída de um jogador em um jogo.
   "session_type": "solo",
   "session_finished": false
 }
-```
+\`\`\`
 
 #### Response - Jogatina Finalizada (200 OK)
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Player left and jogatina finished",
@@ -99,7 +99,7 @@ Registra um evento de entrada ou saída de um jogador em um jogo.
   "session_finished": true,
   "total_duration_minutes": 135
 }
-```
+\`\`\`
 
 #### Erros
 
@@ -118,7 +118,7 @@ Retorna todos os eventos e estatísticas de uma jogatina específica.
 
 #### Response (200 OK)
 
-```json
+\`\`\`json
 {
   "success": true,
   "jogatina_id": "uuid-da-jogatina",
@@ -161,7 +161,7 @@ Retorna todos os eventos e estatísticas de uma jogatina específica.
     }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -169,7 +169,7 @@ Retorna todos os eventos e estatísticas de uma jogatina específica.
 
 ### Cenário 1: Sessão Solo Simples
 
-```
+\`\`\`
 1. Usuario1 inicia Minecraft (10:00)
    → POST /api/discord/events
    {
@@ -194,11 +194,11 @@ Retorna todos os eventos e estatísticas de uma jogatina específica.
    - Total: 120 minutos
    - Solo: 120 minutos
    - Grupo: 0 minutos
-```
+\`\`\`
 
 ### Cenário 2: Sessão em Grupo
 
-```
+\`\`\`
 1. Usuario1 inicia Minecraft (10:00)
    → POST /api/discord/events (player_joined)
    Resultado: Jogatina criada (solo)
@@ -227,11 +227,11 @@ Retorna todos os eventos e estatísticas de uma jogatina específica.
    - Usuario1: 120min total (30min solo + 90min grupo)
    - Usuario2: 60min total (0min solo + 60min grupo)
    - Usuario3: 45min total (0min solo + 45min grupo)
-```
+\`\`\`
 
 ### Cenário 3: Jogador Sai e Volta
 
-```
+\`\`\`
 1. Usuario1 inicia Minecraft (10:00)
    → player_joined
    is_active: true
@@ -262,7 +262,7 @@ Retorna todos os eventos e estatísticas de uma jogatina específica.
    
    Estatísticas Usuario2:
    - Sessão única: 10:30 - 12:00 (90min, 30min solo + 60min grupo)
-```
+\`\`\`
 
 ## Cálculo de Estatísticas
 
@@ -296,7 +296,7 @@ O status **não é calculado automaticamente** - é uma avaliação manual feita
 
 ### Exemplo de Cálculo
 
-```
+\`\`\`
 Timeline de eventos:
 - 10:00 - Usuario1 joined
 - 10:30 - Usuario2 joined  (Usuario1 agora está em grupo)
@@ -307,13 +307,13 @@ Resultado Usuario1:
 - Solo: 30min (10:00-10:30) + 30min (11:00-11:30) = 60min
 - Grupo: 30min (10:30-11:00) = 30min
 - Total: 90min
-```
+\`\`\`
 
 ## Testes
 
 ### Exemplo com cURL
 
-```bash
+\`\`\`bash
 # Registrar entrada
 curl -X POST https://seu-dominio.com/api/discord/events \
   -H "Authorization: Bearer SUA_API_KEY" \
@@ -336,7 +336,7 @@ curl -X POST https://seu-dominio.com/api/discord/events \
 
 # Consultar eventos
 curl https://seu-dominio.com/api/jogatinas/{jogatina_id}/events
-```
+\`\`\`
 
 ## Notas Importantes
 
@@ -352,7 +352,7 @@ curl https://seu-dominio.com/api/jogatinas/{jogatina_id}/events
 
 ## Implementação Recomendada no Bot
 
-```python
+\`\`\`python
 # Pseudo-código
 on_player_starts_game(player_id, game_name):
     send_event("player_joined", player_id, game_name)
@@ -371,4 +371,4 @@ def send_event(event_type, player_id, game_name):
             "event_type": event_type
         }
     )
-```
+\`\`\`

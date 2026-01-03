@@ -93,4 +93,3 @@ COMMENT ON COLUMN public.jogatina_players.is_active IS 'Indica se o jogador est√
 COMMENT ON COLUMN public.jogatina_players.solo_duration_minutes IS 'Tempo total jogado sozinho (calculado ao finalizar)';
 COMMENT ON COLUMN public.jogatina_players.group_duration_minutes IS 'Tempo total jogado em grupo (calculado ao finalizar)';
 COMMENT ON COLUMN public.jogatina_players.total_duration_minutes IS 'Tempo total jogado (solo + grupo)';
-
