@@ -25,7 +25,7 @@ interface AddJogatinaProps {
 
 interface PlayerStatus {
   playerId: string
-  status: "Dropo" | "Zero" | "Dava pra jogar"
+  status: "Jogatina" | "Dropo" | "Zero" | "Dava pra jogar"
   notes: string
 }
 
@@ -37,7 +37,7 @@ export function AddJogatina({ games, players, open, onOpenChange }: AddJogatinaP
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const addPlayer = () => {
-    setPlayerStatuses([...playerStatuses, { playerId: "", status: "Zero", notes: "" }])
+    setPlayerStatuses([...playerStatuses, { playerId: "", status: "Jogatina", notes: "" }])
   }
 
   const removePlayer = (index: number) => {
@@ -187,6 +187,13 @@ export function AddJogatina({ games, players, open, onOpenChange }: AddJogatinaP
                           </div>
 
                           <div className="flex gap-2">
+                            <Badge
+                              variant={ps.status === "Jogatina" ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => updatePlayerStatus(index, "status", "Jogatina")}
+                            >
+                              Jogatina
+                            </Badge>
                             <Badge
                               variant={ps.status === "Dropo" ? "destructive" : "outline"}
                               className="cursor-pointer"
