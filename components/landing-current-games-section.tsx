@@ -30,7 +30,16 @@ export function LandingCurrentGamesSection({ currentGames }: LandingCurrentGames
         const sessionType = jogatina.session_type === "solo" ? "Solo" : "Grupo"
 
         return (
-          <Card key={jogatina.id} className="overflow-hidden hover:border-primary transition-colors">
+          <Card key={jogatina.id} className="relative group overflow-hidden hover:border-primary transition-colors">
+            {/* Decorative corner lines */}
+            <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
+            <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity z-10" />
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">

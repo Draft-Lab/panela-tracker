@@ -51,7 +51,16 @@ export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonP
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {longestSession && (
-        <Card className="border-yellow-500/20 bg-yellow-500/5">
+        <Card className="relative group border-yellow-500/20 bg-yellow-500/5">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Trophy className="h-4 w-4 text-yellow-500" />
@@ -68,7 +77,16 @@ export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonP
       )}
 
       {mostAbandonedGame && (
-        <Card className="border-red-500/20 bg-red-500/5">
+        <Card className="relative group border-red-500/20 bg-red-500/5">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Flame className="h-4 w-4 text-red-500" />
@@ -85,7 +103,16 @@ export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonP
       )}
 
       {mostIntenseSeason && (
-        <Card className="border-green-500/20 bg-green-500/5">
+        <Card className="relative group border-green-500/20 bg-green-500/5">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Target className="h-4 w-4 text-green-500" />

@@ -15,7 +15,7 @@ export function ActiveSeasonsWidget({ seasons }: ActiveSeasonsWidgetProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-500" />
+            <Trophy className="h-5 w-5 text-warning" />
             Temporadas Ativas
           </CardTitle>
         </CardHeader>
@@ -36,10 +36,10 @@ export function ActiveSeasonsWidget({ seasons }: ActiveSeasonsWidgetProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-500" />
+            <Trophy className="h-5 w-5 text-warning" />
             Temporadas Ativas
           </CardTitle>
-          <Badge className="bg-green-500">{seasons.length}</Badge>
+          <Badge className="bg-success">{seasons.length}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">

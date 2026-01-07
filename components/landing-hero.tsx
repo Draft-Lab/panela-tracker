@@ -22,13 +22,27 @@ export function LandingHero({ currentGames, players, jogatinas, activeSeasons }:
 
   return (
     <div className="space-y-4">
-      <div className="text-center mb-8">
+      <div className="relative text-center mb-8">
+        {/* Decorative corner lines */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-px bg-primary/40" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-12 bg-primary/40" />
+        
         <h1 className="text-4xl md:text-5xl font-bold mb-2">Panela Tracker</h1>
         <p className="text-lg text-muted-foreground">Dashboard ao vivo do grupo</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-6 bg-card/50 backdrop-blur">
+        <Card className="relative group p-6 bg-card/50 backdrop-blur">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-muted-foreground">Jogatinas Ativas</p>
             <Zap className="h-4 w-4 text-yellow-500" />
@@ -37,7 +51,17 @@ export function LandingHero({ currentGames, players, jogatinas, activeSeasons }:
           <p className="text-xs text-muted-foreground mt-1">Agora</p>
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur">
+        <Card className="relative group p-6 bg-card/50 backdrop-blur">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-muted-foreground">Jogadores Ativos</p>
             <Users className="h-4 w-4 text-blue-500" />
@@ -46,7 +70,17 @@ export function LandingHero({ currentGames, players, jogatinas, activeSeasons }:
           <p className="text-xs text-muted-foreground mt-1">No grupo</p>
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur">
+        <Card className="relative group p-6 bg-card/50 backdrop-blur">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-muted-foreground">Mais Jogado</p>
             <Gamepad2 className="h-4 w-4 text-green-500" />
@@ -55,7 +89,17 @@ export function LandingHero({ currentGames, players, jogatinas, activeSeasons }:
           <p className="text-xs text-muted-foreground mt-1">Esta semana</p>
         </Card>
 
-        <Card className="p-6 bg-card/50 backdrop-blur">
+        <Card className="relative group p-6 bg-card/50 backdrop-blur">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm text-muted-foreground">Tempo Total</p>
             <Clock className="h-4 w-4 text-purple-500" />

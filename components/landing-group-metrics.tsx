@@ -44,7 +44,17 @@ export function LandingGroupMetrics({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card>
+      <Card className="relative group">
+        {/* Decorative corner lines */}
+        <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+        
         <CardHeader>
           <CardTitle className="text-base">Distribuição de Status</CardTitle>
           <p className="text-xs text-muted-foreground mt-1">
@@ -74,7 +84,17 @@ export function LandingGroupMetrics({
       </Card>
 
       <div className="space-y-4">
-        <Card>
+        <Card className="relative group">
+          {/* Decorative corner lines */}
+          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+          
           <CardHeader className="pb-3">
             <CardTitle className="text-sm">Duração Média</CardTitle>
           </CardHeader>
@@ -87,11 +107,31 @@ export function LandingGroupMetrics({
         </Card>
 
         <div className="grid grid-cols-2 gap-3">
-          <Card className="p-4">
+          <Card className="relative group p-4">
+            {/* Decorative corner lines */}
+            <div className="absolute top-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            
             <p className="text-xs text-muted-foreground mb-1">Jogatinas</p>
             <p className="text-2xl font-bold">{statusCounts.jogatina}</p>
           </Card>
-          <Card className="p-4 border-red-500/30 bg-red-500/5">
+          <Card className="relative group p-4 border-red-500/30 bg-red-500/5">
+            {/* Decorative corner lines */}
+            <div className="absolute top-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+            
             <p className="text-xs text-muted-foreground mb-1">Drops</p>
             <p className="text-2xl font-bold text-red-500">
               {statusCounts.dropo}

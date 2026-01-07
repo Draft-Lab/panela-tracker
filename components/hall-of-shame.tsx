@@ -36,6 +36,10 @@ export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOf
 
       {/* Header section */}
       <div className="relative text-center mb-12 space-y-3">
+        {/* Decorative corner lines */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-px bg-primary/40" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-16 bg-primary/40" />
+        
         <Badge variant="destructive" className="inline-flex mb-2 border-2 border-red-500/50 bg-red-950/50 text-red-200">
           <Flame className="h-4 w-4 mr-2" />
           Hall da Vergonha

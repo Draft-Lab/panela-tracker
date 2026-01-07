@@ -35,7 +35,7 @@ export function TopPlayers({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-yellow-500" />
+          <Trophy className="h-5 w-5 text-warning" />
           Ranking de Participação
         </CardTitle>
       </CardHeader>
@@ -63,7 +63,7 @@ export function TopPlayers({
                     {stat.dropos} drops
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    <Award className="h-3 w-3 mr-1 text-green-500" />
+                    <Award className="h-3 w-3 mr-1 text-success" />
                     {stat.zeros} zeros
                   </Badge>
                 </div>

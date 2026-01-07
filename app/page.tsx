@@ -53,10 +53,18 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+      <header className="relative border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+        {/* Decorative corner lines */}
+        <div className="absolute top-0 left-0 w-8 h-px bg-primary/40" />
+        <div className="absolute top-0 left-0 w-px h-8 bg-primary/40" />
+        <div className="absolute top-0 right-0 w-8 h-px bg-primary/40" />
+        <div className="absolute top-0 right-0 w-px h-8 bg-primary/40" />
+        
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Gamepad2 className="h-8 w-8 text-primary" />
+          <div className="relative flex items-center gap-2">
+            <div className="p-2 rounded-md bg-primary/10 border border-primary/20">
+              <Gamepad2 className="h-6 w-6 text-primary" />
+            </div>
             <div>
               <h1 className="text-xl font-bold">Panela Tracker</h1>
               <p className="text-xs text-muted-foreground">
@@ -81,8 +89,15 @@ export default async function LandingPage() {
           activeSeasons={activeSeasons || []}
         />
 
-        <section>
-          <h2 className="text-2xl font-bold mb-4">O Que Estamos Jogando</h2>
+        <section className="relative">
+          <div className="relative inline-block mb-6">
+            {/* Decorative corner lines for section title */}
+            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
+            <h2 className="text-2xl font-bold relative">O Que Estamos Jogando</h2>
+          </div>
           <LandingCurrentGamesSection
             currentGames={jogatinas?.filter((j) => j.is_current) || []}
           />
@@ -95,24 +110,45 @@ export default async function LandingPage() {
           />
         </section>
 
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Timeline Global</h2>
+        <section className="relative">
+          <div className="relative inline-block mb-6">
+            {/* Decorative corner lines for section title */}
+            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
+            <h2 className="text-2xl font-bold relative">Timeline Global</h2>
+          </div>
           <LandingTimelineSection
             jogatinas={jogatinas || []}
             jogatinaPlayers={jogatinaPlayers || []}
           />
         </section>
 
-        <section id="group-data">
-          <h2 className="text-2xl font-bold mb-4">Como a Gente Joga</h2>
+        <section id="group-data" className="relative">
+          <div className="relative inline-block mb-6">
+            {/* Decorative corner lines for section title */}
+            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
+            <h2 className="text-2xl font-bold relative">Como a Gente Joga</h2>
+          </div>
           <LandingGroupMetrics
             jogatinaPlayers={jogatinaPlayers || []}
             seasonParticipants={allSeasonParticipants || []}
           />
         </section>
 
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Perfis do Grupo</h2>
+        <section className="relative">
+          <div className="relative inline-block mb-6">
+            {/* Decorative corner lines for section title */}
+            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
+            <h2 className="text-2xl font-bold relative">Perfis do Grupo</h2>
+          </div>
           <LandingPlayerProfiles
             players={players || []}
             jogatinaPlayers={jogatinaPlayers || []}
@@ -120,8 +156,15 @@ export default async function LandingPage() {
           />
         </section>
 
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Momentos Marcantes</h2>
+        <section className="relative">
+          <div className="relative inline-block mb-6">
+            {/* Decorative corner lines for section title */}
+            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
+            <h2 className="text-2xl font-bold relative">Momentos Marcantes</h2>
+          </div>
           <LandingHighlights
             jogatinas={jogatinas || []}
             jogatinaPlayers={jogatinaPlayers || []}
@@ -132,7 +175,13 @@ export default async function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t mt-12">
+      <footer className="relative border-t mt-12">
+        {/* Decorative corner lines */}
+        <div className="absolute bottom-0 left-0 w-8 h-px bg-primary/40" />
+        <div className="absolute bottom-0 left-0 w-px h-8 bg-primary/40" />
+        <div className="absolute bottom-0 right-0 w-8 h-px bg-primary/40" />
+        <div className="absolute bottom-0 right-0 w-px h-8 bg-primary/40" />
+        
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
           <p>Panela Tracker - Acompanhe suas sessões de jogo com os amigos</p>
         </div>
