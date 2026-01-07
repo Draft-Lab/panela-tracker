@@ -1,17 +1,15 @@
 import { createClient } from "@/lib/supabase/server"
-import { StatsCards } from "@/components/stats-cards"
-import { PlayerStatsTable } from "@/components/player-stats-table"
-import { RecentActivity } from "@/components/recent-activity"
-import { TopPlayers } from "@/components/top-players"
-import { TopGames } from "@/components/top-games"
-import { ActivityChart } from "@/components/activity-chart"
-import { HallOfShame } from "@/components/hall-of-shame"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Lock, Gamepad2 } from "lucide-react"
-import { CurrentGames } from "@/components/current-games"
 import { calculateStatusStats } from "@/lib/status-helpers"
-import { ActiveSeasonsPublic } from "@/components/active-seasons-public"
+import { LandingHero } from "@/components/landing-hero"
+import { LandingCurrentGamesSection } from "@/components/landing-current-games-section"
+import { LandingTimelineSection } from "@/components/landing-timeline-section"
+import { LandingGroupMetrics } from "@/components/landing-group-metrics"
+import { LandingPlayerProfiles } from "@/components/landing-player-profiles"
+import { LandingHighlights } from "@/components/landing-highlights"
+import { HallOfShame } from "@/components/hall-of-shame"
 
 export default async function LandingPage() {
   const supabase = await createClient()
@@ -20,7 +18,7 @@ export default async function LandingPage() {
   const { data: games } = await supabase.from("games").select("*").order("created_at", { ascending: false })
   const { data: jogatinas } = await supabase
     .from("jogatinas")
-    .select("*, game:games(*)")
+    .select(`*, game:games(*), jogatina_players(*, player:players(*))`)
     .order("date", { ascending: false })
   const { data: jogatinaPlayers } = await supabase.from("jogatina_players").select(`
       *,
@@ -51,103 +49,73 @@ export default async function LandingPage() {
   const stats = calculateStatusStats(jogatinaPlayers || [], allSeasonParticipants || [])
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Gamepad2 className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-xl font-bold">Panela Tracker</h1>
-              <p className="text-xs text-muted-foreground">Estatísticas públicas</p>
+              <p className="text-xs text-muted-foreground">Dashboard do grupo</p>
             </div>
           </div>
           <Button asChild variant="outline">
             <Link href="/login">
               <Lock className="h-4 w-4 mr-2" />
-              Área Admin
+              Admin
             </Link>
           </Button>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 space-y-12">
-        {activeSeasons && activeSeasons.length > 0 && (
-          <div>
-            <h2 className="text-3xl font-bold mb-4">Temporadas em Andamento</h2>
-            <p className="text-muted-foreground mb-6">
-              Temporadas são períodos específicos de jogatinas rastreadas automaticamente pelo bot do Discord
-            </p>
-            <ActiveSeasonsPublic seasons={activeSeasons} />
-          </div>
-        )}
+        <LandingHero
+          currentGames={jogatinas.filter((j) => j.is_current) || []}
+          players={players || []}
+          jogatinas={jogatinas || []}
+          activeSeasons={activeSeasons || []}
+        />
 
-        {/* Current Games Section */}
-        <div>
-          <h2 className="text-3xl font-bold mb-4">Jogos Atuais</h2>
-          <p className="text-muted-foreground mb-6">Jogos sendo jogados neste momento pela galera</p>
-          <CurrentGames />
-        </div>
+        <section>
+          <h2 className="text-2xl font-bold mb-4">O Que Estamos Jogando</h2>
+          <LandingCurrentGamesSection currentGames={jogatinas.filter((j) => j.is_current) || []} />
+        </section>
 
-        {/* Hall of Shame Section */}
-        <HallOfShame jogatinaPlayers={jogatinaPlayers || []} seasonParticipants={allSeasonParticipants || []} />
+        <section>
+          <HallOfShame jogatinaPlayers={jogatinaPlayers || []} seasonParticipants={allSeasonParticipants || []} />
+        </section>
 
-        {/* Welcome Section */}
-        <div className="text-center space-y-4 py-8">
-          <h2 className="text-4xl md:text-5xl font-bold text-balance">Acompanhe Nossas Jogatinas</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-balance">
-            Veja as estatísticas completas das nossas sessões de jogo, descubra quem mais dropa e acompanhe nossa
-            jornada gamer
-          </p>
-        </div>
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Timeline Global</h2>
+          <LandingTimelineSection jogatinas={jogatinas || []} jogatinaPlayers={jogatinaPlayers || []} />
+        </section>
 
-        <div>
-          <h3 className="text-2xl font-bold mb-2">Estatísticas Gerais</h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            Combinando dados de jogatinas manuais e temporadas do Discord bot
-          </p>
-          <StatsCards
-            totalPlayers={players?.length || 0}
-            totalGames={games?.length || 0}
-            totalJogatinas={jogatinas?.length || 0}
-            totalParticipations={stats.totalParticipations}
-            dropRate={stats.dropRate}
-            dropCount={stats.dropos}
-            zeroCount={stats.zeros}
-            davaCount={stats.davaJogar}
+        <section id="group-data">
+          <h2 className="text-2xl font-bold mb-4">Como a Gente Joga</h2>
+          <LandingGroupMetrics
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasonParticipants={allSeasonParticipants || []}
           />
-        </div>
+        </section>
 
-        {/* Activity Chart */}
-        <div>
-          <h3 className="text-2xl font-bold mb-4">Atividade ao Longo do Tempo</h3>
-          <ActivityChart jogatinas={jogatinas || []} />
-        </div>
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Perfis do Grupo</h2>
+          <LandingPlayerProfiles
+            players={players || []}
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasonParticipants={allSeasonParticipants || []}
+          />
+        </section>
 
-        {/* Rankings */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-2xl font-bold mb-4">Top Jogadores</h3>
-            <TopPlayers jogatinaPlayers={jogatinaPlayers || []} seasonParticipants={allSeasonParticipants || []} />
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-bold mb-4">Jogos Mais Jogados</h3>
-            <TopGames jogatinas={jogatinas || []} jogatinaPlayers={jogatinaPlayers || []} />
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div>
-          <h3 className="text-2xl font-bold mb-4">Atividades Recentes</h3>
-          <RecentActivity jogatinas={jogatinas?.slice(0, 10) || []} />
-        </div>
-
-        {/* Detailed Stats - Player Stats Only */}
-        <div>
-          <h3 className="text-2xl font-bold mb-4">Estatísticas por Jogador</h3>
-          <PlayerStatsTable jogatinaPlayers={jogatinaPlayers || []} seasonParticipants={allSeasonParticipants || []} />
-        </div>
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Momentos Marcantes</h2>
+          <LandingHighlights
+            jogatinas={jogatinas || []}
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasons={activeSeasons || []}
+            seasonParticipants={allSeasonParticipants || []}
+          />
+        </section>
       </main>
 
       {/* Footer */}
