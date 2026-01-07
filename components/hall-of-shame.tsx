@@ -9,8 +9,8 @@ import { calculatePlayerStats } from "@/lib/status-helpers"
 import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types"
 
 interface HallOfShameProps {
-  jogatinaPlayers: (JogatinaPlayer & { player: Player })[]
-  seasonParticipants?: (SeasonParticipant & { player: Player })[]
+  jogatinaPlayers: (JogatinaPlayer & { player?: Player })[]
+  seasonParticipants?: (SeasonParticipant & { player?: Player })[]
 }
 
 export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOfShameProps) {
@@ -57,7 +57,7 @@ export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOf
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-full blur-lg" />
                   <Avatar className="h-28 w-28 border-4 border-cyan-500/70 mx-auto ring-4 ring-cyan-500/20 relative">
-                    <AvatarImage src={second.avatarUrl || undefined} alt={second.playerName} />
+                    <AvatarImage src={second.avatarUrl || ""} alt={second.playerName} />
                     <AvatarFallback className="text-3xl bg-gradient-to-br from-cyan-600 to-cyan-700">
                       {second.playerName.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -94,7 +94,7 @@ export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOf
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-gradient-to-br from-red-500/50 to-transparent rounded-full blur-2xl animate-pulse" />
                   <Avatar className="h-40 w-40 border-4 border-red-500 mx-auto ring-4 ring-red-500/30 relative">
-                    <AvatarImage src={first.avatarUrl || undefined} alt={first.playerName} />
+                    <AvatarImage src={first.avatarUrl || ""} alt={first.playerName} />
                     <AvatarFallback className="text-5xl font-black bg-gradient-to-br from-red-600 to-red-700">
                       {first.playerName.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
@@ -136,7 +136,7 @@ export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOf
                 <div className="relative inline-block">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-transparent rounded-full blur-lg" />
                   <Avatar className="h-28 w-28 border-4 border-purple-500/70 mx-auto ring-4 ring-purple-500/20 relative">
-                    <AvatarImage src={third.avatarUrl || undefined} alt={third.playerName} />
+                    <AvatarImage src={third.avatarUrl || ""} alt={third.playerName} />
                     <AvatarFallback className="text-3xl bg-gradient-to-br from-purple-600 to-purple-700">
                       {third.playerName.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
