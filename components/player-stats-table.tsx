@@ -52,9 +52,10 @@ export function PlayerStatsTable({
       <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
       
-      <CardContent className="p-0 flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <Table>
+      <CardContent className="p-0 flex-1 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-x-auto">
+          <div className="h-full overflow-y-auto">
+            <Table className="min-w-full">
             <TableHeader className="sticky top-0 bg-card z-10">
               <TableRow>
                 <TableHead>Jogador</TableHead>
@@ -118,6 +119,7 @@ export function PlayerStatsTable({
               ))}
             </TableBody>
           </Table>
+          </div>
         </div>
       </CardContent>
     </Card>

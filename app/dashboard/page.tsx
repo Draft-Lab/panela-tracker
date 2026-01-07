@@ -178,7 +178,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Detailed Stats Tables */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="space-y-6">
         <div className="relative">
           <div className="relative inline-block mb-6">
             {/* Decorative corner lines for section title */}
