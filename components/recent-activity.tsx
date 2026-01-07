@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Gamepad2 } from "lucide-react"
+import { Calendar } from "lucide-react"
 import type { Jogatina, Game } from "@/lib/types"
 import Link from "next/link"
 
@@ -20,7 +20,17 @@ export function RecentActivity({ jogatinas }: RecentActivityProps) {
   }
 
   return (
-    <Card>
+    <Card className="relative group">
+      {/* Decorative corner lines */}
+      <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" />
@@ -28,8 +38,8 @@ export function RecentActivity({ jogatinas }: RecentActivityProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {jogatinas.map((jogatina) => {
+        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+          {jogatinas.map((jogatina, index) => {
             const date = new Date(jogatina.date)
             const formattedDate = date.toLocaleDateString("pt-BR", {
               day: "2-digit",
@@ -45,13 +55,22 @@ export function RecentActivity({ jogatinas }: RecentActivityProps) {
               <Link
                 key={jogatina.id}
                 href={`/jogos/${jogatina.game_id}`}
-                className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                className="relative flex items-start gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors"
               >
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 flex-shrink-0">
-                  <Gamepad2 className="h-5 w-5 text-primary" />
+                {/* Timeline line connector */}
+                {index < jogatinas.length - 1 && (
+                  <div className="absolute left-[19px] top-12 bottom-0 w-px bg-border/30" />
+                )}
+                
+                {/* Timeline dot - minimalista */}
+                <div className="relative flex items-center justify-center w-10 h-10 flex-shrink-0">
+                  <div className="w-2 h-2 rounded-full bg-primary/60" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium">{jogatina.game.title}</p>
+                
+                <div className="flex-1 min-w-0 pt-1">
+                  <p className="font-medium text-foreground hover:text-primary transition-colors">
+                    {jogatina.game.title}
+                  </p>
                   {jogatina.notes && (
                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{jogatina.notes}</p>
                   )}

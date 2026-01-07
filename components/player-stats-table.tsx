@@ -41,72 +41,84 @@ export function PlayerStatsTable({
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Jogador</TableHead>
-              <TableHead className="text-center">Total de Jogatinas</TableHead>
-              <TableHead className="text-center">Dropos</TableHead>
-              <TableHead className="text-center">Zeros</TableHead>
-              <TableHead className="text-center">Dava pra Jogar</TableHead>
-              <TableHead className="text-center">% Dropo</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {stats.map((stat, index) => (
-              <TableRow key={stat.playerId}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {index === 0 && stat.dropos > 0 && (
-                      <Badge variant="destructive" className="text-xs">
-                        Dropador
-                      </Badge>
-                    )}
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        src={stat.avatarUrl || undefined}
-                        alt={stat.playerName}
-                      />
-                      <AvatarFallback>
-                        {stat.playerName.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium">{stat.playerName}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  {stat.totalJogatinas}
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className="text-red-500 font-semibold">
-                    {stat.dropos}
-                  </span>
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className="text-green-500 font-semibold">
-                    {stat.zeros}
-                  </span>
-                </TableCell>
-                <TableCell className="text-center">
-                  <span className="text-yellow-500 font-semibold">
-                    {stat.davaPraJogar}
-                  </span>
-                </TableCell>
-                <TableCell className="text-center">
-                  <span
-                    className={
-                      stat.dropoPercentage > 50 ? "text-red-500 font-bold" : ""
-                    }
-                  >
-                    {stat.dropoPercentage.toFixed(1)}%
-                  </span>
-                </TableCell>
+    <Card className="relative group flex flex-col h-[600px]">
+      {/* Decorative corner lines */}
+      <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+      
+      <CardContent className="p-0 flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-card z-10">
+              <TableRow>
+                <TableHead>Jogador</TableHead>
+                <TableHead className="text-center">Total de Jogatinas</TableHead>
+                <TableHead className="text-center">Dropos</TableHead>
+                <TableHead className="text-center">Zeros</TableHead>
+                <TableHead className="text-center">Dava pra Jogar</TableHead>
+                <TableHead className="text-center">% Dropo</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {stats.map((stat, index) => (
+                <TableRow key={stat.playerId}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      {index === 0 && stat.dropos > 0 && (
+                        <Badge variant="destructive" className="text-xs">
+                          Dropador
+                        </Badge>
+                      )}
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={stat.avatarUrl || undefined}
+                          alt={stat.playerName}
+                        />
+                        <AvatarFallback>
+                          {stat.playerName.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{stat.playerName}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {stat.totalJogatinas}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-destructive font-semibold">
+                      {stat.dropos}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-success font-semibold">
+                      {stat.zeros}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className="text-warning font-semibold">
+                      {stat.davaPraJogar}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span
+                      className={
+                        stat.dropoPercentage > 50 ? "text-destructive font-bold" : ""
+                      }
+                    >
+                      {stat.dropoPercentage.toFixed(1)}%
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

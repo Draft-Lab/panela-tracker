@@ -23,11 +23,15 @@ export function LandingHero({ currentGames, players, jogatinas, activeSeasons }:
   return (
     <div className="space-y-4">
       <div className="relative text-center mb-8">
-        {/* Decorative corner lines */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-px bg-primary/40" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-12 bg-primary/40" />
-        
-        <h1 className="text-4xl md:text-5xl font-bold mb-2">Panela Tracker</h1>
+        <div className="relative inline-block">
+          {/* Decorative corner lines */}
+          <div className="absolute -top-1 -left-1 w-8 h-px bg-primary/40" />
+          <div className="absolute -top-1 -left-1 w-px h-8 bg-primary/40" />
+          <div className="absolute -top-1 -right-1 w-8 h-px bg-primary/40" />
+          <div className="absolute -top-1 -right-1 w-px h-8 bg-primary/40" />
+          
+          <h1 className="text-4xl md:text-5xl font-bold mb-2 relative">Panela Tracker</h1>
+        </div>
         <p className="text-lg text-muted-foreground">Dashboard ao vivo do grupo</p>
       </div>
 
