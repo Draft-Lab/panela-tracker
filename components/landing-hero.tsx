@@ -18,7 +18,19 @@ export function LandingHero({ currentGames, players, jogatinas, activeSeasons }:
   const weekAgo = new Date()
   weekAgo.setDate(weekAgo.getDate() - 7)
   const weekJogatinas = jogatinas.filter((j) => new Date(j.date) >= weekAgo)
-  const mostPlayedThisWeek = weekJogatinas.length > 0 ? weekJogatinas[0].game.title : "Nenhum"
+  
+  // Contar quantas vezes cada jogo foi jogado na semana
+  const gameCounts = weekJogatinas.reduce((acc, jogatina) => {
+    const gameId = jogatina.game.id
+    acc[gameId] = (acc[gameId] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  
+  // Encontrar o jogo com mais sessões
+  const mostPlayedGameId = Object.entries(gameCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
+  const mostPlayedThisWeek = mostPlayedGameId 
+    ? weekJogatinas.find(j => j.game.id === mostPlayedGameId)?.game.title || "Nenhum"
+    : "Nenhum"
 
   return (
     <div className="space-y-4">
