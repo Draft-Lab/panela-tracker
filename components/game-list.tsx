@@ -48,7 +48,7 @@ export function GameList({ games }: GameListProps) {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {games.map((game) => (
-          <Card key={game.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+          <Card key={game.id} className="hover:shadow-lg transition-shadow overflow-hidden py-0">
             <div className="aspect-video bg-muted relative">
               {game.cover_url ? (
                 <img
@@ -62,13 +62,13 @@ export function GameList({ games }: GameListProps) {
                 </div>
               )}
             </div>
-            <CardHeader>
+            <CardHeader >
               <CardTitle className="text-lg line-clamp-2">{game.title}</CardTitle>
               <p className="text-xs text-muted-foreground">
                 Adicionado em {new Date(game.created_at).toLocaleDateString("pt-BR")}
               </p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pb-6">
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="flex-1 bg-transparent" asChild>
                   <Link href={`/dashboard/jogos/${game.id}`}>

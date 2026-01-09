@@ -59,6 +59,11 @@ export function PlayerList({ players }: PlayerListProps) {
                   <p className="text-sm text-muted-foreground">
                     Desde {new Date(player.created_at).toLocaleDateString("pt-BR")}
                   </p>
+                  {player.total_played_minutes !== undefined && player.total_played_minutes > 0 && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Total jogado: {Math.floor(player.total_played_minutes / 60)}h {player.total_played_minutes % 60}m
+                    </p>
+                  )}
                 </div>
               </div>
             </CardHeader>
