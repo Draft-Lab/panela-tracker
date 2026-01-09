@@ -63,7 +63,19 @@ export function EditJogatinaDialog({ jogatina, allPlayers, open, onOpenChange }:
   }, [open, jogatina])
 
   const updatePlayerStatus = (playerId: string, field: "status" | "notes", value: string) => {
-    setPlayerStatuses((prev) => prev.map((ps) => (ps.player_id === playerId ? { ...ps, [field]: value } : ps)))
+    console.log("[v0] Before update:", { playerId, field, value }) // Added debug
+    setPlayerStatuses((prev) => {
+      const updated = prev.map((ps) => {
+        if (ps.player_id === playerId) {
+          const newValue = field === "status" ? (value as "Jogatina" | "Dropo" | "Zero" | "Dava pra jogar") : value
+          console.log("[v0] Updated player:", { player_id: ps.player_id, [field]: newValue }) // Added debug
+          return { ...ps, [field]: newValue }
+        }
+        return ps
+      })
+      console.log("[v0] New player statuses:", updated) // Added debug
+      return updated
+    })
   }
 
   const removePlayer = (playerId: string) => {
@@ -110,13 +122,25 @@ export function EditJogatinaDialog({ jogatina, allPlayers, open, onOpenChange }:
       // 2. Processar jogadores existentes (update)
       const existingPlayers = playerStatuses.filter((ps) => ps.id && !ps.isNew)
       for (const ps of existingPlayers) {
-        await supabase
+        console.log("[v0] Saving player status:", {
+          id: ps.id,
+          player_id: ps.player_id,
+          status: ps.status,
+          notes: ps.notes,
+        }) // Enhanced debug
+        const { error } = await supabase
           .from("jogatina_players")
           .update({
             status: ps.status,
             notes: ps.notes.trim() || null,
           })
           .eq("id", ps.id)
+          .eq("jogatina_id", jogatina.id)
+
+        if (error) {
+          console.error("[v0] Error updating player:", error)
+          throw error
+        }
       }
 
       // 3. Adicionar novos jogadores

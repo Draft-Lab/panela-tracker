@@ -174,7 +174,7 @@ async function handlePlayerJoined(
     const { error: playerError } = await supabase.from("jogatina_players").insert({
       jogatina_id: jogatina.id,
       player_id: playerId,
-      status: "Dava pra jogar",
+      status: "Jogatina",
       is_active: true,
     })
 
