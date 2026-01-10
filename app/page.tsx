@@ -9,6 +9,7 @@ import { LandingGroupMetrics } from "@/components/landing-group-metrics";
 import { LandingPlayerProfiles } from "@/components/landing-player-profiles";
 import { LandingHighlights } from "@/components/landing-highlights";
 import { HallOfShame } from "@/components/hall-of-shame";
+import { ActivityHeatmap } from "@/components/activity-heatmap";
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -53,7 +54,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      <header className="relative border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+      <header className=" border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         {/* Decorative corner lines */}
         <div className="absolute top-0 left-0 w-8 h-px bg-primary/40" />
         <div className="absolute top-0 left-0 w-px h-8 bg-primary/40" />
@@ -88,6 +89,18 @@ export default async function LandingPage() {
           jogatinas={jogatinas || []}
           activeSeasons={activeSeasons || []}
         />
+
+<section className="relative">
+          <div className="relative inline-block mb-6">
+            {/* Decorative corner lines for section title */}
+            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
+            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
+            <h2 className="text-2xl font-bold relative">Atividade ao Longo do Tempo</h2>
+          </div>
+          <ActivityHeatmap jogatinas={jogatinas || []} />
+        </section>
 
         <section className="relative">
           <div className="relative inline-block mb-6">
@@ -124,6 +137,8 @@ export default async function LandingPage() {
             jogatinaPlayers={jogatinaPlayers || []}
           />
         </section>
+
+     
 
         <section id="group-data" className="relative">
           <div className="relative inline-block mb-6">
