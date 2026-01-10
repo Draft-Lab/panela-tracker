@@ -216,8 +216,11 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
                 {weeks.map((week, weekIndex) => (
                   <div key={weekIndex} className="flex flex-col gap-1 flex-1 min-w-0">
                     {week.map((day, dayIndex) => {
+                      const dayKey = day.date.toISOString().split('T')[0]
+                      const uniqueKey = day.count < 0 ? `empty-${weekIndex}-${dayIndex}` : dayKey
+                      
                       if (day.count < 0) {
-                        return <div key={dayIndex} className="w-full aspect-square" />
+                        return <div key={uniqueKey} className="w-full aspect-square" />
                       }
                       
                       const level = getIntensityLevel(day.count)
@@ -231,7 +234,7 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
                       
                       return (
                         <div
-                          key={dayIndex}
+                          key={uniqueKey}
                           className={`w-full aspect-square rounded-sm ${colors[level]} hover:ring-2 hover:ring-primary transition-all cursor-pointer`}
                           onMouseEnter={(e) => handleMouseEnter(day, e)}
                           onMouseLeave={handleMouseLeave}
