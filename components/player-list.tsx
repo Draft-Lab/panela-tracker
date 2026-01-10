@@ -4,11 +4,12 @@ import type { Player } from "@/lib/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Trash2, Edit } from "lucide-react"
+import { Trash2, Edit, BarChart3 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { EditPlayerDialog } from "@/components/edit-player-dialog"
+import Link from "next/link"
 
 interface PlayerListProps {
   players: Player[]
@@ -77,6 +78,11 @@ export function PlayerList({ players }: PlayerListProps) {
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Editar
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/dashboard/jogadores/${player.id}`}>
+                    <BarChart3 className="h-4 w-4" />
+                  </Link>
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => handleDelete(player.id)}>
                   <Trash2 className="h-4 w-4" />

@@ -109,3 +109,11 @@ export interface EventCalculationResult {
   group_time_minutes: number;
   status: "Jogatina" | "Dropo" | "Zero" | "Dava pra jogar";
 }
+
+export interface PlayerGameStats {
+  game_id: string;
+  game_title: string;
+  game_cover_url: string | null;
+  total_minutes: number;
+  session_count?: number;
+}
