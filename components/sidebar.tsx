@@ -11,9 +11,7 @@ import { logout } from "@/lib/auth"
 const navigationGroups = [
   {
     label: "Principal",
-    items: [
-      { name: "Dashboard", href: "/dashboard", icon: Home },
-    ],
+    items: [{ name: "Dashboard", href: "/dashboard", icon: Home }],
   },
   {
     label: "Jogos",
@@ -71,8 +69,8 @@ export function Sidebar() {
             <div className="absolute top-0 left-0 w-px h-8 bg-sidebar-primary/40" />
             <div className="absolute top-0 right-0 w-8 h-px bg-sidebar-primary/40" />
             <div className="absolute top-0 right-0 w-px h-8 bg-sidebar-primary/40" />
-            
-            <div className="relative flex items-center gap-2">
+
+            <Link href="/" className="relative flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="p-2 rounded-md bg-sidebar-primary/10 border border-sidebar-primary/20">
                 <Gamepad2 className="h-6 w-6 text-sidebar-primary" />
               </div>
@@ -80,7 +78,7 @@ export function Sidebar() {
                 <h1 className="text-xl font-bold text-sidebar-foreground">Panela</h1>
                 <p className="text-xs text-muted-foreground">Tracker</p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -93,12 +91,12 @@ export function Sidebar() {
                   <div className="absolute top-0 left-0 w-px h-6 bg-sidebar-primary/30" />
                   <div className="absolute top-0 right-0 w-6 h-px bg-sidebar-primary/30" />
                   <div className="absolute top-0 right-0 w-px h-6 bg-sidebar-primary/30" />
-                  
+
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {group.label}
                   </h3>
                 </div>
-                
+
                 <div className="space-y-1">
                   {group.items.map((item) => {
                     const isActive = pathname === item.href
@@ -129,11 +127,15 @@ export function Sidebar() {
                             <div className="absolute bottom-0 right-0 w-px h-4 bg-sidebar-primary-foreground/40" />
                           </>
                         )}
-                        
-                        <Icon className={cn(
-                          "h-4 w-4 shrink-0",
-                          isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground group-hover:text-sidebar-accent-foreground"
-                        )} />
+
+                        <Icon
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            isActive
+                              ? "text-sidebar-primary-foreground"
+                              : "text-sidebar-foreground group-hover:text-sidebar-accent-foreground",
+                          )}
+                        />
                         <span className="font-medium text-sm">{item.name}</span>
                       </Link>
                     )
@@ -150,10 +152,10 @@ export function Sidebar() {
             <div className="absolute bottom-0 left-0 w-px h-8 bg-sidebar-primary/40" />
             <div className="absolute bottom-0 right-0 w-8 h-px bg-sidebar-primary/40" />
             <div className="absolute bottom-0 right-0 w-px h-8 bg-sidebar-primary/40" />
-            
-            <Button 
-              variant="outline" 
-              className="w-full justify-start bg-transparent hover:bg-sidebar-accent border-sidebar-border" 
+
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-transparent hover:bg-sidebar-accent border-sidebar-border"
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4 mr-2" />

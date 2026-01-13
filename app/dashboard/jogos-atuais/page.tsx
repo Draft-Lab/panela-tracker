@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
-import { ManageCurrentGames } from "@/components/manage-current-games"
 import { AddGameButton } from "@/components/add-game-button"
+import { LandingCurrentGamesSection } from "@/components/landing-current-games-section"
+import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
 
 export default async function JogosAtuaisPage() {
   const supabase = await createClient()
@@ -20,6 +21,15 @@ export default async function JogosAtuaisPage() {
     .eq("is_current", true)
     .order("date", { ascending: false })
 
+  const formattedJogatinas = (currentJogatinas || []).map((jogatina) => ({
+    ...jogatina,
+    game: jogatina.game as Game,
+    jogatina_players: jogatina.jogatina_players as (JogatinaPlayer & { player: Player })[],
+  })) as (Jogatina & {
+    game: Game
+    jogatina_players?: (JogatinaPlayer & { player: Player })[]
+  })[]
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -30,7 +40,7 @@ export default async function JogosAtuaisPage() {
         <AddGameButton />
       </div>
 
-      <ManageCurrentGames currentJogatinas={currentJogatinas || []} />
+      <LandingCurrentGamesSection currentGames={formattedJogatinas} isInteractive={true} />
     </div>
   )
 }

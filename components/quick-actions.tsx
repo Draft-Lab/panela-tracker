@@ -3,13 +3,12 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { UserPlus, Gamepad2, Plus, PlayCircle, House } from "lucide-react"
+import { UserPlus, Gamepad2, Plus, PlayCircle, Home } from "lucide-react"
 import { AddPlayerDialog } from "@/components/add-player-dialog"
 import { AddGameDialog } from "@/components/add-game-dialog"
 import { AddJogatina } from "@/components/add-jogatina"
 import { AddCurrentGameDialog } from "@/components/add-current-game-dialog"
 import type { Player, Game } from "@/lib/types"
-import { cn } from "@/lib/utils"
 
 interface QuickActionsProps {
   players: Player[]
@@ -72,7 +71,7 @@ export function QuickActions({ players, games }: QuickActionsProps) {
           className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
         >
           <Link href="/">
-            <House className="h-3.5 w-3.5" />
+            <Home className="h-3.5 w-3.5" />
             Home
           </Link>
         </Button>

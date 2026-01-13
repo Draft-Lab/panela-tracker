@@ -32,7 +32,7 @@ interface PlayerStatus {
     name: string
     avatar_url: string | null
   }
-  status: "Dropo" | "Zero" | "Dava pra jogar"
+  status: "Dropo" | "Zero" | "Dava pra jogar" | "Jogatina"
   notes: string
 }
 
@@ -140,6 +140,7 @@ export function FinishCurrentGameDialog({ jogatinaId, gameTitle, open, onOpenCha
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="Jogatina">Jogatina</SelectItem>
                       <SelectItem value="Dropo">Dropo</SelectItem>
                       <SelectItem value="Zero">Zero</SelectItem>
                       <SelectItem value="Dava pra jogar">Dava pra jogar</SelectItem>
