@@ -1,29 +1,34 @@
-import { createClient } from "@/lib/supabase/server"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Lock, Gamepad2 } from "lucide-react"
-import { LandingHero } from "@/components/landing-hero"
-import { LandingCurrentGamesSection } from "@/components/landing-current-games-section"
-import { LandingTimelineSection } from "@/components/landing-timeline-section"
-import { LandingGroupMetrics } from "@/components/landing-group-metrics"
-import { LandingPlayerProfiles } from "@/components/landing-player-profiles"
-import { LandingHighlights } from "@/components/landing-highlights"
-import { HallOfShame } from "@/components/hall-of-shame"
-import { ActivityHeatmap } from "@/components/activity-heatmap"
+import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Lock, Gamepad2 } from "lucide-react";
+import { LandingHero } from "@/components/landing-hero";
+import { LandingCurrentGamesSection } from "@/components/landing-current-games-section";
+import { LandingTimelineSection } from "@/components/landing-timeline-section";
+import { LandingGroupMetrics } from "@/components/landing-group-metrics";
+import { LandingPlayerProfiles } from "@/components/landing-player-profiles";
+import { LandingHighlights } from "@/components/landing-highlights";
+import { HallOfShame } from "@/components/hall-of-shame";
+import { ActivityHeatmap } from "@/components/activity-heatmap";
+import { ActivitySummaryCards } from "@/components/activity-summary-cards";
 
 export default async function LandingPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const { data: players } = await supabase.from("players").select("*").order("created_at", { ascending: false })
+  const { data: players } = await supabase
+    .from("players")
+    .select("*")
+    .order("created_at", { ascending: false });
   const { data: jogatinas } = await supabase
     .from("jogatinas")
     .select(`*, game:games(*), jogatina_players(*, player:players(*))`)
-    .order("date", { ascending: false })
-  const { data: jogatinaPlayers } = await supabase.from("jogatina_players").select(`
+    .order("date", { ascending: false });
+  const { data: jogatinaPlayers } = await supabase.from("jogatina_players")
+    .select(`
       *,
       player:players(*),
       jogatina:jogatinas(*, game:games(*))
-    `)
+    `);
 
   const { data: activeSeasons } = await supabase
     .from("seasons")
@@ -38,13 +43,15 @@ export default async function LandingPage() {
     `,
     )
     .eq("is_active", true)
-    .order("started_at", { ascending: false })
+    .order("started_at", { ascending: false });
 
   // Buscar todos os season_participants para cálculos
-  const { data: allSeasonParticipants } = await supabase.from("season_participants").select(`
+  const { data: allSeasonParticipants } = await supabase.from(
+    "season_participants",
+  ).select(`
       *,
       player:players(*)
-    `)
+    `);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
@@ -62,7 +69,9 @@ export default async function LandingPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold">Panela Tracker</h1>
-              <p className="text-xs text-muted-foreground">Dashboard do grupo</p>
+              <p className="text-xs text-muted-foreground">
+                Dashboard do grupo
+              </p>
             </div>
           </div>
           <Button asChild variant="outline">
@@ -89,9 +98,18 @@ export default async function LandingPage() {
             <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
             <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
             <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Atividade ao Longo do Tempo</h2>
+            <h2 className="text-2xl font-bold relative">
+              Atividade ao Longo do Tempo
+            </h2>
           </div>
-          <ActivityHeatmap jogatinas={jogatinas || []} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <ActivityHeatmap jogatinas={jogatinas || []} />
+            </div>
+            <div>
+              <ActivitySummaryCards jogatinas={jogatinas || []} />
+            </div>
+          </div>
         </section>
 
         <section className="relative">
@@ -101,7 +119,9 @@ export default async function LandingPage() {
             <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
             <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
             <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">O Que Estamos Jogando</h2>
+            <h2 className="text-2xl font-bold relative">
+              O Que Estamos Jogando
+            </h2>
           </div>
           <LandingCurrentGamesSection
             currentGames={jogatinas?.filter((j) => j.is_current) || []}
@@ -110,7 +130,10 @@ export default async function LandingPage() {
         </section>
 
         <section>
-          <HallOfShame jogatinaPlayers={jogatinaPlayers || []} seasonParticipants={allSeasonParticipants || []} />
+          <HallOfShame
+            jogatinaPlayers={jogatinaPlayers || []}
+            seasonParticipants={allSeasonParticipants || []}
+          />
         </section>
 
         <section className="relative">
@@ -122,7 +145,10 @@ export default async function LandingPage() {
             <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
             <h2 className="text-2xl font-bold relative">Timeline Global</h2>
           </div>
-          <LandingTimelineSection jogatinas={jogatinas || []} jogatinaPlayers={jogatinaPlayers || []} />
+          <LandingTimelineSection
+            jogatinas={jogatinas || []}
+            jogatinaPlayers={jogatinaPlayers || []}
+          />
         </section>
 
         <section id="group-data" className="relative">
@@ -187,5 +213,5 @@ export default async function LandingPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

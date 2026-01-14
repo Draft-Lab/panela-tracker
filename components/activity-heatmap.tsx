@@ -159,8 +159,15 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     setHoveredDay(null)
   }
 
+  const CELL_SIZE = 12
+  const CELL_GAP = 4
+  const WEEKDAY_LABEL_WIDTH = 48
+  const MONTH_LABEL_PADDING = 52
+
+  const gridWidth = weeks.length * (CELL_SIZE + CELL_GAP) - CELL_GAP
+
   return (
-    <Card className="relative group">
+    <Card className="relative group w-full">
       {/* Decorative corner lines */}
       <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -179,18 +186,18 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
       </CardHeader>
       <CardContent>
         <div className="w-full overflow-x-auto pb-2">
-          <div className="w-full min-w-max">
+          <div className="w-full" style={{ width: `${WEEKDAY_LABEL_WIDTH + gridWidth + MONTH_LABEL_PADDING}px` }}>
             {/* Labels de meses */}
             <div className="flex mb-2 ml-[51px] relative h-4">
               {monthLabels.map((label, index) => {
-                const totalWeeks = weeks.length
-                const leftPosition = (label.weekIndex / totalWeeks) * 100
+                const prevLabel = index > 0 ? monthLabels[index - 1] : null
+                const weekStart = label.weekIndex * (CELL_SIZE + CELL_GAP)
                 return (
                   <div
                     key={index}
                     className="text-xs text-muted-foreground absolute"
                     style={{
-                      left: `${leftPosition}%`,
+                      left: `${weekStart}px`,
                     }}
                   >
                     {label.month.charAt(0).toUpperCase() + label.month.slice(1)}
@@ -213,7 +220,7 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
               </div>
 
               {/* Grid de semanas */}
-              <div className="flex gap-1 flex-1">
+              <div className="flex gap-1">
                 {weeks.map((week, weekIndex) => (
                   <div key={weekIndex} className="flex flex-col gap-1">
                     {week.map((day, dayIndex) => {
