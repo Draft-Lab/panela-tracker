@@ -4,14 +4,19 @@ import { Gamepad2 } from "lucide-react"
 import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
 
 interface LandingTimelineSectionProps {
-  jogatinas: (Jogatina & { game: Game })[]
+  jogatinas: (Jogatina & { game: Game; jogatina_players?: (JogatinaPlayer & { player: Player })[] })[]
   jogatinaPlayers: (JogatinaPlayer & { player: Player })[]
 }
 
 export function LandingTimelineSection({ jogatinas, jogatinaPlayers }: LandingTimelineSectionProps) {
   const recentEvents = jogatinas.slice(0, 8).map((jogatina) => {
-    const players = jogatinaPlayers.filter((jp) => jp.jogatina_id === jogatina.id)
-    const firstPlayer = players[0]?.player.name || "Alguém"
+    // Primeiro tenta usar os jogadores que vêm junto com a jogatina
+    const playersFromJogatina = jogatina.jogatina_players || []
+    // Se não tiver, busca no array separado de jogatinaPlayers
+    const playersFromSeparate = jogatinaPlayers.filter((jp) => jp.jogatina_id === jogatina.id)
+    
+    const players = playersFromJogatina.length > 0 ? playersFromJogatina : playersFromSeparate
+    const firstPlayer = players[0]?.player?.name || "Alguém"
 
     return {
       jogatina,
