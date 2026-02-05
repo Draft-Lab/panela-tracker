@@ -74,12 +74,19 @@ export default async function LandingPage() {
               </p>
             </div>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/login">
-              <Lock className="h-4 w-4 mr-2" />
-              Admin
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+              <Link href="/memorial">
+                Memorial
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/login">
+                <Lock className="h-4 w-4 mr-2" />
+                Admin
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
