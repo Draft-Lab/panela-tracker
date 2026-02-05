@@ -8,6 +8,7 @@ import { TopPlayers } from "@/components/top-players";
 import { TopGames } from "@/components/top-games";
 import { ActivityChart } from "@/components/activity-chart";
 import { ActiveSeasonsWidget } from "@/components/active-seasons-widget";
+import { Supervivememorial } from "@/components/supervive-memorial";
 import { calculateStatusStats } from "@/lib/status-helpers";
 
 export default async function DashboardPage() {
@@ -61,6 +62,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      {/* Supervive Memorial Section */}
+      <Supervivememorial />
+
       {/* Header Section */}
       <div className="relative">
         {/* Decorative corner lines */}
