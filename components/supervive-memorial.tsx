@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 
 export function Supervivememorial() {
@@ -17,18 +18,27 @@ export function Supervivememorial() {
 
         <Card className="border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
           {/* Memorial Header Banner */}
-          <div className="relative h-48 bg-gradient-to-b from-primary/10 to-primary/5 flex items-center justify-center border-b border-primary/10">
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent)]" />
-            </div>
+          <div className="relative h-64 md:h-96 overflow-hidden border-b border-primary/10 group">
+            <Image
+              src="/supervive-banner.jpg"
+              alt="Supervive - Memorial Banner"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              priority
+            />
             
-            <div className="relative text-center space-y-2">
-              <div className="text-5xl md:text-6xl font-bold text-foreground text-balance">
-                Supervive
+            {/* Overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <div className="text-5xl md:text-6xl font-bold text-white text-balance drop-shadow-lg">
+                  Supervive
+                </div>
+                <p className="text-lg text-white/90 text-balance drop-shadow">
+                  Um legado que viverá para sempre em nossas memórias
+                </p>
               </div>
-              <p className="text-lg text-muted-foreground text-balance">
-                Um legado que viverá para sempre em nossas memórias
-              </p>
             </div>
           </div>
 
