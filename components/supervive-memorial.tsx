@@ -20,7 +20,7 @@ export function Supervivememorial() {
           {/* Memorial Header Banner */}
           <div className="relative h-64 md:h-96 overflow-hidden border-b border-primary/10 group">
             <Image
-              src="/supervive-banner.jpg"
+              src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.nichegamer.com%2Fwp-content%2Fuploads%2F2025%2F06%2Fsupervive-06-30-25-1.jpg"
               alt="Supervive - Memorial Banner"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
