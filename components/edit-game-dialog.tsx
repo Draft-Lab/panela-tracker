@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import type { Game } from "@/lib/types"
@@ -28,6 +29,7 @@ interface EditGameDialogProps {
 export function EditGameDialog({ game, open, onOpenChange }: EditGameDialogProps) {
   const [title, setTitle] = useState(game.title)
   const [coverUrl, setCoverUrl] = useState(game.cover_url || "")
+  const [isApp, setIsApp] = useState(game.is_app || false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSearchingImage, setIsSearchingImage] = useState(false)
   const router = useRouter()
@@ -69,6 +71,7 @@ export function EditGameDialog({ game, open, onOpenChange }: EditGameDialogProps
       .update({
         title: title.trim(),
         cover_url: coverUrl.trim() || null,
+        is_app: isApp,
       })
       .eq("id", game.id)
 
@@ -144,6 +147,16 @@ export function EditGameDialog({ game, open, onOpenChange }: EditGameDialogProps
                   />
                 </div>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="edit-is-app"
+                checked={isApp}
+                onCheckedChange={(checked) => setIsApp(checked === true)}
+              />
+              <Label htmlFor="edit-is-app" className="text-sm font-normal cursor-pointer">
+                Este item é um aplicativo (Spotify, VSCode, etc.) e não um jogo
+              </Label>
             </div>
           </div>
           <DialogFooter>

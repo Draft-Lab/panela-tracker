@@ -3,7 +3,11 @@ import { GameRoulette } from "@/components/game-roulette"
 
 export default async function RoletaPage() {
   const supabase = await createClient()
-  const { data: games } = await supabase.from("games").select("*").order("title")
+  const { data: games } = await supabase
+    .from("games")
+    .select("*")
+    .eq("is_app", false)
+    .order("title")
 
   return <GameRoulette games={games || []} />
 }

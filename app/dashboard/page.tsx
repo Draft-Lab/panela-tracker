@@ -53,9 +53,14 @@ export default async function DashboardPage() {
     .from("season_participants")
     .select("*");
 
-  // Calcular estatísticas usando a nova lógica
+  // Filtrar jogatinas de apps (Spotify, VSCode, etc.) das métricas
+  const gameOnly = games?.filter((g) => !g.is_app) || [];
+  const gameJogatinas = jogatinas?.filter((j) => !j.game?.is_app) || [];
+  const gameJogatinaPlayers = jogatinaPlayers?.filter((jp) => !jp.jogatina?.game?.is_app) || [];
+
+  // Calcular estatísticas usando a nova lógica (somente jogos)
   const stats = calculateStatusStats(
-    jogatinaPlayers || [],
+    gameJogatinaPlayers,
     allSeasonParticipants || [],
   );
 
@@ -93,8 +98,8 @@ export default async function DashboardPage() {
         </div>
         <StatsCards
           totalPlayers={players?.length || 0}
-          totalGames={games?.length || 0}
-          totalJogatinas={jogatinas?.length || 0}
+          totalGames={gameOnly.length}
+          totalJogatinas={gameJogatinas.length}
           totalParticipations={stats.totalParticipations}
           dropRate={stats.dropRate}
           dropCount={stats.dropos}
@@ -128,7 +133,7 @@ export default async function DashboardPage() {
           <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
           <h2 className="text-2xl font-bold relative">Atividade ao Longo do Tempo</h2>
         </div>
-        <ActivityChart jogatinas={jogatinas || []} />
+        <ActivityChart jogatinas={gameJogatinas} />
       </div>
 
       {/* Two Column Layout for Rankings */}
@@ -143,7 +148,7 @@ export default async function DashboardPage() {
             <h2 className="text-2xl font-bold relative">Top Jogadores</h2>
           </div>
           <TopPlayers
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
         </div>
@@ -158,8 +163,8 @@ export default async function DashboardPage() {
             <h2 className="text-2xl font-bold relative">Jogos Mais Jogados</h2>
           </div>
           <TopGames
-            jogatinas={jogatinas || []}
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinas={gameJogatinas}
+            jogatinaPlayers={gameJogatinaPlayers}
           />
         </div>
       </div>
@@ -174,7 +179,7 @@ export default async function DashboardPage() {
           <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
           <h2 className="text-2xl font-bold relative">Atividades Recentes</h2>
         </div>
-        <RecentActivity jogatinas={jogatinas?.slice(0, 10) || []} />
+        <RecentActivity jogatinas={gameJogatinas.slice(0, 10)} />
       </div>
 
       {/* Detailed Stats Tables */}
@@ -189,7 +194,7 @@ export default async function DashboardPage() {
             <h2 className="text-2xl font-bold relative">Estatísticas por Jogador</h2>
           </div>
           <PlayerStatsTable
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
         </div>
@@ -204,8 +209,8 @@ export default async function DashboardPage() {
             <h2 className="text-2xl font-bold relative">Estatísticas por Jogo</h2>
           </div>
           <GameStatsTable
-            jogatinas={jogatinas || []}
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinas={gameJogatinas}
+            jogatinaPlayers={gameJogatinaPlayers}
           />
         </div>
       </div>

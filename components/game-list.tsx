@@ -3,7 +3,8 @@
 import type { Game } from "@/lib/types"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trash2, Edit, Eye } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Trash2, Edit, Eye, Monitor } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -62,8 +63,16 @@ export function GameList({ games }: GameListProps) {
                 </div>
               )}
             </div>
-            <CardHeader >
-              <CardTitle className="text-lg line-clamp-2">{game.title}</CardTitle>
+            <CardHeader>
+              <div className="flex items-start justify-between gap-2">
+                <CardTitle className="text-lg line-clamp-2 flex-1">{game.title}</CardTitle>
+                {game.is_app && (
+                  <Badge variant="secondary" className="shrink-0 flex items-center gap-1">
+                    <Monitor className="h-3 w-3" />
+                    App
+                  </Badge>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Adicionado em {new Date(game.created_at).toLocaleDateString("pt-BR")}
               </p>
