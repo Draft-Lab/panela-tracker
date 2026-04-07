@@ -11,6 +11,7 @@ export interface Game {
   id: string;
   title: string;
   cover_url: string | null;
+  is_app: boolean;
   created_at: string;
 }
 

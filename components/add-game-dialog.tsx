@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Plus, Search, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -28,6 +29,7 @@ export function AddGameDialog({ open: externalOpen, onOpenChange: externalOnOpen
   const [internalOpen, setInternalOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [coverUrl, setCoverUrl] = useState("")
+  const [isApp, setIsApp] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isSearchingImage, setIsSearchingImage] = useState(false)
   const router = useRouter()
@@ -70,6 +72,7 @@ export function AddGameDialog({ open: externalOpen, onOpenChange: externalOnOpen
     const { error } = await supabase.from("games").insert({
       title: title.trim(),
       cover_url: coverUrl.trim() || null,
+      is_app: isApp,
     })
 
     if (error) {
@@ -78,6 +81,7 @@ export function AddGameDialog({ open: externalOpen, onOpenChange: externalOnOpen
     } else {
       setTitle("")
       setCoverUrl("")
+      setIsApp(false)
       setOpen(false)
       router.refresh()
     }
@@ -155,13 +159,23 @@ export function AddGameDialog({ open: externalOpen, onOpenChange: externalOnOpen
                 </div>
               )}
             </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="is-app"
+                checked={isApp}
+                onCheckedChange={(checked) => setIsApp(checked === true)}
+              />
+              <Label htmlFor="is-app" className="text-sm font-normal cursor-pointer">
+                Este item é um aplicativo (Spotify, VSCode, etc.) e não um jogo
+              </Label>
+            </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Criando..." : "Criar Jogo"}
+              {isLoading ? "Criando..." : isApp ? "Criar Aplicativo" : "Criar Jogo"}
             </Button>
           </DialogFooter>
         </form>

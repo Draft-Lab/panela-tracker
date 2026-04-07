@@ -53,6 +53,10 @@ export default async function LandingPage() {
       player:players(*)
     `);
 
+  // Filtrar jogatinas de apps (Spotify, VSCode, etc.) das métricas
+  const gameJogatinas = jogatinas?.filter((j) => !j.game?.is_app) || [];
+  const gameJogatinaPlayers = jogatinaPlayers?.filter((jp) => !jp.jogatina?.game?.is_app) || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
       <header className=" border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
@@ -92,9 +96,9 @@ export default async function LandingPage() {
 
       <main className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 space-y-12">
         <LandingHero
-          currentGames={jogatinas?.filter((j) => j.is_current) || []}
+          currentGames={gameJogatinas.filter((j) => j.is_current)}
           players={players || []}
-          jogatinas={jogatinas || []}
+          jogatinas={gameJogatinas}
           activeSeasons={activeSeasons || []}
         />
 
@@ -111,10 +115,10 @@ export default async function LandingPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <ActivityHeatmap jogatinas={jogatinas || []} />
+              <ActivityHeatmap jogatinas={gameJogatinas} />
             </div>
             <div>
-              <ActivitySummaryCards jogatinas={jogatinas || []} />
+              <ActivitySummaryCards jogatinas={gameJogatinas} />
             </div>
           </div>
         </section>
@@ -131,14 +135,14 @@ export default async function LandingPage() {
             </h2>
           </div>
           <LandingCurrentGamesSection
-            currentGames={jogatinas?.filter((j) => j.is_current) || []}
+            currentGames={gameJogatinas.filter((j) => j.is_current)}
             isInteractive={false}
           />
         </section>
 
         <section>
           <HallOfShame
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
         </section>
@@ -153,8 +157,8 @@ export default async function LandingPage() {
             <h2 className="text-2xl font-bold relative">Timeline Global</h2>
           </div>
           <LandingTimelineSection
-            jogatinas={jogatinas || []}
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinas={gameJogatinas}
+            jogatinaPlayers={gameJogatinaPlayers}
           />
         </section>
 
@@ -168,7 +172,7 @@ export default async function LandingPage() {
             <h2 className="text-2xl font-bold relative">Como a Gente Joga</h2>
           </div>
           <LandingGroupMetrics
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
         </section>
@@ -184,7 +188,7 @@ export default async function LandingPage() {
           </div>
           <LandingPlayerProfiles
             players={players || []}
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
         </section>
@@ -199,8 +203,8 @@ export default async function LandingPage() {
             <h2 className="text-2xl font-bold relative">Momentos Marcantes</h2>
           </div>
           <LandingHighlights
-            jogatinas={jogatinas || []}
-            jogatinaPlayers={jogatinaPlayers || []}
+            jogatinas={gameJogatinas}
+            jogatinaPlayers={gameJogatinaPlayers}
             seasons={activeSeasons || []}
             seasonParticipants={allSeasonParticipants || []}
           />
