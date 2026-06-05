@@ -1,5 +1,4 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import type { JogatinaPlayer, SeasonParticipant } from "@/lib/types";
 
@@ -11,7 +10,6 @@ interface LandingGroupMetricsProps {
 export function LandingGroupMetrics({
   jogatinaPlayers,
 }: LandingGroupMetricsProps) {
-  // Calcular percentuais
   const statusCounts = {
     jogatina: jogatinaPlayers.filter((jp) => jp.status === "Jogatina").length,
     dropo: jogatinaPlayers.filter((jp) => jp.status === "Dropo").length,
@@ -31,7 +29,6 @@ export function LandingGroupMetrics({
     { name: "Dava", value: statusCounts.davaJogar, fill: "#eab308" },
   ].filter((d) => d.value > 0);
 
-  // Calcular duração média
   const avgDuration =
     jogatinaPlayers.length > 0
       ? (
@@ -43,26 +40,14 @@ export function LandingGroupMetrics({
       : 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="relative group">
-        {/* Decorative corner lines */}
-        <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        <CardHeader>
-          <CardTitle className="text-base">Distribuição de Status</CardTitle>
-          <p className="text-xs text-muted-foreground mt-1">
-            Taxa de drop: {dropRate}%
-          </p>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+      <div>
+        <p className="text-sm font-medium">Distribuição de status</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Taxa de drop: {dropRate}%
+        </p>
+        <div className="mt-4">
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
                 data={pieData}
@@ -80,63 +65,31 @@ export function LandingGroupMetrics({
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <div className="space-y-4">
-        <Card className="relative group">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Duração Média</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{avgDuration}</p>
-            <p className="text-xs text-muted-foreground">
-              minutos por participação
+      <div className="divide-y divide-border/60">
+        <div className="pb-6">
+          <p className="text-sm text-muted-foreground">Duração média</p>
+          <p className="mt-1 text-3xl font-bold tabular-nums">{avgDuration}</p>
+          <p className="text-xs text-muted-foreground">
+            minutos por participação
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6 pt-6">
+          <div>
+            <p className="text-xs text-muted-foreground">Jogatinas</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums">
+              {statusCounts.jogatina}
             </p>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="relative group p-4">
-            {/* Decorative corner lines */}
-            <div className="absolute top-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <p className="text-xs text-muted-foreground mb-1">Jogatinas</p>
-            <p className="text-2xl font-bold">{statusCounts.jogatina}</p>
-          </Card>
-          <Card className="relative group p-4 border-red-500/30 bg-red-500/5">
-            {/* Decorative corner lines */}
-            <div className="absolute top-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute top-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 left-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 left-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 right-0 w-3 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 right-0 w-px h-3 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <p className="text-xs text-muted-foreground mb-1">Drops</p>
-            <p className="text-2xl font-bold text-red-500">
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Drops</p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-red-500">
               {statusCounts.dropo}
             </p>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

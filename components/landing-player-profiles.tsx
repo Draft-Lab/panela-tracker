@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { Player, JogatinaPlayer, SeasonParticipant } from "@/lib/types"
 
@@ -22,7 +21,6 @@ export function LandingPlayerProfiles({ players, jogatinaPlayers, seasonParticip
       playerJogatinas.filter((jp) => jp.status === "Dropo").length +
       playerSeasons.filter((sp) => sp.status === "Dropo").length
 
-    // Definir tags comportamentais
     const tags: string[] = []
     if (dropCount === 0 && totalSessions > 5) tags.push("Finalizador")
     if (totalMinutes > totalSessions * 60) tags.push("Dedicado")
@@ -34,41 +32,30 @@ export function LandingPlayerProfiles({ players, jogatinaPlayers, seasonParticip
   })
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
       {playerStats.map((stat) => (
-        <Card key={stat.player.id} className="relative group hover:border-primary transition-colors">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader>
-            <CardTitle className="text-base">{stat.player.name}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">Sessões</p>
-                <p className="text-2xl font-bold">{stat.totalSessions}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Drops</p>
-                <p className="text-2xl font-bold text-red-500">{stat.dropCount}</p>
-              </div>
+        <div key={stat.player.id} className="border-t border-border/60 pt-5">
+          <p className="font-semibold">{stat.player.name}</p>
+
+          <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Sessões</p>
+              <p className="text-2xl font-bold tabular-nums">{stat.totalSessions}</p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {stat.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
+            <div>
+              <p className="text-muted-foreground">Drops</p>
+              <p className="text-2xl font-bold tabular-nums text-red-500">{stat.dropCount}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {stat.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   )

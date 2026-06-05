@@ -1,16 +1,180 @@
 "use client"
 
 import { useMemo } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Trophy, Flame } from "lucide-react"
+import { Flame } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { calculatePlayerStats } from "@/lib/status-helpers"
+import { cn } from "@/lib/utils"
 import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types"
 
 interface HallOfShameProps {
   jogatinaPlayers: (JogatinaPlayer & { player?: Player })[]
   seasonParticipants?: (SeasonParticipant & { player?: Player })[]
+}
+
+type DropperStat = ReturnType<typeof calculatePlayerStats>[number]
+
+const RANK_STYLES = {
+  1: {
+    label: "text-red-400",
+    stat: "text-red-500",
+    avatarRing: "ring-red-500/40",
+    avatarBorder: "border-red-500/50",
+    avatarFallback: "bg-red-950 text-red-100",
+    pedestal:
+      "border-red-600/40 border-t-red-500 bg-gradient-to-t from-red-950 via-red-800 to-red-600",
+    pedestalHeight: "h-24 sm:h-28 md:h-36",
+    rankMark: "text-red-100/15",
+  },
+  2: {
+    label: "text-muted-foreground",
+    stat: "text-foreground",
+    avatarRing: "ring-border/80",
+    avatarBorder: "border-border",
+    avatarFallback: "bg-muted text-muted-foreground",
+    pedestal:
+      "border-border/60 border-t-zinc-500 bg-gradient-to-t from-zinc-950 via-zinc-800 to-zinc-600",
+    pedestalHeight: "h-16 sm:h-20 md:h-28",
+    rankMark: "text-zinc-400/12",
+  },
+  3: {
+    label: "text-muted-foreground",
+    stat: "text-foreground",
+    avatarRing: "ring-border/60",
+    avatarBorder: "border-border/80",
+    avatarFallback: "bg-muted/80 text-muted-foreground",
+    pedestal:
+      "border-border/50 border-t-zinc-600 bg-gradient-to-t from-zinc-950 via-zinc-900 to-zinc-700",
+    pedestalHeight: "h-12 sm:h-14 md:h-20",
+    rankMark: "text-zinc-500/10",
+  },
+} as const
+
+interface PodiumSlotProps {
+  rank: 1 | 2 | 3
+  stat: DropperStat
+  className?: string
+}
+
+function PodiumSlot({ rank, stat, className }: PodiumSlotProps) {
+  const theme = RANK_STYLES[rank]
+  const isFirst = rank === 1
+
+  return (
+    <div
+      className={cn(
+        "flex min-w-0 flex-1 flex-col items-center",
+        isFirst && "z-10 md:-mt-2",
+        className,
+      )}
+    >
+      <div className="flex w-full flex-col items-center px-2 pb-4 text-center sm:px-3 md:px-4">
+        <span
+          className={cn(
+            "text-[10px] font-semibold uppercase tracking-widest sm:text-xs",
+            theme.label,
+          )}
+        >
+          {rank}º lugar
+        </span>
+
+        <Avatar
+          className={cn(
+            "mt-3 ring-2",
+            theme.avatarRing,
+            theme.avatarBorder,
+            isFirst
+              ? "h-[4.5rem] w-[4.5rem] sm:h-20 sm:w-20 md:h-24 md:w-24"
+              : "h-14 w-14 sm:h-16 sm:w-16 md:h-[4.5rem] md:w-[4.5rem]",
+          )}
+        >
+          <AvatarImage src={stat.avatarUrl || ""} alt={stat.playerName} />
+          <AvatarFallback
+            className={cn("text-xs font-semibold sm:text-sm", theme.avatarFallback)}
+          >
+            {stat.playerName.substring(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+
+        <p className="mt-3 line-clamp-1 w-full text-sm font-semibold text-foreground sm:text-base">
+          {stat.playerName}
+        </p>
+
+        <p
+          className={cn(
+            "mt-1 font-bold tabular-nums tracking-tight",
+            theme.stat,
+            isFirst ? "text-3xl sm:text-4xl md:text-5xl" : "text-2xl sm:text-3xl",
+          )}
+        >
+          {stat.dropos}
+        </p>
+        <p className="text-[10px] text-muted-foreground sm:text-xs">drops</p>
+        <p className="mt-2 text-[11px] text-muted-foreground sm:text-sm">
+          {stat.dropoPercentage.toFixed(0)}% de taxa
+        </p>
+      </div>
+
+      <div
+        className={cn(
+          "relative flex w-full items-end justify-center overflow-hidden rounded-t-lg border-x border-t",
+          theme.pedestal,
+          theme.pedestalHeight,
+        )}
+      >
+        <span
+          className={cn(
+            "select-none pb-2 text-5xl font-black tabular-nums md:text-6xl",
+            theme.rankMark,
+          )}
+        >
+          {rank}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function PodiumStage({
+  first,
+  second,
+  third,
+  className,
+}: {
+  first: DropperStat
+  second?: DropperStat
+  third?: DropperStat
+  className?: string
+}) {
+  const count = 1 + (second ? 1 : 0) + (third ? 1 : 0)
+
+  return (
+    <div className={cn("px-4 sm:px-6", className)}>
+      <div
+        className={cn(
+          "mx-auto flex max-w-3xl items-end justify-center gap-2 sm:gap-3 md:gap-4",
+          count === 1 && "max-w-[220px]",
+          count === 2 && "max-w-xl",
+        )}
+      >
+        {second && (
+          <PodiumSlot
+            rank={2}
+            stat={second}
+            className={count === 2 ? "order-1" : undefined}
+          />
+        )}
+        <PodiumSlot
+          rank={1}
+          stat={first}
+          className={cn(count === 2 && "order-2", count === 1 && "max-w-[220px]")}
+        />
+        {third && <PodiumSlot rank={3} stat={third} />}
+      </div>
+
+      <div className="mx-auto mt-0 h-1 max-w-3xl rounded-full bg-border/80" />
+    </div>
+  )
 }
 
 export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOfShameProps) {
@@ -27,147 +191,23 @@ export function HallOfShame({ jogatinaPlayers, seasonParticipants = [] }: HallOf
     return null
   }
 
-  const [second, first, third] = [topDroppers[1], topDroppers[0], topDroppers[2]].filter(Boolean)
+  const first = topDroppers[0]
+  const second = topDroppers[1]
+  const third = topDroppers[2]
 
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Background gradient effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-red-950/40 via-transparent to-red-950/20 blur-3xl pointer-events-none" />
-
-      {/* Header section */}
-      <div className="relative text-center mb-12 space-y-3">
-        {/* Decorative corner lines */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-px bg-primary/40" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-16 bg-primary/40" />
-        
-        <Badge variant="destructive" className="inline-flex mb-2 border-2 border-red-500/50 bg-red-950/50 text-red-200">
-          <Flame className="h-4 w-4 mr-2" />
-          Hall da Vergonha
-        </Badge>
-        <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-white drop-shadow-lg">TOP DROPADORES</h2>
-        <p className="text-lg text-red-200/80 font-medium">Os campeões do abandono</p>
+    <div className="overflow-hidden rounded-xl border border-border/60 bg-card/30">
+      <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4 sm:px-6">
+        <Flame className="h-4 w-4 shrink-0 text-red-500" strokeWidth={2} />
+        <p className="text-sm font-medium text-foreground">Ranking de drops</p>
       </div>
 
-      {/* Podium section */}
-      <div className="relative grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 items-end max-w-4xl mx-auto mb-8">
-        {/* 2nd Place - Left */}
-        {second && (
-          <div className="relative md:order-1 order-2 group">
-            {/* Glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-b from-cyan-500/20 to-transparent rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
-
-            <Card className="relative border-2 border-cyan-500/30 bg-gradient-to-b from-slate-900/80 to-slate-950/80 backdrop-blur-xl hover:border-cyan-500/60 transition-all duration-300">
-              <CardContent className="pt-8 pb-6 text-center space-y-4">
-                <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/30 to-transparent rounded-full blur-lg" />
-                  <Avatar className="h-28 w-28 border-4 border-cyan-500/70 mx-auto ring-4 ring-cyan-500/20 relative">
-                    <AvatarImage src={second.avatarUrl || ""} alt={second.playerName} />
-                    <AvatarFallback className="text-3xl bg-gradient-to-br from-cyan-600 to-cyan-700">
-                      {second.playerName.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Badge className="absolute -bottom-2 -right-2 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-2 border-cyan-400 shadow-lg shadow-cyan-500/50">
-                    <Trophy className="h-3 w-3 mr-1" />
-                    2º
-                  </Badge>
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-white">{second.playerName}</h3>
-                  <div className="text-5xl font-black text-cyan-400 drop-shadow-lg mb-1 mt-2">{second.dropos}</div>
-                  <p className="text-sm text-cyan-200/60">drops</p>
-                  <div className="mt-3 p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
-                    <Badge variant="outline" className="text-cyan-400 border-cyan-500/50 bg-cyan-500/5">
-                      {second.dropoPercentage.toFixed(0)}% de taxa
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* 1st Place - Center Champion */}
-        {first && (
-          <div className="relative md:order-2 order-1 group md:scale-110 md:z-10">
-            {/* Intense glow effect */}
-            <div className="absolute -inset-2 bg-gradient-to-t from-red-600/40 via-red-500/20 to-transparent rounded-2xl blur-2xl group-hover:blur-3xl transition-all duration-300 animate-pulse" />
-            <div className="absolute -inset-1 bg-gradient-to-b from-red-500/30 to-transparent rounded-2xl blur-lg" />
-
-            <Card className="relative border-4 border-red-500/70 bg-gradient-to-b from-slate-900/90 to-red-950/60 backdrop-blur-xl shadow-2xl shadow-red-600/30 hover:shadow-red-600/50 transition-all duration-300">
-              <CardContent className="pt-10 pb-8 text-center space-y-4">
-                <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-500/50 to-transparent rounded-full blur-2xl animate-pulse" />
-                  <Avatar className="h-40 w-40 border-4 border-red-500 mx-auto ring-4 ring-red-500/30 relative">
-                    <AvatarImage src={first.avatarUrl || ""} alt={first.playerName} />
-                    <AvatarFallback className="text-5xl font-black bg-gradient-to-br from-red-600 to-red-700">
-                      {first.playerName.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Badge className="absolute -bottom-3 -right-3 bg-gradient-to-r from-red-600 to-red-700 text-white border-2 border-red-400 shadow-lg shadow-red-600/70 text-base px-3 py-1">
-                    <Trophy className="h-4 w-4 mr-2" />
-                    CAMPEÃO
-                  </Badge>
-                  <Flame className="absolute -top-4 -right-4 h-8 w-8 text-red-500 animate-bounce" />
-                </div>
-                <div>
-                  <h3 className="font-black text-2xl text-white drop-shadow-lg">{first.playerName}</h3>
-                  <div className="text-7xl font-black text-red-500 drop-shadow-lg mb-2 mt-2 animate-pulse">
-                    {first.dropos}
-                  </div>
-                  <p className="text-sm text-red-200/70 font-semibold">drops registrados</p>
-                  <div className="mt-4 p-3 bg-red-600/20 rounded-lg border border-red-500/40">
-                    <Badge
-                      variant="destructive"
-                      className="text-base px-3 py-1 bg-gradient-to-r from-red-600 to-red-700 border border-red-500/50 shadow-lg"
-                    >
-                      {first.dropoPercentage.toFixed(0)}% de taxa
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* 3rd Place - Right */}
-        {third && (
-          <div className="relative md:order-3 order-3 group">
-            {/* Glow effect */}
-            <div className="absolute -inset-1 bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
-
-            <Card className="relative border-2 border-purple-500/30 bg-gradient-to-b from-slate-900/80 to-slate-950/80 backdrop-blur-xl hover:border-purple-500/60 transition-all duration-300">
-              <CardContent className="pt-8 pb-6 text-center space-y-4">
-                <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-transparent rounded-full blur-lg" />
-                  <Avatar className="h-28 w-28 border-4 border-purple-500/70 mx-auto ring-4 ring-purple-500/20 relative">
-                    <AvatarImage src={third.avatarUrl || ""} alt={third.playerName} />
-                    <AvatarFallback className="text-3xl bg-gradient-to-br from-purple-600 to-purple-700">
-                      {third.playerName.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Badge className="absolute -bottom-2 -right-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white border-2 border-purple-400 shadow-lg shadow-purple-500/50">
-                    <Trophy className="h-3 w-3 mr-1" />
-                    3º
-                  </Badge>
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-white">{third.playerName}</h3>
-                  <div className="text-5xl font-black text-purple-400 drop-shadow-lg mb-1 mt-2">{third.dropos}</div>
-                  <p className="text-sm text-purple-200/60">drops</p>
-                  <div className="mt-3 p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                    <Badge variant="outline" className="text-purple-400 border-purple-500/50 bg-purple-500/5">
-                      {third.dropoPercentage.toFixed(0)}% de taxa
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom decoration */}
-      <div className="relative h-1 bg-gradient-to-r from-transparent via-red-500/50 to-transparent mx-auto max-w-2xl rounded-full" />
+      <PodiumStage
+        first={first}
+        second={second}
+        third={third}
+        className="pb-5 pt-6 md:pb-6 md:pt-8"
+      />
     </div>
   )
 }

@@ -1,5 +1,5 @@
-import { Card } from "@/components/ui/card"
 import { Gamepad2, Users, Zap, Clock } from "lucide-react"
+import { LandingStatCard } from "@/components/landing/landing-stat-card"
 import type { Jogatina, Player, Game, Season } from "@/lib/types"
 
 interface LandingHeroProps {
@@ -9,120 +9,75 @@ interface LandingHeroProps {
   activeSeasons: Season[]
 }
 
-export function LandingHero({ currentGames, players, jogatinas, activeSeasons }: LandingHeroProps) {
-  // Calcular tempo total jogado em minutos
-  const totalMinutes = jogatinas.reduce((acc, j) => acc + (j.total_duration_minutes || 0), 0)
+export function LandingHero({
+  currentGames,
+  players,
+  jogatinas,
+}: LandingHeroProps) {
+  const totalMinutes = jogatinas.reduce(
+    (acc, j) => acc + (j.total_duration_minutes || 0),
+    0,
+  )
   const totalHours = Math.floor(totalMinutes / 60)
 
-  // Jogo mais jogado da semana
   const weekAgo = new Date()
   weekAgo.setDate(weekAgo.getDate() - 7)
   const weekJogatinas = jogatinas.filter((j) => new Date(j.date) >= weekAgo)
-  
-  // Contar quantas vezes cada jogo foi jogado na semana
-  const gameCounts = weekJogatinas.reduce((acc, jogatina) => {
-    const gameId = jogatina.game.id
-    acc[gameId] = (acc[gameId] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-  
-  // Encontrar o jogo com mais sessões
-  const mostPlayedGameId = Object.entries(gameCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
-  const mostPlayedThisWeek = mostPlayedGameId 
-    ? weekJogatinas.find(j => j.game.id === mostPlayedGameId)?.game.title || "Nenhum"
+
+  const gameCounts = weekJogatinas.reduce(
+    (acc, jogatina) => {
+      const gameId = jogatina.game.id
+      acc[gameId] = (acc[gameId] || 0) + 1
+      return acc
+    },
+    {} as Record<string, number>,
+  )
+
+  const mostPlayedGameId = Object.entries(gameCounts).sort(
+    (a, b) => b[1] - a[1],
+  )[0]?.[0]
+  const mostPlayedThisWeek = mostPlayedGameId
+    ? weekJogatinas.find((j) => j.game.id === mostPlayedGameId)?.game.title ||
+      "Nenhum"
     : "Nenhum"
 
   return (
-    <div className="space-y-4">
-      <div className="relative text-center mb-8">
-        <div className="relative inline-block">
-          {/* Decorative corner lines */}
-          <div className="absolute -top-1 -left-1 w-8 h-px bg-primary/40" />
-          <div className="absolute -top-1 -left-1 w-px h-8 bg-primary/40" />
-          <div className="absolute -top-1 -right-1 w-8 h-px bg-primary/40" />
-          <div className="absolute -top-1 -right-1 w-px h-8 bg-primary/40" />
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-2 relative">Panela Tracker</h1>
-        </div>
-        <p className="text-lg text-muted-foreground">Dashboard ao vivo do grupo</p>
+    <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-12">
+      <div className="max-w-lg">
+        <p className="text-sm font-medium text-primary">Resumo ao vivo</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-balance md:text-4xl">
+          Dashboard do grupo
+        </h1>
+        <p className="mt-3 text-base leading-relaxed text-muted-foreground text-pretty">
+          Jogatinas ativas, tempo total e o jogo mais jogado esta semana.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="relative group p-6 bg-card/50 backdrop-blur">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">Jogatinas Ativas</p>
-            <Zap className="h-4 w-4 text-yellow-500" />
-          </div>
-          <p className="text-3xl font-bold">{currentGames.length}</p>
-          <p className="text-xs text-muted-foreground mt-1">Agora</p>
-        </Card>
-
-        <Card className="relative group p-6 bg-card/50 backdrop-blur">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">Jogadores Ativos</p>
-            <Users className="h-4 w-4 text-blue-500" />
-          </div>
-          <p className="text-3xl font-bold">{players.length}</p>
-          <p className="text-xs text-muted-foreground mt-1">No grupo</p>
-        </Card>
-
-        <Card className="relative group p-6 bg-card/50 backdrop-blur">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">Mais Jogado</p>
-            <Gamepad2 className="h-4 w-4 text-green-500" />
-          </div>
-          <p className="text-xl font-bold line-clamp-1">{mostPlayedThisWeek}</p>
-          <p className="text-xs text-muted-foreground mt-1">Esta semana</p>
-        </Card>
-
-        <Card className="relative group p-6 bg-card/50 backdrop-blur">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">Tempo Total</p>
-            <Clock className="h-4 w-4 text-purple-500" />
-          </div>
-          <p className="text-3xl font-bold">{totalHours}h</p>
-          <p className="text-xs text-muted-foreground mt-1">Grupo</p>
-        </Card>
+      <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+        <LandingStatCard
+          label="Jogatinas ativas"
+          value={currentGames.length}
+          hint="Agora"
+          icon={Zap}
+        />
+        <LandingStatCard
+          label="Jogadores"
+          value={players.length}
+          hint="No grupo"
+          icon={Users}
+        />
+        <LandingStatCard
+          label="Mais jogado"
+          value={mostPlayedThisWeek}
+          hint="Esta semana"
+          icon={Gamepad2}
+        />
+        <LandingStatCard
+          label="Tempo total"
+          value={`${totalHours}h`}
+          hint="Histórico do grupo"
+          icon={Clock}
+        />
       </div>
     </div>
   )

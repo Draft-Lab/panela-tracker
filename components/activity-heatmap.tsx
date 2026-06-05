@@ -1,11 +1,7 @@
 "use client"
 
-import type React from "react"
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar } from "lucide-react"
+import { Fragment, useState, type MouseEvent } from "react"
 import type { Jogatina, Game } from "@/lib/types"
-import { useState } from "react"
 
 interface ActivityHeatmapProps {
   jogatinas: (Jogatina & { game: Game })[]
@@ -17,11 +13,12 @@ interface DayData {
   totalMinutes: number
 }
 
+const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+
 export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
   const [hoveredDay, setHoveredDay] = useState<DayData | null>(null)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  // Calcular período (últimos 12 meses)
   const endDate = new Date()
   endDate.setHours(23, 59, 59, 999)
 
@@ -29,7 +26,6 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
   startDate.setMonth(startDate.getMonth() - 12)
   startDate.setHours(0, 0, 0, 0)
 
-  // Agrupar jogatinas por dia
   const dayDataMap = new Map<string, DayData>()
 
   jogatinas.forEach((jogatina) => {
@@ -56,7 +52,6 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     }
   })
 
-  // Criar array de todos os dias no período
   const allDays: DayData[] = []
   const currentDate = new Date(startDate)
 
@@ -79,7 +74,6 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     currentDate.setDate(currentDate.getDate() + 1)
   }
 
-  // Calcular níveis de intensidade
   const counts = allDays.filter((d) => d.count > 0).map((d) => d.count)
   const maxCount = Math.max(...counts, 1)
 
@@ -92,19 +86,15 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     return 4
   }
 
-  // Organizar dias em semanas
   const weeks: DayData[][] = []
   let currentWeek: DayData[] = []
 
-  // Ajustar primeiro dia para começar no domingo
-  const firstDay = allDays[0]
-  const firstDayOfWeek = firstDay.date.getDay()
+  const firstDayOfWeek = allDays[0].date.getDay()
 
-  // Preencher dias vazios antes do primeiro dia
   for (let i = 0; i < firstDayOfWeek; i++) {
     currentWeek.push({
       date: new Date(0),
-      count: -1, // Marcador para dia inexistente
+      count: -1,
       totalMinutes: 0,
     })
   }
@@ -118,7 +108,6 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     }
   })
 
-  // Adicionar última semana se incompleta
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
       currentWeek.push({
@@ -130,7 +119,6 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     weeks.push(currentWeek)
   }
 
-  // Obter labels de meses
   const monthLabels: { month: string; weekIndex: number }[] = []
   let lastMonth = -1
 
@@ -140,7 +128,9 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
       const month = firstValidDay.date.getMonth()
       if (month !== lastMonth) {
         monthLabels.push({
-          month: firstValidDay.date.toLocaleDateString("pt-BR", { month: "short" }),
+          month: firstValidDay.date.toLocaleDateString("pt-BR", {
+            month: "short",
+          }),
           weekIndex,
         })
         lastMonth = month
@@ -148,7 +138,7 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     }
   })
 
-  const handleMouseEnter = (day: DayData, event: React.MouseEvent) => {
+  const handleMouseEnter = (day: DayData, event: MouseEvent) => {
     if (day.count >= 0) {
       setHoveredDay(day)
       setMousePosition({ x: event.clientX, y: event.clientY })
@@ -159,140 +149,118 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
     setHoveredDay(null)
   }
 
-  const CELL_SIZE = 12
-  const CELL_GAP = 4
-  const WEEKDAY_LABEL_WIDTH = 48
-  const MONTH_LABEL_PADDING = 52
+  const intensityColors = [
+    "bg-muted",
+    "bg-primary/20",
+    "bg-primary/40",
+    "bg-primary/60",
+    "bg-primary/80",
+  ]
 
-  const gridWidth = weeks.length * (CELL_SIZE + CELL_GAP) - CELL_GAP
+  const gridColumns = `2.25rem repeat(${weeks.length}, minmax(0, 1fr))`
 
   return (
-    <Card className="relative group w-full">
-      {/* Decorative corner lines */}
-      <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+    <div className="min-w-0 w-full px-1 sm:px-0">
+      <div
+        className="mb-2 grid gap-[3px]"
+        style={{ gridTemplateColumns: gridColumns }}
+      >
+        <div />
+        {weeks.map((_, weekIndex) => {
+          const label = monthLabels.find((m) => m.weekIndex === weekIndex)
+          return (
+            <div
+              key={`month-${weekIndex}`}
+              className="truncate text-[10px] leading-none text-muted-foreground"
+            >
+              {label
+                ? label.month.charAt(0).toUpperCase() + label.month.slice(1)
+                : ""}
+            </div>
+          )
+        })}
+      </div>
 
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
-          Heatmap de Atividade
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="w-full overflow-x-auto pb-2">
-          <div className="w-full" style={{ width: `${WEEKDAY_LABEL_WIDTH + gridWidth + MONTH_LABEL_PADDING}px` }}>
-            {/* Labels de meses */}
-            <div className="flex mb-2 ml-[51px] relative h-4">
-              {monthLabels.map((label, index) => {
-                const prevLabel = index > 0 ? monthLabels[index - 1] : null
-                const weekStart = label.weekIndex * (CELL_SIZE + CELL_GAP)
+      <div
+        className="grid gap-[3px]"
+        style={{ gridTemplateColumns: gridColumns }}
+      >
+        {WEEKDAY_LABELS.map((weekdayLabel, rowIndex) => (
+          <Fragment key={weekdayLabel}>
+            <div className="flex items-center text-[10px] leading-none text-muted-foreground">
+              {weekdayLabel}
+            </div>
+            {weeks.map((week, weekIndex) => {
+              const day = week[rowIndex]
+              const year = day.date.getFullYear()
+              const month = String(day.date.getMonth() + 1).padStart(2, "0")
+              const dayStr = String(day.date.getDate()).padStart(2, "0")
+              const dayKey = `${year}-${month}-${dayStr}`
+              const uniqueKey =
+                day.count < 0 ? `empty-${weekIndex}-${rowIndex}` : dayKey
+
+              if (day.count < 0) {
                 return (
                   <div
-                    key={index}
-                    className="text-xs text-muted-foreground absolute"
-                    style={{
-                      left: `${weekStart}px`,
-                    }}
-                  >
-                    {label.month.charAt(0).toUpperCase() + label.month.slice(1)}
-                  </div>
+                    key={uniqueKey}
+                    className="aspect-square w-full min-w-0 rounded-[2px]"
+                  />
                 )
-              })}
-            </div>
+              }
 
-            {/* Grid de dias */}
-            <div className="flex gap-1">
-              {/* Labels de dias da semana */}
-              <div className="flex flex-col gap-1 text-xs text-muted-foreground pr-2 justify-around shrink-0 w-12">
-                <div className="h-3 flex items-center">Dom</div>
-                <div className="h-3 flex items-center">Seg</div>
-                <div className="h-3 flex items-center">Ter</div>
-                <div className="h-3 flex items-center">Qua</div>
-                <div className="h-3 flex items-center">Qui</div>
-                <div className="h-3 flex items-center">Sex</div>
-                <div className="h-3 flex items-center">Sáb</div>
-              </div>
+              const level = getIntensityLevel(day.count)
 
-              {/* Grid de semanas */}
-              <div className="flex gap-1">
-                {weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="flex flex-col gap-1">
-                    {week.map((day, dayIndex) => {
-                      const year = day.date.getFullYear()
-                      const month = String(day.date.getMonth() + 1).padStart(2, "0")
-                      const dayStr = String(day.date.getDate()).padStart(2, "0")
-                      const dayKey = `${year}-${month}-${dayStr}`
-                      const uniqueKey = day.count < 0 ? `empty-${weekIndex}-${dayIndex}` : dayKey
+              return (
+                <div
+                  key={uniqueKey}
+                  className={`aspect-square w-full min-w-0 rounded-[2px] ${intensityColors[level]} transition-colors hover:ring-1 hover:ring-primary`}
+                  onMouseEnter={(e) => handleMouseEnter(day, e)}
+                  onMouseLeave={handleMouseLeave}
+                  aria-label={`${day.date.toLocaleDateString("pt-BR")}: ${day.count} jogatinas`}
+                />
+              )
+            })}
+          </Fragment>
+        ))}
+      </div>
 
-                      if (day.count < 0) {
-                        return <div key={uniqueKey} className="w-3 h-3 rounded-sm" />
-                      }
-
-                      const level = getIntensityLevel(day.count)
-                      const colors = ["bg-muted", "bg-primary/20", "bg-primary/40", "bg-primary/60", "bg-primary/80"]
-
-                      return (
-                        <div
-                          key={uniqueKey}
-                          className={`w-3 h-3 rounded-sm ${colors[level]} hover:ring-2 hover:ring-primary transition-all cursor-pointer`}
-                          onMouseEnter={(e) => handleMouseEnter(day, e)}
-                          onMouseLeave={handleMouseLeave}
-                          aria-label={`${day.date.toLocaleDateString("pt-BR")}: ${day.count} jogatinas`}
-                        />
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Legenda */}
-            <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-              <span>Menos</span>
-              <div className="flex gap-1">
-                <div className="w-3 h-3 rounded-sm bg-muted" />
-                <div className="w-3 h-3 rounded-sm bg-primary/20" />
-                <div className="w-3 h-3 rounded-sm bg-primary/40" />
-                <div className="w-3 h-3 rounded-sm bg-primary/60" />
-                <div className="w-3 h-3 rounded-sm bg-primary/80" />
-              </div>
-              <span>Mais</span>
-            </div>
-          </div>
+      <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Menos</span>
+        <div className="flex gap-1">
+          {intensityColors.map((color, index) => (
+            <div key={index} className={`h-3 w-3 rounded-[2px] ${color}`} />
+          ))}
         </div>
+        <span>Mais</span>
+      </div>
 
-        {hoveredDay && (
-          <div
-            className="fixed z-50 bg-popover text-popover-foreground px-3 py-2 rounded-md shadow-md text-sm border pointer-events-none max-w-xs"
-            style={{
-              left: Math.min(mousePosition.x + 10, window.innerWidth - 200),
-              top: Math.min(mousePosition.y + 10, window.innerHeight - 120),
-            }}
-          >
-            <div className="font-semibold">
-              {hoveredDay.date.toLocaleDateString("pt-BR", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
-            <div className="text-muted-foreground">
-              {hoveredDay.count} {hoveredDay.count === 1 ? "jogatina" : "jogatinas"}
-            </div>
-            {hoveredDay.totalMinutes > 0 && (
-              <div className="text-muted-foreground text-xs">
-                {Math.floor(hoveredDay.totalMinutes / 60)}h {hoveredDay.totalMinutes % 60}m jogados
-              </div>
-            )}
+      {hoveredDay && (
+        <div
+          className="pointer-events-none fixed z-50 max-w-xs rounded-md border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md"
+          style={{
+            left: Math.min(mousePosition.x + 10, window.innerWidth - 200),
+            top: Math.min(mousePosition.y + 10, window.innerHeight - 120),
+          }}
+        >
+          <div className="font-semibold">
+            {hoveredDay.date.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            })}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <div className="text-muted-foreground">
+            {hoveredDay.count}{" "}
+            {hoveredDay.count === 1 ? "jogatina" : "jogatinas"}
+          </div>
+          {hoveredDay.totalMinutes > 0 && (
+            <div className="text-xs text-muted-foreground">
+              {Math.floor(hoveredDay.totalMinutes / 60)}h{" "}
+              {hoveredDay.totalMinutes % 60}m jogados
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

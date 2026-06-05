@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Flame, Target } from "lucide-react"
 import type { Jogatina, Game, JogatinaPlayer, Season, SeasonParticipant } from "@/lib/types"
@@ -11,7 +10,6 @@ interface LandingHighlightsProps {
 }
 
 export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonParticipants }: LandingHighlightsProps) {
-  // Jogatina mais longa
   const longestSession =
     jogatinas.length > 0
       ? jogatinas.reduce((prev, current) =>
@@ -19,7 +17,6 @@ export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonP
         )
       : null
 
-  // Season mais intensa (mais participantes)
   const mostIntenseSeason =
     seasons.length > 0
       ? seasons.reduce((prev, current) => {
@@ -29,7 +26,6 @@ export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonP
         })
       : null
 
-  // Jogo mais abandonado
   const gameDrops = jogatinas.reduce(
     (acc, jogatina) => {
       const gameId = jogatina.game_id
@@ -49,83 +45,44 @@ export function LandingHighlights({ jogatinas, jogatinaPlayers, seasons, seasonP
       : null
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
       {longestSession && (
-        <Card className="relative group border-yellow-500/20 bg-yellow-500/5">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-yellow-500" />
-              Maratona
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-medium">{longestSession.game.title}</p>
-            <Badge variant="outline" className="mt-2">
-              {longestSession.total_duration_minutes ? Math.floor(longestSession.total_duration_minutes / 60) : 0}h
-            </Badge>
-          </CardContent>
-        </Card>
+        <div className="border-l-2 border-yellow-500/60 pl-4">
+          <p className="flex items-center gap-2 text-sm font-medium text-yellow-500">
+            <Trophy className="h-4 w-4" />
+            Maratona
+          </p>
+          <p className="mt-2 font-medium">{longestSession.game.title}</p>
+          <Badge variant="outline" className="mt-2">
+            {longestSession.total_duration_minutes ? Math.floor(longestSession.total_duration_minutes / 60) : 0}h
+          </Badge>
+        </div>
       )}
 
       {mostAbandonedGame && (
-        <Card className="relative group border-red-500/20 bg-red-500/5">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Flame className="h-4 w-4 text-red-500" />
-              Mais Abandonado
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-medium">{mostAbandonedGame.game.title}</p>
-            <Badge variant="outline" className="mt-2">
-              {mostAbandonedGame.drops} drops
-            </Badge>
-          </CardContent>
-        </Card>
+        <div className="border-l-2 border-red-500/60 pl-4">
+          <p className="flex items-center gap-2 text-sm font-medium text-red-500">
+            <Flame className="h-4 w-4" />
+            Mais abandonado
+          </p>
+          <p className="mt-2 font-medium">{mostAbandonedGame.game.title}</p>
+          <Badge variant="outline" className="mt-2">
+            {mostAbandonedGame.drops} drops
+          </Badge>
+        </div>
       )}
 
       {mostIntenseSeason && (
-        <Card className="relative group border-green-500/20 bg-green-500/5">
-          {/* Decorative corner lines */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Target className="h-4 w-4 text-green-500" />
-              Season Intensa
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-medium">{mostIntenseSeason.name}</p>
-            <Badge variant="outline" className="mt-2">
-              {seasonParticipants.filter((sp) => sp.season_id === mostIntenseSeason.id).length} players
-            </Badge>
-          </CardContent>
-        </Card>
+        <div className="border-l-2 border-green-500/60 pl-4">
+          <p className="flex items-center gap-2 text-sm font-medium text-green-500">
+            <Target className="h-4 w-4" />
+            Season intensa
+          </p>
+          <p className="mt-2 font-medium">{mostIntenseSeason.name}</p>
+          <Badge variant="outline" className="mt-2">
+            {seasonParticipants.filter((sp) => sp.season_id === mostIntenseSeason.id).length} players
+          </Badge>
+        </div>
       )}
     </div>
   )

@@ -1,7 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Lock, Gamepad2 } from "lucide-react";
 import { LandingHero } from "@/components/landing-hero";
 import { LandingCurrentGamesSection } from "@/components/landing-current-games-section";
 import { LandingTimelineSection } from "@/components/landing-timeline-section";
@@ -11,6 +8,9 @@ import { LandingHighlights } from "@/components/landing-highlights";
 import { HallOfShame } from "@/components/hall-of-shame";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { ActivitySummaryCards } from "@/components/activity-summary-cards";
+import { LandingHeader } from "@/components/landing/landing-header";
+import { LandingFooter } from "@/components/landing/landing-footer";
+import { LandingSection } from "@/components/landing/landing-section";
 
 export default async function LandingPage() {
   const supabase = await createClient();
@@ -45,7 +45,6 @@ export default async function LandingPage() {
     .eq("is_active", true)
     .order("started_at", { ascending: false });
 
-  // Buscar todos os season_participants para cálculos
   const { data: allSeasonParticipants } = await supabase.from(
     "season_participants",
   ).select(`
@@ -53,176 +52,110 @@ export default async function LandingPage() {
       player:players(*)
     `);
 
-  // Filtrar jogatinas de apps (Spotify, VSCode, etc.) das métricas
   const gameJogatinas = jogatinas?.filter((j) => !j.game?.is_app) || [];
-  const gameJogatinaPlayers = jogatinaPlayers?.filter((jp) => !jp.jogatina?.game?.is_app) || [];
+  const gameJogatinaPlayers =
+    jogatinaPlayers?.filter((jp) => !jp.jogatina?.game?.is_app) || [];
+  const currentGames = gameJogatinas.filter((j) => j.is_current);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
-      <header className=" border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        {/* Decorative corner lines */}
-        <div className="absolute top-0 left-0 w-8 h-px bg-primary/40" />
-        <div className="absolute top-0 left-0 w-px h-8 bg-primary/40" />
-        <div className="absolute top-0 right-0 w-8 h-px bg-primary/40" />
-        <div className="absolute top-0 right-0 w-px h-8 bg-primary/40" />
+    <div className="min-h-screen bg-background">
+      <LandingHeader />
 
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="relative flex items-center gap-2">
-            <div className="p-2 rounded-md bg-primary/10 border border-primary/20">
-              <Gamepad2 className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Panela Tracker</h1>
-              <p className="text-xs text-muted-foreground">
-                Dashboard do grupo
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button asChild variant="outline">
-              <Link href="/memorial">
-                Memorial
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/login">
-                <Lock className="h-4 w-4 mr-2" />
-                Admin
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 space-y-12">
-        <LandingHero
-          currentGames={gameJogatinas.filter((j) => j.is_current)}
-          players={players || []}
-          jogatinas={gameJogatinas}
-          activeSeasons={activeSeasons || []}
-        />
-
-        <section className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">
-              Atividade ao Longo do Tempo
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <ActivityHeatmap jogatinas={gameJogatinas} />
-            </div>
-            <div>
-              <ActivitySummaryCards jogatinas={gameJogatinas} />
-            </div>
-          </div>
-        </section>
-
-        <section className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">
-              O Que Estamos Jogando
-            </h2>
-          </div>
-          <LandingCurrentGamesSection
-            currentGames={gameJogatinas.filter((j) => j.is_current)}
-            isInteractive={false}
+      <main className="mx-auto max-w-7xl px-4 lg:px-8">
+        <section id="overview" className="scroll-mt-[7.5rem] pt-8 pb-4 lg:pt-10">
+          <LandingHero
+            currentGames={currentGames}
+            players={players || []}
+            jogatinas={gameJogatinas}
+            activeSeasons={activeSeasons || []}
           />
         </section>
 
-        <section>
+        <LandingSection
+          id="agora"
+          title="O que estamos jogando"
+          description="Sessões em andamento e quem está online agora."
+        >
+          <LandingCurrentGamesSection
+            currentGames={currentGames}
+            isInteractive={false}
+          />
+        </LandingSection>
+
+        <LandingSection
+          id="atividade"
+          title="Atividade ao longo do tempo"
+          description="Heatmap dos últimos 12 meses e resumo de frequência."
+          tone="muted"
+        >
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-12">
+            <ActivityHeatmap jogatinas={gameJogatinas} />
+            <ActivitySummaryCards jogatinas={gameJogatinas} />
+          </div>
+        </LandingSection>
+
+        <LandingSection
+          id="vergonha"
+          title="Hall da vergonha"
+          description="Os três maiores dropadores do grupo."
+        >
           <HallOfShame
             jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
-        </section>
+        </LandingSection>
 
-        <section className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Timeline Global</h2>
-          </div>
+        <LandingSection
+          id="timeline"
+          title="Timeline global"
+          description="Últimos eventos registrados pelo grupo."
+          tone="muted"
+        >
           <LandingTimelineSection
             jogatinas={gameJogatinas}
             jogatinaPlayers={gameJogatinaPlayers}
           />
-        </section>
+        </LandingSection>
 
-        <section id="group-data" className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Como a Gente Joga</h2>
-          </div>
+        <LandingSection
+          id="metricas"
+          title="Como a gente joga"
+          description="Distribuição de status e duração média das sessões."
+        >
           <LandingGroupMetrics
             jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
-        </section>
+        </LandingSection>
 
-        <section className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Perfis do Grupo</h2>
-          </div>
+        <LandingSection
+          id="perfis"
+          title="Perfis do grupo"
+          description="Resumo individual de participação e comportamento."
+          tone="muted"
+        >
           <LandingPlayerProfiles
             players={players || []}
             jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
-        </section>
+        </LandingSection>
 
-        <section className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Momentos Marcantes</h2>
-          </div>
+        <LandingSection
+          id="destaques"
+          title="Momentos marcantes"
+          description="Recordes e curiosidades das jogatinas."
+        >
           <LandingHighlights
             jogatinas={gameJogatinas}
             jogatinaPlayers={gameJogatinaPlayers}
             seasons={activeSeasons || []}
             seasonParticipants={allSeasonParticipants || []}
           />
-        </section>
+        </LandingSection>
       </main>
 
-      {/* Footer */}
-      <footer className="relative border-t mt-12">
-        {/* Decorative corner lines */}
-        <div className="absolute bottom-0 left-0 w-8 h-px bg-primary/40" />
-        <div className="absolute bottom-0 left-0 w-px h-8 bg-primary/40" />
-        <div className="absolute bottom-0 right-0 w-8 h-px bg-primary/40" />
-        <div className="absolute bottom-0 right-0 w-px h-8 bg-primary/40" />
-
-        <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>Panela Tracker - Acompanhe suas sessões de jogo com os amigos</p>
-        </div>
-      </footer>
+      <LandingFooter />
     </div>
   );
 }

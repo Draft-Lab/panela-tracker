@@ -1,98 +1,104 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Gamepad2 } from "lucide-react"
 import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
+import {
+  TimelineEventItem,
+  type TimelineEvent,
+} from "@/components/landing/timeline-event-item"
 
 interface LandingTimelineSectionProps {
-  jogatinas: (Jogatina & { game: Game; jogatina_players?: (JogatinaPlayer & { player: Player })[] })[]
+  jogatinas: (Jogatina & {
+    game: Game
+    jogatina_players?: (JogatinaPlayer & { player: Player })[]
+  })[]
   jogatinaPlayers: (JogatinaPlayer & { player: Player })[]
 }
 
-export function LandingTimelineSection({ jogatinas, jogatinaPlayers }: LandingTimelineSectionProps) {
-  const recentEvents = jogatinas.slice(0, 8).map((jogatina) => {
-    // Primeiro tenta usar os jogadores que vêm junto com a jogatina
+function getDateGroupLabel(date: Date) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const target = new Date(date)
+  target.setHours(0, 0, 0, 0)
+
+  const diffDays = Math.round(
+    (today.getTime() - target.getTime()) / (1000 * 60 * 60 * 24),
+  )
+
+  if (diffDays === 0) return "Hoje"
+  if (diffDays === 1) return "Ontem"
+  if (diffDays < 7) {
+    const weekday = date.toLocaleDateString("pt-BR", { weekday: "long" })
+    return weekday.charAt(0).toUpperCase() + weekday.slice(1)
+  }
+
+  const formatted = date.toLocaleDateString("pt-BR", {
+    day: "numeric",
+    month: "long",
+  })
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
+}
+
+function groupEventsByDate(events: TimelineEvent[]) {
+  const groups = new Map<string, TimelineEvent[]>()
+
+  events.forEach((event) => {
+    const label = getDateGroupLabel(new Date(event.jogatina.date))
+    const existing = groups.get(label) ?? []
+    existing.push(event)
+    groups.set(label, existing)
+  })
+
+  return Array.from(groups.entries())
+}
+
+export function LandingTimelineSection({
+  jogatinas,
+  jogatinaPlayers,
+}: LandingTimelineSectionProps) {
+  const recentEvents: TimelineEvent[] = jogatinas.slice(0, 8).map((jogatina) => {
     const playersFromJogatina = jogatina.jogatina_players || []
-    // Se não tiver, busca no array separado de jogatinaPlayers
-    const playersFromSeparate = jogatinaPlayers.filter((jp) => jp.jogatina_id === jogatina.id)
-    
-    const players = playersFromJogatina.length > 0 ? playersFromJogatina : playersFromSeparate
-    const firstPlayer = players[0]?.player?.name || "Alguém"
+    const playersFromSeparate = jogatinaPlayers.filter(
+      (jp) => jp.jogatina_id === jogatina.id,
+    )
+
+    const players =
+      playersFromJogatina.length > 0 ? playersFromJogatina : playersFromSeparate
 
     return {
       jogatina,
-      firstPlayer,
+      firstPlayer: players[0]?.player?.name || "Alguém",
       playerCount: players.length,
+      players,
     }
   })
 
   if (recentEvents.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Nenhum evento recente</p>
-        </CardContent>
-      </Card>
+      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
+        Nenhum evento recente
+      </p>
     )
   }
 
+  const groupedEvents = groupEventsByDate(recentEvents)
+
   return (
-    <Card className="relative group">
-      {/* Decorative corner lines */}
-      <div className="absolute top-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute top-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 left-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 left-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 right-0 w-4 h-px bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 right-0 w-px h-4 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
-      
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Gamepad2 className="h-5 w-5 text-primary" />
-          Timeline Global
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {recentEvents.map((event) => {
-            const date = new Date(event.jogatina.date)
-            const timeAgo = getTimeAgo(date)
-
-            return (
-              <div key={event.jogatina.id} className="flex gap-4 pb-4 border-b last:border-0 last:pb-0">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium">
-                    <span className="text-primary">{event.firstPlayer}</span> iniciou uma jogatina em{" "}
-                    <span className="text-primary">{event.jogatina.game.title}</span>
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant="outline" className="text-xs">
-                      {event.playerCount} jogadores
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      {timeAgo}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-8">
+      {groupedEvents.map(([label, events]) => (
+        <section key={label}>
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            {label}
+          </h3>
+          <div>
+            {events.map((event, index) => (
+              <TimelineEventItem
+                key={event.jogatina.id}
+                event={event}
+                isLast={index === events.length - 1}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
   )
-}
-
-function getTimeAgo(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 60) return `${diffMins}m atrás`
-  if (diffHours < 24) return `${diffHours}h atrás`
-  return `${diffDays}d atrás`
 }
