@@ -1,23 +1,49 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { PlayerProfileHero } from "@/components/player-profile/player-profile-hero";
 import { PlayerProfileLayout } from "@/components/player-profile/player-profile-layout";
-import {
-  buildPlayerGameLibrary,
-  buildPlayerProfileSummary,
-  filterGameJogatinaPlayers,
-  filterGameSeasonParticipants,
-  getActiveSeasonsForPlayer,
-  getPlayerJogatinasForCalendar,
-  getPlayerParticipationDays,
-  getPlayerTags,
-  getRecentGames,
-  getTopGameCover,
-  type JogatinaPlayerWithDetails,
-  type SeasonParticipantWithDetails,
-} from "@/lib/player-profile-helpers";
+import { loadPlayerProfile } from "@/lib/load-player-profile";
+import { formatPlayerDuration } from "@/lib/player-profile-helpers";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const data = await loadPlayerProfile(id);
+
+  if (!data) {
+    return {
+      title: "Jogador não encontrado",
+    };
+  }
+
+  const { player, summary, tags } = data;
+  const title = `${player.name} · Panela Tracker`;
+  const description = `${formatPlayerDuration(summary.totalMinutes)} jogados · ${summary.totalSessions} sessões${
+    tags.length > 0 ? ` · ${tags.slice(0, 2).join(", ")}` : ""
+  }`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/jogadores/${id}`,
+      type: "profile",
+      siteName: "Panela Tracker",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function PlayerProfilePage({
   params,
@@ -25,58 +51,23 @@ export default async function PlayerProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const data = await loadPlayerProfile(id);
 
-  const { data: player, error: playerError } = await supabase
-    .from("players")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (playerError || !player) {
+  if (!data) {
     notFound();
   }
 
-  const { data: jogatinaPlayers } = await supabase
-    .from("jogatina_players")
-    .select(
-      `
-      *,
-      jogatina:jogatinas(*, game:games(*))
-    `,
-    )
-    .eq("player_id", id);
-
-  const { data: seasonParticipants } = await supabase
-    .from("season_participants")
-    .select(
-      `
-      *,
-      season:seasons(*, game:games(*))
-    `,
-    )
-    .eq("player_id", id);
-
-  const gameJogatinaPlayers = filterGameJogatinaPlayers(
-    (jogatinaPlayers || []) as JogatinaPlayerWithDetails[],
-  );
-  const gameSeasonParticipants = filterGameSeasonParticipants(
-    (seasonParticipants || []) as SeasonParticipantWithDetails[],
-  );
-
-  const summary = buildPlayerProfileSummary(
-    gameJogatinaPlayers,
-    gameSeasonParticipants,
-  );
-  const tags = getPlayerTags(summary);
-  const library = buildPlayerGameLibrary(
-    gameJogatinaPlayers,
-    gameSeasonParticipants,
-  );
-  const recentGames = getRecentGames(library);
-  const participationDays = getPlayerParticipationDays(gameJogatinaPlayers);
-  const calendarJogatinas = getPlayerJogatinasForCalendar(gameJogatinaPlayers);
-  const activeSeasons = getActiveSeasonsForPlayer(gameSeasonParticipants);
+  const {
+    player,
+    summary,
+    tags,
+    library,
+    recentGames,
+    participationDays,
+    calendarJogatinas,
+    activeSeasons,
+    bannerCoverUrl,
+  } = data;
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +78,7 @@ export default async function PlayerProfilePage({
           player={player}
           tags={tags}
           totalMinutes={summary.totalMinutes}
-          bannerCoverUrl={getTopGameCover(library)}
+          bannerCoverUrl={bannerCoverUrl}
         />
 
         <PlayerProfileLayout
