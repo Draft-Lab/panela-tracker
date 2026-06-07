@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const SECTION_LINKS = [
-  { href: "#agora", label: "Agora" },
-  { href: "#jogos", label: "Jogos" },
-  { href: "#atividade", label: "Atividade" },
-  { href: "#vergonha", label: "Vergonha" },
-  { href: "#timeline", label: "Timeline" },
-  { href: "#metricas", label: "Métricas" },
-  { href: "#perfis", label: "Perfis" },
-  { href: "#destaques", label: "Destaques" },
+  { href: "/#agora", label: "Agora" },
+  { href: "/#jogos", label: "Jogos" },
+  { href: "/#atividade", label: "Atividade" },
+  { href: "/#vergonha", label: "Vergonha" },
+  { href: "/#timeline", label: "Timeline" },
+  { href: "/#metricas", label: "Métricas" },
+  { href: "/#perfis", label: "Perfis" },
+  { href: "/#destaques", label: "Destaques" },
 ] as const
 
 export function LandingHeader() {
@@ -35,7 +35,7 @@ export function LandingHeader() {
           className="hidden items-center gap-1 xl:flex"
         >
           {SECTION_LINKS.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className={cn(
@@ -44,7 +44,7 @@ export function LandingHeader() {
               )}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -67,13 +67,13 @@ export function LandingHeader() {
       >
         <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SECTION_LINKS.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="shrink-0 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
       </nav>
