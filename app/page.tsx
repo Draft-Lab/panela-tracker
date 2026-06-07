@@ -86,7 +86,7 @@ export default async function LandingPage() {
         <LandingSection
           id="jogos"
           title="Jogos do grupo"
-          description="Os três jogos com mais sessões registradas pelo grupo."
+          description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
           tone="muted"
           className="mb-8 lg:mb-10"
         >

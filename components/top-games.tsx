@@ -17,7 +17,7 @@ export function TopGames({ jogatinas, jogatinaPlayers }: TopGamesProps) {
     return (
       <Card>
         <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Nenhum jogo registrado ainda</p>
+          <p className="text-center text-muted-foreground">Nenhuma sessão em grupo registrada ainda</p>
         </CardContent>
       </Card>
     )

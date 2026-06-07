@@ -161,7 +161,7 @@ export function LandingTopGames({
   if (topGames.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
-        Nenhum jogo registrado ainda
+        Nenhuma sessão em grupo registrada ainda
       </p>
     )
   }
