@@ -5,6 +5,7 @@ import { LandingTimelineSection } from "@/components/landing-timeline-section";
 import { LandingGroupMetrics } from "@/components/landing-group-metrics";
 import { LandingPlayerProfiles } from "@/components/landing-player-profiles";
 import { LandingHighlights } from "@/components/landing-highlights";
+import { LandingTopGames } from "@/components/landing-top-games";
 import { HallOfShame } from "@/components/hall-of-shame";
 import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { ActivitySummaryCards } from "@/components/activity-summary-cards";
@@ -79,6 +80,19 @@ export default async function LandingPage() {
           <LandingCurrentGamesSection
             currentGames={currentGames}
             isInteractive={false}
+          />
+        </LandingSection>
+
+        <LandingSection
+          id="jogos"
+          title="Jogos do grupo"
+          description="Os três jogos com mais sessões registradas pelo grupo."
+          tone="muted"
+          className="mb-8 lg:mb-10"
+        >
+          <LandingTopGames
+            jogatinas={gameJogatinas}
+            jogatinaPlayers={gameJogatinaPlayers}
           />
         </LandingSection>
 

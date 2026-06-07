@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 
 const SECTION_LINKS = [
   { href: "#agora", label: "Agora" },
+  { href: "#jogos", label: "Jogos" },
   { href: "#atividade", label: "Atividade" },
   { href: "#vergonha", label: "Vergonha" },
   { href: "#timeline", label: "Timeline" },

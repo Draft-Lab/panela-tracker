@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Gamepad2, Users } from "lucide-react"
 import type { Jogatina, Game, JogatinaPlayer } from "@/lib/types"
+import { calculateTopGames } from "@/lib/game-stats-helpers"
 import Image from "next/image"
 
 interface TopGamesProps {
@@ -10,26 +11,7 @@ interface TopGamesProps {
 }
 
 export function TopGames({ jogatinas, jogatinaPlayers }: TopGamesProps) {
-  const gameStats = jogatinas.reduce(
-    (acc, jogatina) => {
-      const gameId = jogatina.game.id
-      if (!acc[gameId]) {
-        acc[gameId] = {
-          game: jogatina.game,
-          sessions: 0,
-          players: 0,
-        }
-      }
-      acc[gameId].sessions++
-      acc[gameId].players += jogatinaPlayers.filter((jp) => jp.jogatina_id === jogatina.id).length
-      return acc
-    },
-    {} as Record<string, { game: Game; sessions: number; players: number }>,
-  )
-
-  const topGames = Object.values(gameStats)
-    .sort((a, b) => b.sessions - a.sessions)
-    .slice(0, 5)
+  const topGames = calculateTopGames(jogatinas, jogatinaPlayers)
 
   if (topGames.length === 0) {
     return (
@@ -75,7 +57,7 @@ export function TopGames({ jogatinas, jogatinaPlayers }: TopGamesProps) {
                 <div className="flex gap-2 mt-1">
                   <Badge variant="outline" className="text-xs">
                     <Users className="h-3 w-3 mr-1" />
-                    {stat.players} participações
+                    {stat.participations} participações
                   </Badge>
                 </div>
               </div>

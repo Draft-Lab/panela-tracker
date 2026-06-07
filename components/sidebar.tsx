@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Home, Users, Gamepad2, ListChecks, Menu, X, LogOut, Dices, PlayCircle, Trophy } from "lucide-react"
+import { Home, Users, Gamepad2, ListChecks, Menu, X, LogOut, Dices, PlayCircle, Trophy, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -20,6 +20,7 @@ const navigationGroups = [
       { name: "Temporadas", href: "/dashboard/temporadas", icon: Trophy },
       { name: "Jogos", href: "/dashboard/jogos", icon: Gamepad2 },
       { name: "Jogatinas", href: "/dashboard/jogatinas", icon: ListChecks },
+      { name: "Calendário", href: "/dashboard/calendario", icon: Calendar },
     ],
   },
   {
