@@ -14,10 +14,7 @@ import {
 interface GameCalendarGridProps {
   viewDate: Date;
   dayMap: Map<string, CalendarDayData>;
-  activeDayKey: string | null;
-  onHover: (dayData: CalendarDayData, event: React.MouseEvent) => void;
-  onLeave: () => void;
-  onTap: (dayData: CalendarDayData, event: React.MouseEvent) => void;
+  compact?: boolean;
 }
 
 function chunkWeeks(cells: CalendarCell[]): CalendarCell[][] {
@@ -31,38 +28,48 @@ function chunkWeeks(cells: CalendarCell[]): CalendarCell[][] {
 export function GameCalendarGrid({
   viewDate,
   dayMap,
-  activeDayKey,
-  onHover,
-  onLeave,
-  onTap,
+  compact = false,
 }: GameCalendarGridProps) {
   const cells = buildMonthGrid(viewDate.getFullYear(), viewDate.getMonth());
   const weeks = chunkWeeks(cells);
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card/30 p-3 sm:p-4">
-      <div className="mb-2 grid grid-cols-[2rem_repeat(7,minmax(0,1fr))] gap-1.5 sm:grid-cols-[2.5rem_repeat(7,minmax(0,1fr))] sm:gap-2">
+    <div
+      className={
+        compact
+          ? "rounded-lg border border-border/40 bg-background/40 p-2"
+          : "rounded-xl border border-border/60 bg-card/30 p-3 sm:p-4"
+      }
+    >
+      <div
+        className={
+          compact
+            ? "mb-1.5 grid grid-cols-[1.5rem_repeat(7,minmax(0,1fr))] gap-1"
+            : "mb-2 grid grid-cols-[2rem_repeat(7,minmax(0,1fr))] gap-1.5 sm:grid-cols-[2.5rem_repeat(7,minmax(0,1fr))] sm:gap-2"
+        }
+      >
         <div />
         {WEEKDAY_LABELS.map((label) => (
           <div
             key={label}
-            className="text-center text-[10px] font-medium text-muted-foreground sm:text-xs"
+            className={
+              compact
+                ? "text-center text-[9px] font-medium text-muted-foreground"
+                : "text-center text-[10px] font-medium text-muted-foreground sm:text-xs"
+            }
           >
             {label}
           </div>
         ))}
       </div>
 
-      <div className="space-y-1.5 sm:space-y-2">
+      <div className={compact ? "space-y-1" : "space-y-1.5 sm:space-y-2"}>
         {weeks.map((weekCells, index) => (
           <GameCalendarWeekRow
             key={`week-${index}-${getDateKey(weekCells[0]?.date || new Date())}`}
             weekCells={weekCells}
             dayMap={dayMap}
-            activeDayKey={activeDayKey}
-            onHover={onHover}
-            onLeave={onLeave}
-            onTap={onTap}
+            compact={compact}
           />
         ))}
       </div>

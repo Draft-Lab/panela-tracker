@@ -17,10 +17,7 @@ import {
 interface GameCalendarDayCellProps {
   cell: CalendarCell;
   dayData?: CalendarDayData;
-  isActive: boolean;
-  onHover: (dayData: CalendarDayData, event: React.MouseEvent) => void;
-  onLeave: () => void;
-  onTap: (dayData: CalendarDayData, event: React.MouseEvent) => void;
+  compact?: boolean;
 }
 
 interface ActivitySegmentsProps {
@@ -65,16 +62,19 @@ function ActivitySegments({
 export function GameCalendarDayCell({
   cell,
   dayData,
-  isActive,
-  onHover,
-  onLeave,
-  onTap,
+  compact = false,
 }: GameCalendarDayCellProps) {
   const [hoveredGameIndex, setHoveredGameIndex] = useState<number | null>(null);
 
   if (cell.isPadding) {
     return (
-      <div className="min-h-[72px] rounded-lg bg-transparent md:aspect-[4/5] md:min-h-0" />
+      <div
+        className={
+          compact
+            ? "min-h-[48px] rounded-md bg-transparent"
+            : "min-h-[72px] rounded-lg bg-transparent md:aspect-[4/5] md:min-h-0"
+        }
+      />
     );
   }
 
@@ -87,52 +87,35 @@ export function GameCalendarDayCell({
       : dayData?.primaryJogatina?.game;
   const coverUrl = displayedGame?.cover_url;
 
-  const handleMouseEnter = (event: React.MouseEvent) => {
-    if (dayData && hasActivity) onHover(dayData, event);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredGameIndex(null);
-    onLeave();
-  };
-
-  const handleClick = (event: React.MouseEvent) => {
-    if (dayData && hasActivity) onTap(dayData, event);
-  };
-
   return (
     <div
-      role="button"
-      tabIndex={hasActivity ? 0 : -1}
       data-calendar-day="true"
       className={cn(
-        "group relative flex min-h-[72px] w-full flex-col overflow-hidden rounded-lg border text-left transition-all md:aspect-[4/5] md:min-h-0",
+        "group relative flex w-full flex-col overflow-hidden border text-left transition-all",
+        compact
+          ? "min-h-[48px] rounded-md"
+          : "min-h-[72px] rounded-lg md:aspect-[4/5] md:min-h-0",
         hasActivity
-          ? "cursor-pointer border-border/50 bg-card hover:border-primary/40 hover:ring-1 hover:ring-primary/30"
+          ? "border-border/50 bg-card hover:border-primary/40 hover:ring-1 hover:ring-primary/30"
           : "border-border/30 bg-muted/20",
         today && "ring-2 ring-primary/50",
-        isActive && hasActivity && "border-primary/50 ring-2 ring-primary/40",
       )}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
-      onKeyDown={(event) => {
-        if (!dayData || !hasActivity) return;
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          handleClick(event as unknown as React.MouseEvent);
-        }
-      }}
       aria-label={
         hasActivity
           ? `${cell.date.toLocaleDateString("pt-BR")}: ${dayData?.gameCount} jogatinas, ${dayData?.uniqueGameCount} jogos`
           : cell.date.toLocaleDateString("pt-BR")
       }
     >
-      <div className="relative z-10 flex items-start justify-between gap-1 px-1.5 pt-1.5">
+      <div
+        className={cn(
+          "relative z-10 flex items-start justify-between gap-1",
+          compact ? "px-1 pt-1" : "px-1.5 pt-1.5",
+        )}
+      >
         <span
           className={cn(
-            "text-[11px] font-semibold tabular-nums sm:text-xs",
+            "font-semibold tabular-nums",
+            compact ? "text-[10px]" : "text-[11px] sm:text-xs",
             today ? "text-primary" : "text-foreground/90",
           )}
         >
@@ -140,7 +123,7 @@ export function GameCalendarDayCell({
         </span>
       </div>
 
-      {hasActivity && dayData && (
+      {hasActivity && dayData && !compact && (
         <ActivitySegments
           games={uniqueGames}
           activeIndex={hoveredGameIndex}
@@ -176,19 +159,13 @@ export function GameCalendarDayCell({
 interface GameCalendarWeekRowProps {
   weekCells: CalendarCell[];
   dayMap: Map<string, CalendarDayData>;
-  activeDayKey: string | null;
-  onHover: (dayData: CalendarDayData, event: React.MouseEvent) => void;
-  onLeave: () => void;
-  onTap: (dayData: CalendarDayData, event: React.MouseEvent) => void;
+  compact?: boolean;
 }
 
 export function GameCalendarWeekRow({
   weekCells,
   dayMap,
-  activeDayKey,
-  onHover,
-  onLeave,
-  onTap,
+  compact = false,
 }: GameCalendarWeekRowProps) {
   const firstRealDay = weekCells.find((cell) => !cell.isPadding);
   const weekNumber = firstRealDay
@@ -196,8 +173,20 @@ export function GameCalendarWeekRow({
     : null;
 
   return (
-    <div className="grid grid-cols-[2rem_repeat(7,minmax(0,1fr))] gap-1.5 sm:grid-cols-[2.5rem_repeat(7,minmax(0,1fr))] sm:gap-2">
-      <div className="flex items-start justify-center pt-2 text-[11px] font-semibold tabular-nums text-primary/80 sm:text-xs">
+    <div
+      className={
+        compact
+          ? "grid grid-cols-[1.25rem_repeat(7,minmax(0,1fr))] gap-1"
+          : "grid grid-cols-[2rem_repeat(7,minmax(0,1fr))] gap-1.5 sm:grid-cols-[2.5rem_repeat(7,minmax(0,1fr))] sm:gap-2"
+      }
+    >
+      <div
+        className={
+          compact
+            ? "flex items-start justify-center pt-1 text-[9px] font-semibold tabular-nums text-primary/80"
+            : "flex items-start justify-center pt-2 text-[11px] font-semibold tabular-nums text-primary/80 sm:text-xs"
+        }
+      >
         {weekNumber}
       </div>
 
@@ -208,10 +197,7 @@ export function GameCalendarWeekRow({
             key={`${dayKey}-${cell.isPadding ? "pad" : "day"}`}
             cell={cell}
             dayData={cell.isPadding ? undefined : dayMap.get(dayKey)}
-            isActive={activeDayKey === dayKey}
-            onHover={onHover}
-            onLeave={onLeave}
-            onTap={onTap}
+            compact={compact}
           />
         );
       })}
