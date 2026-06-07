@@ -4,19 +4,21 @@ import { ArrowLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { PlayerAchievement } from "@/lib/player-achievements";
 import { formatPlayerDuration } from "@/lib/player-profile-helpers";
+import { cn } from "@/lib/utils";
 import type { Player } from "@/lib/types";
 
 interface PlayerProfileHeroProps {
   player: Player;
-  tags: string[];
+  achievements?: PlayerAchievement[];
   totalMinutes: number;
   bannerCoverUrl: string | null;
 }
 
 export function PlayerProfileHero({
   player,
-  tags,
+  achievements = [],
   totalMinutes,
   bannerCoverUrl,
 }: PlayerProfileHeroProps) {
@@ -67,13 +69,20 @@ export function PlayerProfileHero({
                 year: "numeric",
               })}
             </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+            {achievements.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {achievements.map((achievement) => (
+                  <Badge
+                    key={achievement.id}
+                    variant="outline"
+                    title={achievement.description}
+                    className={cn("text-xs", achievement.style)}
+                  >
+                    {achievement.label}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="shrink-0 text-right">

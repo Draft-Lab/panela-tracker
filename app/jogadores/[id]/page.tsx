@@ -21,10 +21,13 @@ export async function generateMetadata({
     };
   }
 
-  const { player, summary, tags } = data;
+  const { player, summary, achievements } = data;
   const title = `${player.name} · Panela Tracker`;
+  const achievementLabels = (achievements ?? []).map((a) => a.label);
   const description = `${formatPlayerDuration(summary.totalMinutes)} jogados · ${summary.totalSessions} sessões${
-    tags.length > 0 ? ` · ${tags.slice(0, 2).join(", ")}` : ""
+    achievementLabels.length > 0
+      ? ` · ${achievementLabels.slice(0, 2).join(", ")}`
+      : ""
   }`;
 
   return {
@@ -60,7 +63,7 @@ export default async function PlayerProfilePage({
   const {
     player,
     summary,
-    tags,
+    achievements,
     library,
     recentGames,
     participationDays,
@@ -76,7 +79,7 @@ export default async function PlayerProfilePage({
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 lg:px-8 lg:py-10">
         <PlayerProfileHero
           player={player}
-          tags={tags}
+          achievements={achievements}
           totalMinutes={summary.totalMinutes}
           bannerCoverUrl={bannerCoverUrl}
         />

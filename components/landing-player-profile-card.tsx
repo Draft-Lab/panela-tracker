@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { PlayerAchievement } from "@/lib/player-achievements";
 import { formatPlayerDuration } from "@/lib/player-profile-helpers";
 import { cn } from "@/lib/utils";
 import type { Player } from "@/lib/types";
@@ -41,14 +42,6 @@ const ACCENT_PALETTE = [
   },
 ] as const;
 
-const TAG_STYLES: Record<string, string> = {
-  Finalizador: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-  Dedicado: "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  Explorador: "border-amber-500/30 bg-amber-500/10 text-amber-400",
-  Veterano: "border-violet-500/30 bg-violet-500/10 text-violet-400",
-  Casual: "border-border/60 bg-muted/40 text-muted-foreground",
-};
-
 function getAccentIndex(id: string) {
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
@@ -62,7 +55,7 @@ interface LandingPlayerProfileCardProps {
   totalSessions: number;
   totalMinutes: number;
   dropCount: number;
-  tags: string[];
+  achievements?: PlayerAchievement[];
 }
 
 export function LandingPlayerProfileCard({
@@ -70,7 +63,7 @@ export function LandingPlayerProfileCard({
   totalSessions,
   totalMinutes,
   dropCount,
-  tags,
+  achievements = [],
 }: LandingPlayerProfileCardProps) {
   const accent = ACCENT_PALETTE[getAccentIndex(player.id)];
   const initials = player.name.substring(0, 2).toUpperCase();
@@ -134,15 +127,16 @@ export function LandingPlayerProfileCard({
           </div>
         </div>
 
-        {tags.length > 0 && (
+        {achievements.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
+            {achievements.map((achievement) => (
               <Badge
-                key={tag}
+                key={achievement.id}
                 variant="outline"
-                className={cn("text-xs", TAG_STYLES[tag] ?? TAG_STYLES.Casual)}
+                title={achievement.description}
+                className={cn("text-xs", achievement.style)}
               >
-                {tag}
+                {achievement.label}
               </Badge>
             ))}
           </div>

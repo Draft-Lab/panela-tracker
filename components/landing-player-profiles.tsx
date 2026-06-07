@@ -26,7 +26,7 @@ export function LandingPlayerProfiles({
           totalSessions={stat.totalSessions}
           totalMinutes={stat.totalMinutes}
           dropCount={stat.dropCount}
-          tags={stat.tags}
+          achievements={stat.achievements ?? []}
         />
       ))}
     </div>

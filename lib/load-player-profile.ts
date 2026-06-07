@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { getPlayerAchievements } from "@/lib/player-achievements";
 import {
   buildPlayerGameLibrary,
   buildPlayerProfileSummary,
@@ -8,7 +9,6 @@ import {
   getActiveSeasonsForPlayer,
   getPlayerJogatinasForCalendar,
   getPlayerParticipationDays,
-  getPlayerTags,
   getRecentGames,
   getTopGameCover,
   type JogatinaPlayerWithDetails,
@@ -68,7 +68,7 @@ export const loadPlayerProfile = cache(async (id: string) => {
   return {
     player,
     summary,
-    tags: getPlayerTags(summary),
+    achievements: getPlayerAchievements(summary) ?? [],
     library,
     recentGames: getRecentGames(library),
     participationDays: getPlayerParticipationDays(gameJogatinaPlayers),

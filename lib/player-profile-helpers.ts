@@ -1,4 +1,8 @@
 import { formatDuration } from "@/lib/calendar-helpers";
+import {
+  getPlayerAchievements,
+  type PlayerProfileSummary,
+} from "@/lib/player-achievements";
 import type {
   Game,
   Jogatina,
@@ -7,6 +11,8 @@ import type {
   Season,
   SeasonParticipant,
 } from "@/lib/types";
+
+export type { PlayerProfileSummary };
 
 export type JogatinaPlayerWithDetails = JogatinaPlayer & {
   jogatina: Jogatina & { game: Game };
@@ -17,16 +23,6 @@ export type SeasonParticipantWithDetails = SeasonParticipant & {
 };
 
 export type JogatinaWithGame = Jogatina & { game: Game };
-
-export interface PlayerProfileSummary {
-  totalMinutes: number;
-  totalSessions: number;
-  uniqueGames: number;
-  drops: number;
-  zeros: number;
-  davaPraJogar: number;
-  dropRate: number;
-}
 
 export interface PlayerProfileGameEntry {
   gameId: string;
@@ -111,20 +107,6 @@ export function buildPlayerProfileSummary(
     davaPraJogar,
     dropRate: totalSessions > 0 ? (drops / totalSessions) * 100 : 0,
   };
-}
-
-export function getPlayerTags(
-  summary: PlayerProfileSummary,
-): string[] {
-  const tags: string[] = [];
-
-  if (summary.drops === 0 && summary.totalSessions > 5) tags.push("Finalizador");
-  if (summary.totalMinutes > summary.totalSessions * 60) tags.push("Dedicado");
-  if (summary.drops > summary.totalSessions * 0.3) tags.push("Explorador");
-  if (summary.totalSessions > 20) tags.push("Veterano");
-  if (tags.length === 0) tags.push("Casual");
-
-  return tags;
 }
 
 export function buildPlayerGameLibrary(
@@ -263,33 +245,19 @@ export function buildLandingPlayerCardStats(
   jogatinaPlayers: JogatinaPlayer[],
   seasonParticipants: SeasonParticipant[],
 ) {
-  const playerJogatinas = jogatinaPlayers.filter((jp) => jp.player_id === player.id);
-  const playerSeasons = seasonParticipants.filter((sp) => sp.player_id === player.id);
+  const playerJogatinas = jogatinaPlayers.filter(
+    (jp) => jp.player_id === player.id,
+  ) as JogatinaPlayerWithDetails[];
+  const playerSeasons = seasonParticipants.filter(
+    (sp) => sp.player_id === player.id,
+  ) as SeasonParticipantWithDetails[];
 
-  const totalSessions = playerJogatinas.length + playerSeasons.length;
-  const totalMinutes =
-    playerJogatinas.reduce((acc, jp) => acc + (jp.total_duration_minutes || 0), 0) +
-    playerSeasons.reduce((acc, sp) => acc + (sp.total_duration_minutes || 0), 0);
-
-  const dropCount =
-    playerJogatinas.filter((jp) => jp.status === "Dropo").length +
-    playerSeasons.filter((sp) => sp.status === "Dropo").length;
-
-  const summary: PlayerProfileSummary = {
-    totalMinutes,
-    totalSessions,
-    uniqueGames: 0,
-    drops: dropCount,
-    zeros: 0,
-    davaPraJogar: 0,
-    dropRate: totalSessions > 0 ? (dropCount / totalSessions) * 100 : 0,
-  };
-
+  const summary = buildPlayerProfileSummary(playerJogatinas, playerSeasons);
   return {
     player,
-    totalSessions,
-    totalMinutes,
-    dropCount,
-    tags: getPlayerTags(summary),
+    totalSessions: summary.totalSessions,
+    totalMinutes: summary.totalMinutes,
+    dropCount: summary.drops,
+    achievements: getPlayerAchievements(summary, { limit: 3 }) ?? [],
   };
 }
