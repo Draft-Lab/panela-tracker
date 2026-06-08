@@ -31,9 +31,10 @@ interface PlayerStatus {
 
 interface AddJogatinaDialogProps {
   gameId: string
+  trigger?: React.ReactNode
 }
 
-export function AddJogatinaDialog({ gameId }: AddJogatinaDialogProps) {
+export function AddJogatinaDialog({ gameId, trigger }: AddJogatinaDialogProps) {
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState("")
   const [notes, setNotes] = useState("")
@@ -161,10 +162,12 @@ export function AddJogatinaDialog({ gameId }: AddJogatinaDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Jogatina
-        </Button>
+        {trigger ?? (
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Nova Jogatina
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>

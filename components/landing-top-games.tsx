@@ -3,6 +3,7 @@ import { Gamepad2, Users } from "lucide-react"
 import { calculateTopGames, type GameRankingStat } from "@/lib/game-stats-helpers"
 import { cn } from "@/lib/utils"
 import type { Jogatina, Game, JogatinaPlayer } from "@/lib/types"
+import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 
 interface LandingTopGamesProps {
   jogatinas: (Jogatina & { game: Game })[]
@@ -95,7 +96,7 @@ function GameRankCard({ stat, rank, variant, className }: GameRankCardProps) {
                 alt={stat.game.title}
                 fill
                 sizes={isHero ? "80px" : "48px"}
-                className="object-cover"
+                className="object-cover object-center"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-muted/80">
@@ -121,10 +122,16 @@ function GameRankCard({ stat, rank, variant, className }: GameRankCardProps) {
             {stat.game.title}
           </h3>
 
+          <GameIgdbMetaInline
+            game={stat.game}
+            variant="line"
+            className={cn(isHero ? "mt-1.5" : "mt-1")}
+          />
+
           <div
             className={cn(
-              "mt-3 flex flex-wrap items-end gap-x-5 gap-y-2",
-              isHero ? "sm:mt-4" : "mt-2.5",
+              "flex flex-wrap items-end gap-x-5 gap-y-2",
+              isHero ? "mt-3 sm:mt-4" : "mt-2",
             )}
           >
             <div>

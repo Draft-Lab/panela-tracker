@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { GameListWithSearch } from "@/components/game-list-with-search"
 import { AddGameDialog } from "@/components/add-game-dialog"
+import { EnrichAllGamesIgdb } from "@/components/enrich-all-games-igdb"
 
 export default async function JogosPage() {
   const supabase = await createClient()
@@ -20,7 +21,10 @@ export default async function JogosPage() {
               <h1 className="text-4xl font-bold text-foreground mb-2">Jogos</h1>
               <p className="text-muted-foreground">Gerencie os jogos do seu grupo</p>
             </div>
-            <AddGameDialog />
+            <div className="flex items-center gap-2">
+              <EnrichAllGamesIgdb games={games || []} />
+              <AddGameDialog />
+            </div>
           </div>
 
           <GameListWithSearch games={games || []} />

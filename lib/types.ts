@@ -13,6 +13,19 @@ export interface Game {
   cover_url: string | null;
   is_app: boolean;
   created_at: string;
+  igdb_id: number | null;
+  summary: string | null;
+  storyline: string | null;
+  first_release_date: string | null;
+  genres: string[] | null;
+  platforms: string[] | null;
+  developers: string[] | null;
+  themes: string[] | null;
+  game_modes: string[] | null;
+  rating: number | null;
+  igdb_url: string | null;
+  screenshots: string[] | null;
+  igdb_synced_at: string | null;
 }
 
 export interface Jogatina {

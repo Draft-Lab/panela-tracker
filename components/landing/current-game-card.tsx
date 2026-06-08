@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 
 interface CurrentGameCardProps {
   jogatina: Jogatina & {
@@ -57,7 +58,7 @@ export function CurrentGameCard({
               alt={jogatina.game.title}
               fill
               sizes="64px"
-              className="object-cover"
+              className="object-cover object-center"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted/80">
@@ -71,6 +72,11 @@ export function CurrentGameCard({
             <p className="truncate text-base font-semibold text-foreground">
               {jogatina.game.title}
             </p>
+            <GameIgdbMetaInline
+              game={jogatina.game}
+              variant="chips"
+              className="mt-1.5"
+            />
             <div className="mt-2 flex flex-wrap gap-2">
               <Badge
                 variant="outline"

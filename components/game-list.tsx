@@ -9,6 +9,8 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { EditGameDialog } from "@/components/edit-game-dialog"
+import { EnrichGameFromIgdb } from "@/components/enrich-game-from-igdb"
+import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 import Link from "next/link"
 
 interface GameListProps {
@@ -49,21 +51,21 @@ export function GameList({ games }: GameListProps) {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {games.map((game) => (
-          <Card key={game.id} className="hover:shadow-lg transition-shadow overflow-hidden py-0">
-            <div className="aspect-video bg-muted relative">
+          <Card key={game.id} className="flex h-full flex-col overflow-hidden py-0 hover:shadow-lg transition-shadow">
+            <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-muted">
               {game.cover_url ? (
                 <img
                   src={game.cover_url || "/placeholder.svg"}
                   alt={game.title}
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
                   <span className="text-4xl font-bold opacity-20">{game.title.substring(0, 2).toUpperCase()}</span>
                 </div>
               )}
             </div>
-            <CardHeader>
+            <CardHeader className="flex-1">
               <div className="flex items-start justify-between gap-2">
                 <CardTitle className="text-lg line-clamp-2 flex-1">{game.title}</CardTitle>
                 {game.is_app && (
@@ -73,7 +75,12 @@ export function GameList({ games }: GameListProps) {
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <GameIgdbMetaInline
+                game={game}
+                variant="line"
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
                 Adicionado em {new Date(game.created_at).toLocaleDateString("pt-BR")}
               </p>
             </CardHeader>
@@ -85,6 +92,7 @@ export function GameList({ games }: GameListProps) {
                     Ver
                   </Link>
                 </Button>
+                <EnrichGameFromIgdb game={game} />
                 <Button variant="outline" size="sm" onClick={() => setEditingGame(game)}>
                   <Edit className="h-4 w-4" />
                 </Button>

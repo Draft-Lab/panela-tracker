@@ -5,6 +5,7 @@ import Image from "next/image"
 import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
 import { LocalTime } from "@/components/local-time"
 import { cn } from "@/lib/utils"
+import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 
 export interface TimelineEvent {
   jogatina: Jogatina & { game: Game }
@@ -59,7 +60,7 @@ export function TimelineEventItem({ event, isLast }: TimelineEventItemProps) {
                 alt={jogatina.game.title}
                 fill
                 sizes="56px"
-                className="object-cover"
+                className="object-cover object-center"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center">
@@ -74,6 +75,11 @@ export function TimelineEventItem({ event, isLast }: TimelineEventItemProps) {
                 <p className="truncate font-semibold text-foreground">
                   {jogatina.game.title}
                 </p>
+                <GameIgdbMetaInline
+                  game={jogatina.game}
+                  variant="line"
+                  className="mt-1"
+                />
                 <p className="mt-1 text-sm text-muted-foreground">
                   <span className="font-medium text-foreground/90">{firstPlayer}</span>
                   {" "}iniciou a sessão
