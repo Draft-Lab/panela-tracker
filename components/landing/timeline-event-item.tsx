@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Clock, Gamepad2, Users } from "lucide-react"
 import Image from "next/image"
 import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
+import { LocalTime } from "@/components/local-time"
 import { cn } from "@/lib/utils"
 
 export interface TimelineEvent {
@@ -25,19 +26,11 @@ function formatDuration(minutes: number | null) {
   return `${mins}m`
 }
 
-function formatEventTime(date: Date) {
-  return date.toLocaleTimeString("pt-BR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
-
 export function TimelineEventItem({ event, isLast }: TimelineEventItemProps) {
   const { jogatina, firstPlayer, playerCount, players } = event
   const coverUrl = jogatina.game.cover_url
   const sessionType = jogatina.session_type === "solo" ? "Solo" : "Grupo"
   const duration = formatDuration(jogatina.total_duration_minutes)
-  const eventDate = new Date(jogatina.date)
   const visiblePlayers = players.slice(0, 4)
 
   return (
@@ -86,12 +79,10 @@ export function TimelineEventItem({ event, isLast }: TimelineEventItemProps) {
                   {" "}iniciou a sessão
                 </p>
               </div>
-              <time
-                dateTime={eventDate.toISOString()}
-                className="shrink-0 text-xs tabular-nums text-muted-foreground"
-              >
-                {formatEventTime(eventDate)}
-              </time>
+              <LocalTime
+                iso={jogatina.date}
+                className="shrink-0 text-xs text-muted-foreground"
+              />
             </div>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
