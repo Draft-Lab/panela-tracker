@@ -1,181 +1,181 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import type { Game } from "@/lib/types"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Dices, CheckCheck, Trophy } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Game, JogatinaPlayer } from "@/lib/types";
+import {
+  buildGameSessionStatsMap,
+  type JogatinaWithPlayers,
+} from "@/lib/roulette/game-session-stats";
+import {
+  buildEligiblePool,
+  buildRoulettePool,
+} from "@/lib/roulette/build-pool";
+import { extractLibraryGenres } from "@/lib/roulette/extract-genres";
+import {
+  DEFAULT_ROULETTE_FILTERS,
+  type RouletteSmartFilters,
+} from "@/lib/roulette/types";
+import { RouletteGamePool } from "@/components/roulette/roulette-game-pool";
+import { RouletteSmartFiltersPanel } from "@/components/roulette/roulette-smart-filters";
+import {
+  RouletteStage,
+  type RouletteStageState,
+} from "@/components/roulette/roulette-stage";
+import { useRouletteSpin } from "@/components/roulette/use-roulette-spin";
+import { toast } from "sonner";
 
 interface GameRouletteProps {
-  games: Game[]
+  games: Game[];
+  jogatinas: JogatinaWithPlayers[];
+  jogatinaPlayers: Pick<JogatinaPlayer, "jogatina_id" | "player_id">[];
 }
 
-export function GameRoulette({ games }: GameRouletteProps) {
-  const [selectedGames, setSelectedGames] = useState<string[]>([])
-  const [isSpinning, setIsSpinning] = useState(false)
-  const [winner, setWinner] = useState<Game | null>(null)
-  const [displayedGame, setDisplayedGame] = useState<Game | null>(null)
-  const spinIntervalRef = useRef<NodeJS.Timeout | null>(null)
+export function GameRoulette({
+  games,
+  jogatinas,
+  jogatinaPlayers,
+}: GameRouletteProps) {
+  const [filters, setFilters] = useState<RouletteSmartFilters>(
+    DEFAULT_ROULETTE_FILTERS,
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [stageState, setStageState] = useState<RouletteStageState>("idle");
+  const [displayedGame, setDisplayedGame] = useState<Game | null>(null);
+  const [winner, setWinner] = useState<Game | null>(null);
+  const [spinning, setSpinning] = useState(false);
 
-  // Initialize with all games selected
   useEffect(() => {
-    setSelectedGames(games.map((g) => g.id))
-  }, [games])
+    setSelectedIds(new Set(games.map((game) => game.id)));
+  }, [games]);
+
+  const statsMap = useMemo(
+    () => buildGameSessionStatsMap(jogatinas, jogatinaPlayers),
+    [jogatinas, jogatinaPlayers],
+  );
+
+  const genres = useMemo(() => extractLibraryGenres(games), [games]);
+
+  const eligiblePool = useMemo(
+    () => buildEligiblePool(games, statsMap, filters),
+    [games, statsMap, filters],
+  );
+
+  const spinPool = useMemo(
+    () => buildRoulettePool(games, statsMap, filters, selectedIds),
+    [games, statsMap, filters, selectedIds],
+  );
+
+  const handleSpinComplete = useCallback((picked: Game) => {
+    setWinner(picked);
+    setDisplayedGame(picked);
+    setStageState("winner");
+    setSpinning(false);
+    toast.success(`Sorteado: ${picked.title}`);
+  }, []);
+
+  const handleSpinTick = useCallback((game: Game) => {
+    setDisplayedGame(game);
+  }, []);
+
+  const { spin, cancelSpin } = useRouletteSpin({
+    onTick: handleSpinTick,
+    onComplete: handleSpinComplete,
+  });
+
+  useEffect(() => cancelSpin, [cancelSpin]);
 
   const toggleGame = (gameId: string) => {
-    setSelectedGames((prev) => (prev.includes(gameId) ? prev.filter((id) => id !== gameId) : [...prev, gameId]))
-  }
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(gameId)) {
+        next.delete(gameId);
+      } else {
+        next.add(gameId);
+      }
+      return next;
+    });
+  };
 
-  const selectAll = () => {
-    setSelectedGames(games.map((g) => g.id))
-  }
+  const selectVisible = (gameIds: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      gameIds.forEach((id) => next.add(id));
+      return next;
+    });
+  };
 
-  const deselectAll = () => {
-    setSelectedGames([])
-  }
+  const clearVisible = (gameIds: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      gameIds.forEach((id) => next.delete(id));
+      return next;
+    });
+  };
 
-  const spinRoulette = () => {
-    if (selectedGames.length === 0) return
+  const handleSpin = () => {
+    if (spinPool.entries.length === 0) return;
 
-    setIsSpinning(true)
-    setWinner(null)
+    setWinner(null);
+    setStageState("spinning");
+    setSpinning(true);
+    spin(spinPool.entries);
+  };
 
-    const availableGames = games.filter((g) => selectedGames.includes(g.id))
-    let counter = 0
-    const maxSpins = 30 + Math.floor(Math.random() * 20)
+  const handleSpinAgain = () => {
+    setWinner(null);
+    setDisplayedGame(null);
+    setStageState("idle");
+    handleSpin();
+  };
 
-    spinIntervalRef.current = setInterval(
-      () => {
-        const randomGame = availableGames[Math.floor(Math.random() * availableGames.length)]
-        setDisplayedGame(randomGame)
-        counter++
+  const poolSize = spinPool.entries.length;
+  const isSpinDisabled = poolSize === 0;
 
-        if (counter >= maxSpins) {
-          if (spinIntervalRef.current) clearInterval(spinIntervalRef.current)
-          const finalWinner = availableGames[Math.floor(Math.random() * availableGames.length)]
-          setDisplayedGame(finalWinner)
-          setWinner(finalWinner)
-          setIsSpinning(false)
-        }
-      },
-      100 + counter * 5,
-    )
-  }
+  const filtersFooterMessage =
+    poolSize === 0 && eligiblePool.entries.length > 0
+      ? "Nenhum jogo no pool — selecione jogos ou afrouxe os filtros."
+      : poolSize === 0 && eligiblePool.entries.length === 0
+        ? "Nenhum jogo no pool — afrouxe os filtros."
+        : null;
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-balance">Roleta de Jogos</h1>
-        <p className="text-muted-foreground mt-1">Deixe o destino escolher o próximo jogo!</p>
+        <h1 className="text-3xl font-bold text-balance tracking-tight">
+          Roleta de Jogos
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Filtros inteligentes e sorteio justo para o próximo jogo do grupo.
+        </p>
       </div>
 
-      {/* Roulette Display */}
-      <Card className="border-2">
-        <CardContent className="pt-6">
-          <div className="flex flex-col items-center justify-center min-h-[300px] gap-6">
-            {!winner && !isSpinning && (
-              <div className="text-center space-y-4">
-                <Dices className="h-24 w-24 mx-auto text-muted-foreground" />
-                <p className="text-lg text-muted-foreground">Clique em girar para sortear um jogo!</p>
-              </div>
-            )}
+      <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-stretch">
+        <RouletteStage
+          state={spinning ? "spinning" : stageState}
+          displayedGame={displayedGame}
+          winner={winner}
+          poolSize={poolSize}
+          isSpinDisabled={isSpinDisabled}
+          onSpin={handleSpin}
+          onSpinAgain={handleSpinAgain}
+        />
 
-            {isSpinning && displayedGame && (
-              <div className="text-center space-y-4 animate-pulse">
-                {displayedGame.cover_url ? (
-                  <img
-                    src={displayedGame.cover_url || "/placeholder.svg"}
-                    alt={displayedGame.title}
-                    className="w-48 h-48 object-cover rounded-lg mx-auto border-4 border-primary"
-                  />
-                ) : (
-                  <div className="w-48 h-48 bg-muted rounded-lg flex items-center justify-center mx-auto border-4 border-primary">
-                    <Dices className="h-16 w-16 text-muted-foreground" />
-                  </div>
-                )}
-                <h3 className="text-2xl font-bold">{displayedGame.title}</h3>
-              </div>
-            )}
+        <RouletteSmartFiltersPanel
+          filters={filters}
+          genres={genres}
+          poolSize={poolSize}
+          onChange={setFilters}
+          footerMessage={filtersFooterMessage}
+        />
+      </div>
 
-            {winner && (
-              <div className="text-center space-y-4 animate-in zoom-in duration-500">
-                <Trophy className="h-16 w-16 mx-auto text-yellow-500" />
-                {winner.cover_url ? (
-                  <img
-                    src={winner.cover_url || "/placeholder.svg"}
-                    alt={winner.title}
-                    className="w-64 h-64 object-cover rounded-lg mx-auto border-4 border-yellow-500 shadow-lg"
-                  />
-                ) : (
-                  <div className="w-64 h-64 bg-muted rounded-lg flex items-center justify-center mx-auto border-4 border-yellow-500">
-                    <Dices className="h-20 w-20 text-muted-foreground" />
-                  </div>
-                )}
-                <div>
-                  <Badge variant="default" className="mb-2 bg-yellow-500 text-black">
-                    VENCEDOR
-                  </Badge>
-                  <h3 className="text-3xl font-bold">{winner.title}</h3>
-                </div>
-              </div>
-            )}
-
-            <Button
-              size="lg"
-              onClick={spinRoulette}
-              disabled={isSpinning || selectedGames.length === 0}
-              className="mt-4"
-            >
-              <Dices className="h-5 w-5 mr-2" />
-              {isSpinning ? "Girando..." : "Girar Roleta"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Game Selection */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Selecionar Jogos</CardTitle>
-              <CardDescription>
-                Escolha quais jogos participam do sorteio ({selectedGames.length} selecionados)
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={selectAll}>
-                <CheckCheck className="h-4 w-4 mr-1" />
-                Todos
-              </Button>
-              <Button variant="outline" size="sm" onClick={deselectAll}>
-                Limpar
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto">
-            {games.map((game) => (
-              <label
-                key={game.id}
-                className={cn(
-                  "flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all hover:bg-accent",
-                  selectedGames.includes(game.id) ? "border-primary bg-primary/5" : "border-border",
-                )}
-              >
-                <Checkbox checked={selectedGames.includes(game.id)} onCheckedChange={() => toggleGame(game.id)} />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{game.title}</p>
-                </div>
-              </label>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <RouletteGamePool
+        entries={eligiblePool.entries}
+        selectedIds={selectedIds}
+        onToggle={toggleGame}
+        onSelectAll={selectVisible}
+        onClearVisible={clearVisible}
+      />
     </div>
-  )
+  );
 }
