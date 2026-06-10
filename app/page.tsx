@@ -50,7 +50,8 @@ export default async function LandingPage() {
     "season_participants",
   ).select(`
       *,
-      player:players(*)
+      player:players(*),
+      season:seasons(*, game:games(*))
     `);
 
   const gameJogatinas = jogatinas?.filter((j) => !j.game?.is_app) || [];
@@ -158,12 +159,11 @@ export default async function LandingPage() {
         <LandingSection
           id="destaques"
           title="Momentos marcantes"
-          description="Recordes e curiosidades das jogatinas."
+          description="Recordes raros: quem voltou, quem lotou a sessão e quem zerou de verdade."
         >
           <LandingHighlights
             jogatinas={gameJogatinas}
             jogatinaPlayers={gameJogatinaPlayers}
-            seasons={activeSeasons || []}
             seasonParticipants={allSeasonParticipants || []}
           />
         </LandingSection>

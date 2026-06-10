@@ -8,12 +8,12 @@ export interface GameRankingStat {
   participations: number;
 }
 
-type JogatinaWithPlayers = Jogatina & {
+export type JogatinaWithPlayers = Jogatina & {
   game: Game;
   jogatina_players?: JogatinaPlayer[];
 };
 
-function getPlayersForJogatina(
+export function getPlayersForJogatina(
   jogatina: JogatinaWithPlayers,
   jogatinaPlayers: JogatinaPlayer[],
 ): JogatinaPlayer[] {
@@ -25,7 +25,7 @@ function getPlayersForJogatina(
   return jogatinaPlayers.filter((jp) => jp.jogatina_id === jogatina.id);
 }
 
-function getUniquePlayerCount(
+export function getUniquePlayerCount(
   jogatina: JogatinaWithPlayers,
   jogatinaPlayers: JogatinaPlayer[],
 ): number {
