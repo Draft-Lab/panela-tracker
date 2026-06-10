@@ -4,6 +4,9 @@ import { calculateTopGames, type GameRankingStat } from "@/lib/game-stats-helper
 import { cn } from "@/lib/utils"
 import type { Jogatina, Game, JogatinaPlayer } from "@/lib/types"
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
+import { LandingTopGamesExtended } from "@/components/landing-top-games-extended"
+
+const TOP_GAMES_LIMIT = 20
 
 interface LandingTopGamesProps {
   jogatinas: (Jogatina & { game: Game })[]
@@ -159,20 +162,7 @@ function GameRankCard({ stat, rank, variant, className }: GameRankCardProps) {
   )
 }
 
-export function LandingTopGames({
-  jogatinas,
-  jogatinaPlayers,
-}: LandingTopGamesProps) {
-  const topGames = calculateTopGames(jogatinas, jogatinaPlayers, 3)
-
-  if (topGames.length === 0) {
-    return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
-        Nenhuma sessão em grupo registrada ainda
-      </p>
-    )
-  }
-
+function TopGamesPodium({ topGames }: { topGames: GameRankingStat[] }) {
   const [first, second, third] = topGames
 
   if (topGames.length === 1) {
@@ -208,6 +198,34 @@ export function LandingTopGames({
         variant="compact"
         className="lg:col-span-5"
       />
+    </div>
+  )
+}
+
+export function LandingTopGames({
+  jogatinas,
+  jogatinaPlayers,
+}: LandingTopGamesProps) {
+  const rankedGames = calculateTopGames(
+    jogatinas,
+    jogatinaPlayers,
+    TOP_GAMES_LIMIT,
+  )
+  const topGames = rankedGames.slice(0, 3)
+  const extendedGames = rankedGames.slice(3)
+
+  if (topGames.length === 0) {
+    return (
+      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
+        Nenhuma sessão em grupo registrada ainda
+      </p>
+    )
+  }
+
+  return (
+    <div className="space-y-5">
+      <TopGamesPodium topGames={topGames} />
+      <LandingTopGamesExtended games={extendedGames} />
     </div>
   )
 }
