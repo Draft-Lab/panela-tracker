@@ -22,7 +22,7 @@ export function CurrentGameCard({
   onFinish,
 }: CurrentGameCardProps) {
   const activePlayers = jogatina.jogatina_players?.filter((jp) => jp.is_active) || []
-  const sessionType = jogatina.session_type === "solo" ? "Solo" : "Grupo"
+  const sessionType = activePlayers.length > 1 ? "Grupo" : "Solo"
   const coverUrl = jogatina.game.cover_url
 
   return (
@@ -100,7 +100,10 @@ export function CurrentGameCard({
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="h-4 w-4 shrink-0" strokeWidth={2} />
-            <span>{jogatina.active_players} jogador(es) ativo(s)</span>
+            <span>
+              {activePlayers.length}{" "}
+              {activePlayers.length === 1 ? "jogador ativo" : "jogadores ativos"}
+            </span>
           </div>
 
           {activePlayers.length > 0 && (

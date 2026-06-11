@@ -22,6 +22,19 @@ function verifyAuth(request: Request) {
   return token === DISCORD_BOT_API_KEY;
 }
 
+async function countActivePlayers(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  jogatinaId: string,
+) {
+  const { data } = await supabase
+    .from("jogatina_players")
+    .select("id")
+    .eq("jogatina_id", jogatinaId)
+    .eq("is_active", true);
+
+  return data?.length || 0;
+}
+
 async function syncPlayerFromDiscord(
   supabase: Awaited<ReturnType<typeof createClient>>,
   playerId: string,
@@ -243,7 +256,30 @@ async function handlePlayerJoined(
     .eq("player_id", playerId)
     .single();
 
-  // Se o jogador não está na jogatina, adicionar
+  if (existingPlayer?.is_active) {
+    const activeCount = await countActivePlayers(supabase, jogatina.id);
+    const sessionType = activeCount > 1 ? "group" : "solo";
+
+    await supabase
+      .from("jogatinas")
+      .update({
+        active_players: activeCount,
+        session_type: sessionType,
+        last_event_at: timestamp,
+      })
+      .eq("id", jogatina.id);
+
+    return NextResponse.json({
+      success: true,
+      message: "Player already active in jogatina",
+      jogatina_id: jogatina.id,
+      game_title: gameTitle,
+      active_players: activeCount,
+      session_type: sessionType,
+      season_id: jogatina.season_id || null,
+    });
+  }
+
   if (!existingPlayer) {
     const { error: playerError } = await supabase.from("jogatina_players").insert({
       jogatina_id: jogatina.id,
@@ -259,23 +295,19 @@ async function handlePlayerJoined(
       );
     }
   } else {
-    // Se o jogador já existe mas não está ativo, reativá-lo
-    if (!existingPlayer.is_active) {
-      const { error: activateError } = await supabase
-        .from("jogatina_players")
-        .update({ is_active: true })
-        .eq("id", existingPlayer.id);
+    const { error: activateError } = await supabase
+      .from("jogatina_players")
+      .update({ is_active: true })
+      .eq("id", existingPlayer.id);
 
-      if (activateError) {
-        return NextResponse.json(
-          { error: `Failed to reactivate player: ${activateError.message}` },
-          { status: 500 }
-        );
-      }
+    if (activateError) {
+      return NextResponse.json(
+        { error: `Failed to reactivate player: ${activateError.message}` },
+        { status: 500 }
+      );
     }
   }
 
-  // Registrar evento de entrada
   const { error: eventError } = await supabase.from("jogatina_events").insert({
     jogatina_id: jogatina.id,
     player_id: playerId,
@@ -290,15 +322,14 @@ async function handlePlayerJoined(
     );
   }
 
-  // Atualizar contador de jogadores ativos e tipo de sessão
-  const newActiveCount = jogatina.active_players + 1;
-  const newSessionType = newActiveCount > 1 ? "group" : "solo";
+  const activeCount = await countActivePlayers(supabase, jogatina.id);
+  const sessionType = activeCount > 1 ? "group" : "solo";
 
   const { error: updateError } = await supabase
     .from("jogatinas")
     .update({
-      active_players: newActiveCount,
-      session_type: newSessionType,
+      active_players: activeCount,
+      session_type: sessionType,
       last_event_at: timestamp,
     })
     .eq("id", jogatina.id);
@@ -315,8 +346,8 @@ async function handlePlayerJoined(
     message: "Player joined event registered",
     jogatina_id: jogatina.id,
     game_title: gameTitle,
-    active_players: newActiveCount,
-    session_type: newSessionType,
+    active_players: activeCount,
+    session_type: sessionType,
     season_id: jogatina.season_id || null,
   });
 }
@@ -393,13 +424,10 @@ async function handlePlayerLeft(
     );
   }
 
-  const { data: activePlayers } = await supabase
-    .from("jogatina_players")
-    .select("id", { count: "exact" })
-    .eq("jogatina_id", activeJogatina.id)
-    .eq("is_active", true);
-
-  const activePlayerCount = activePlayers?.length || 0;
+  const activePlayerCount = await countActivePlayers(
+    supabase,
+    activeJogatina.id,
+  );
 
   console.log(
     `[Discord Events] Jogador ${playerId} saiu. Jogadores ativos: ${activePlayerCount}`

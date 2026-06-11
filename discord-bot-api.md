@@ -12,6 +12,8 @@ Authorization: Bearer YOUR_API_KEY
 
 Configure a variável de ambiente `DISCORD_BOT_API_KEY` no servidor.
 
+> **Sync no startup:** depois de reiniciar ou reconectar, chame `POST /api/discord/sync` com a lista de quem está jogando agora. Documentação: [discord-sync-api.md](discord-sync-api.md).
+
 ## Conceito de Eventos
 
 O sistema funciona com eventos de entrada e saída de jogadores:
