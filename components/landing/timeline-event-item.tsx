@@ -17,6 +17,7 @@ export interface TimelineEvent {
 interface TimelineEventItemProps {
   event: TimelineEvent
   isLast: boolean
+  compact?: boolean
 }
 
 function formatDuration(minutes: number | null) {
@@ -27,7 +28,11 @@ function formatDuration(minutes: number | null) {
   return `${mins}m`
 }
 
-export function TimelineEventItem({ event, isLast }: TimelineEventItemProps) {
+export function TimelineEventItem({
+  event,
+  isLast,
+  compact = false,
+}: TimelineEventItemProps) {
   const { jogatina, firstPlayer, playerCount, players } = event
   const coverUrl = jogatina.game.cover_url
   const sessionType = jogatina.session_type === "solo" ? "Solo" : "Grupo"
@@ -35,7 +40,7 @@ export function TimelineEventItem({ event, isLast }: TimelineEventItemProps) {
   const visiblePlayers = players.slice(0, 4)
 
   return (
-    <div className={cn("relative pl-8", !isLast && "pb-8")}>
+    <div className={cn("relative pl-8", !isLast && (compact ? "pb-4" : "pb-8"))}>
       {!isLast && (
         <div
           className="absolute left-[11px] top-6 bottom-0 w-px bg-border/70"

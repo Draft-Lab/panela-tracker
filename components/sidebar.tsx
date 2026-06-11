@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Home, Users, Gamepad2, ListChecks, Menu, X, LogOut, Dices, PlayCircle, Trophy, Calendar } from "lucide-react"
+import { Home, Users, Gamepad2, ListChecks, Menu, X, LogOut, Dices, PlayCircle, Trophy, Calendar, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -11,7 +11,10 @@ import { logout } from "@/lib/auth"
 const navigationGroups = [
   {
     label: "Principal",
-    items: [{ name: "Dashboard", href: "/dashboard", icon: Home }],
+    items: [
+      { name: "Dashboard", href: "/dashboard", icon: Home },
+      { name: "Retrospectiva", href: "/dashboard/retrospectiva", icon: Sparkles },
+    ],
   },
   {
     label: "Jogos",

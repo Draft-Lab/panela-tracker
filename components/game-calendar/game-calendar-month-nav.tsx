@@ -8,7 +8,7 @@ interface GameCalendarMonthNavProps {
   viewDate: Date;
   onPrevious: () => void;
   onNext: () => void;
-  onToday: () => void;
+  onToday?: () => void;
   compact?: boolean;
 }
 
@@ -53,15 +53,17 @@ export function GameCalendarMonthNav({
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Mês anterior</span>
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className={compact ? "h-7 px-2 text-xs" : ""}
-          onClick={onToday}
-          disabled={isCurrentMonth}
-        >
-          Hoje
-        </Button>
+        {onToday && (
+          <Button
+            variant="outline"
+            size="sm"
+            className={compact ? "h-7 px-2 text-xs" : ""}
+            onClick={onToday}
+            disabled={isCurrentMonth}
+          >
+            Hoje
+          </Button>
+        )}
         <Button variant="outline" size="icon" className={compact ? "h-7 w-7" : ""} onClick={onNext}>
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Próximo mês</span>

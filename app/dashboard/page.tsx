@@ -1,14 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
-import { StatsCards } from "@/components/stats-cards";
-import { PlayerStatsTable } from "@/components/player-stats-table";
-import { GameStatsTable } from "@/components/game-stats-table";
+import { DashboardPlayerStatsGrid } from "@/components/dashboard/dashboard-player-stats-grid";
+import { DashboardGameStatsGrid } from "@/components/dashboard/dashboard-game-stats-grid";
 import { QuickActions } from "@/components/quick-actions";
-import { RecentActivity } from "@/components/recent-activity";
 import { TopPlayers } from "@/components/top-players";
-import { TopGames } from "@/components/top-games";
 import { ActivityChart } from "@/components/activity-chart";
 import { ActiveSeasonsWidget } from "@/components/active-seasons-widget";
 import { calculateStatusStats } from "@/lib/status-helpers";
+import { RetrospectiveTeaser } from "@/components/retrospective/retrospective-teaser";
+import {
+  buildMonthlyRetrospective,
+  buildYearSummary,
+} from "@/lib/retrospective-helpers";
+import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { DashboardStatsOverview } from "@/components/dashboard/dashboard-stats-overview";
+import { LandingTopGames } from "@/components/landing-top-games";
+import { LandingTimelineSection } from "@/components/landing-timeline-section";
+import { ActivitySummaryCards } from "@/components/activity-summary-cards";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -23,7 +30,11 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false });
   const { data: jogatinas } = await supabase
     .from("jogatinas")
-    .select("*, game:games(*)")
+    .select(`
+      *,
+      game:games(*),
+      jogatina_players(*, player:players(*))
+    `)
     .order("date", { ascending: false });
   const { data: jogatinaPlayers } = await supabase.from("jogatina_players")
     .select(`
@@ -32,7 +43,6 @@ export default async function DashboardPage() {
       jogatina:jogatinas(*, game:games(*))
     `);
 
-  // Buscar temporadas ativas
   const { data: activeSeasons } = await supabase
     .from("seasons")
     .select(
@@ -48,55 +58,62 @@ export default async function DashboardPage() {
     .eq("is_active", true)
     .order("started_at", { ascending: false });
 
-  // Buscar todos os season_participants para cálculos
   const { data: allSeasonParticipants } = await supabase
     .from("season_participants")
     .select("*");
 
-  // Filtrar jogatinas de apps (Spotify, VSCode, etc.) das métricas
   const gameOnly = games?.filter((g) => !g.is_app) || [];
   const gameJogatinas = jogatinas?.filter((j) => !j.game?.is_app) || [];
-  const gameJogatinaPlayers = jogatinaPlayers?.filter((jp) => !jp.jogatina?.game?.is_app) || [];
+  const gameJogatinaPlayers =
+    jogatinaPlayers?.filter((jp) => !jp.jogatina?.game?.is_app) || [];
 
-  // Calcular estatísticas usando a nova lógica (somente jogos)
   const stats = calculateStatusStats(
     gameJogatinaPlayers,
     allSeasonParticipants || [],
   );
 
+  const currentYear = new Date().getFullYear();
+  const retrospectiveSummary = buildYearSummary(
+    gameJogatinas,
+    gameJogatinaPlayers,
+    currentYear,
+  );
+  const retrospectiveMonths = buildMonthlyRetrospective(
+    gameJogatinas,
+    gameJogatinaPlayers,
+    currentYear,
+  );
+
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
+    <div className="space-y-10">
       <div className="relative">
-        {/* Decorative corner lines */}
-        <div className="absolute top-0 left-0 w-12 h-px bg-primary/40" />
-        <div className="absolute top-0 left-0 w-px h-12 bg-primary/40" />
-        <div className="absolute top-0 right-0 w-12 h-px bg-primary/40" />
-        <div className="absolute top-0 right-0 w-px h-12 bg-primary/40" />
-        
+        <div className="absolute top-0 left-0 h-px w-12 bg-primary/40" />
+        <div className="absolute top-0 left-0 h-12 w-px bg-primary/40" />
+        <div className="absolute top-0 right-0 h-px w-12 bg-primary/40" />
+        <div className="absolute top-0 right-0 h-12 w-px bg-primary/40" />
+
         <div className="mb-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 text-balance">
+          <h1 className="mb-2 text-4xl font-bold text-balance text-foreground md:text-5xl">
             Dashboard
           </h1>
-          <p className="text-lg text-muted-foreground text-balance">
-            Visão completa das suas sessões de jogo e estatísticas dos jogadores
+          <p className="text-base text-muted-foreground text-balance sm:text-lg">
+            Resumo do grupo, jogos em destaque e atividade recente
           </p>
         </div>
 
         <QuickActions players={players || []} games={games || []} />
       </div>
 
-      {/* Main Stats Cards */}
-      <div className="relative">
-        <div className="relative inline-block mb-6">
-          {/* Decorative corner lines for section title */}
-          <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-          <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-          <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-          <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-          <h2 className="text-2xl font-bold relative">Visão Geral</h2>
-        </div>
-        <StatsCards
+      <RetrospectiveTeaser
+        summary={retrospectiveSummary}
+        months={retrospectiveMonths}
+      />
+
+      <DashboardSection
+        title="Visão geral"
+        description="Números consolidados do grupo."
+      >
+        <DashboardStatsOverview
           totalPlayers={players?.length || 0}
           totalGames={gameOnly.length}
           totalJogatinas={gameJogatinas.length}
@@ -106,113 +123,91 @@ export default async function DashboardPage() {
           zeroCount={stats.zeros}
           davaCount={stats.davaJogar}
         />
-      </div>
+      </DashboardSection>
 
-      {/* Active Seasons Widget */}
       {activeSeasons && activeSeasons.length > 0 && (
-        <div className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Temporadas em Andamento</h2>
-          </div>
+        <DashboardSection
+          title="Temporadas em andamento"
+          description="Campanhas ativas no momento."
+        >
           <ActiveSeasonsWidget seasons={activeSeasons} />
-        </div>
+        </DashboardSection>
       )}
 
-      {/* Activity Chart */}
-      <div className="relative">
-        <div className="relative inline-block mb-6">
-          {/* Decorative corner lines for section title */}
-          <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-          <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-          <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-          <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-          <h2 className="text-2xl font-bold relative">Atividade ao Longo do Tempo</h2>
-        </div>
-        <ActivityChart jogatinas={gameJogatinas} />
-      </div>
-
-      {/* Two Column Layout for Rankings */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Top Jogadores</h2>
+      <DashboardSection
+        title="Atividade"
+        description="Últimos 6 meses e resumo de frequência."
+      >
+        <div className="overflow-hidden rounded-xl border border-border/50 bg-card/30 lg:grid lg:grid-cols-[minmax(0,1fr)_220px]">
+          <ActivityChart
+            jogatinas={gameJogatinas}
+            compact
+            borderless
+          />
+          <div className="border-t border-border/50 px-4 py-2 lg:border-t-0 lg:border-l">
+            <ActivitySummaryCards jogatinas={gameJogatinas} className="lg:pl-2" />
           </div>
+        </div>
+      </DashboardSection>
+
+      <DashboardSection
+        title="Jogos mais jogados"
+        description="Sessões em grupo com 2 ou mais jogadores — capas, gênero e ranking."
+      >
+        <LandingTopGames
+          jogatinas={gameJogatinas}
+          jogatinaPlayers={gameJogatinaPlayers}
+          showExtended={false}
+        />
+      </DashboardSection>
+
+      <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+        <DashboardSection
+          title="Top jogadores"
+          description="Quem mais participou das jogatinas."
+        >
           <TopPlayers
             jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
-        </div>
+        </DashboardSection>
 
-        <div className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Jogos Mais Jogados</h2>
+        <DashboardSection
+          title="Atividades recentes"
+          description="As 3 jogatinas mais recentes."
+        >
+          <div className="rounded-xl border border-border/50 bg-card/20 p-4 sm:p-5">
+            <LandingTimelineSection
+              jogatinas={gameJogatinas}
+              jogatinaPlayers={gameJogatinaPlayers}
+              limit={3}
+              compact
+            />
           </div>
-          <TopGames
-            jogatinas={gameJogatinas}
-            jogatinaPlayers={gameJogatinaPlayers}
-          />
-        </div>
+        </DashboardSection>
       </div>
 
-      {/* Recent Activity Timeline */}
-      <div className="relative">
-        <div className="relative inline-block mb-6">
-          {/* Decorative corner lines for section title */}
-          <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-          <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-          <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-          <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-          <h2 className="text-2xl font-bold relative">Atividades Recentes</h2>
-        </div>
-        <RecentActivity jogatinas={gameJogatinas.slice(0, 10)} />
-      </div>
-
-      {/* Detailed Stats Tables */}
-      <div className="space-y-6">
-        <div className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Estatísticas por Jogador</h2>
-          </div>
-          <PlayerStatsTable
+      <div className="space-y-8 border-t border-border/50 pt-8">
+        <DashboardSection
+          title="Estatísticas por jogador"
+          description="Resumo individual com drops, zeros e taxa de drop."
+        >
+          <DashboardPlayerStatsGrid
             jogatinaPlayers={gameJogatinaPlayers}
             seasonParticipants={allSeasonParticipants || []}
           />
-        </div>
+        </DashboardSection>
 
-        <div className="relative">
-          <div className="relative inline-block mb-6">
-            {/* Decorative corner lines for section title */}
-            <div className="absolute -top-1 -left-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -left-1 w-px h-6 bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-6 h-px bg-primary/30" />
-            <div className="absolute -top-1 -right-1 w-px h-6 bg-primary/30" />
-            <h2 className="text-2xl font-bold relative">Estatísticas por Jogo</h2>
-          </div>
-          <GameStatsTable
+        <DashboardSection
+          title="Estatísticas por jogo"
+          description="Sessões, participações e status por título."
+        >
+          <DashboardGameStatsGrid
             jogatinas={gameJogatinas}
             jogatinaPlayers={gameJogatinaPlayers}
+            limit={12}
           />
-        </div>
+        </DashboardSection>
       </div>
     </div>
   );

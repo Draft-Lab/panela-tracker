@@ -1,81 +1,96 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowUpRight, Award, TrendingDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, TrendingDown, Award } from "lucide-react";
 import { calculatePlayerStats } from "@/lib/status-helpers";
 import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface TopPlayersProps {
   jogatinaPlayers: (JogatinaPlayer & { player: Player })[];
   seasonParticipants?: (SeasonParticipant & { player: Player })[];
+  className?: string;
 }
 
 export function TopPlayers({
   jogatinaPlayers,
   seasonParticipants = [],
+  className,
 }: TopPlayersProps) {
-  const allStats = calculatePlayerStats(jogatinaPlayers, seasonParticipants);
-  const topPlayers = allStats
+  const topPlayers = calculatePlayerStats(jogatinaPlayers, seasonParticipants)
     .sort((a, b) => b.totalJogatinas - a.totalJogatinas)
     .slice(0, 5);
 
   if (topPlayers.length === 0) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">
-            Nenhum jogador registrado ainda
-          </p>
-        </CardContent>
-      </Card>
+      <div
+        className={cn(
+          "rounded-xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground",
+          className,
+        )}
+      >
+        Nenhum jogador registrado ainda
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-warning" />
-          Ranking de Participação
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {topPlayers.map((stat, index) => (
-            <div key={stat.playerId} className="flex items-center gap-4">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted font-bold text-sm">
-                {index + 1}
-              </div>
-              <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={stat.avatarUrl || undefined}
-                  alt={stat.playerName}
-                />
-                <AvatarFallback>
-                  {stat.playerName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{stat.playerName}</p>
-                <div className="flex gap-2 mt-1">
-                  <Badge variant="outline" className="text-xs">
-                    <TrendingDown className="h-3 w-3 mr-1 text-destructive" />
-                    {stat.dropos} drops
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    <Award className="h-3 w-3 mr-1 text-success" />
-                    {stat.zeros} zeros
-                  </Badge>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold">{stat.totalJogatinas}</p>
-                <p className="text-xs text-muted-foreground">jogatinas</p>
-              </div>
+    <div
+      className={cn(
+        "divide-y divide-border/50 overflow-hidden rounded-xl border border-border/50 bg-card/30",
+        className,
+      )}
+    >
+      {topPlayers.map((stat, index) => (
+        <Link
+          key={stat.playerId}
+          href={`/dashboard/jogadores/${stat.playerId}`}
+          className="group flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-muted/30 sm:px-5"
+        >
+          <span className="w-5 shrink-0 text-center text-xs font-semibold tabular-nums text-muted-foreground">
+            {index + 1}
+          </span>
+
+          <Avatar className="h-10 w-10 shrink-0 ring-1 ring-border/50">
+            <AvatarImage
+              src={stat.avatarUrl || undefined}
+              alt={stat.playerName}
+            />
+            <AvatarFallback className="text-xs">
+              {stat.playerName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-medium text-foreground group-hover:text-primary">
+              {stat.playerName}
+            </p>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <Badge variant="outline" className="h-5 gap-1 px-1.5 text-[10px]">
+                <TrendingDown className="h-3 w-3 text-destructive" />
+                {stat.dropos} drops
+              </Badge>
+              <Badge variant="outline" className="h-5 gap-1 px-1.5 text-[10px]">
+                <Award className="h-3 w-3 text-success" />
+                {stat.zeros} zeros
+              </Badge>
+              {stat.dropoPercentage > 0 && (
+                <Badge variant="secondary" className="h-5 px-1.5 text-[10px] tabular-nums">
+                  {stat.dropoPercentage}% drop
+                </Badge>
+              )}
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="text-right">
+              <p className="text-xl font-bold tabular-nums">{stat.totalJogatinas}</p>
+              <p className="text-[10px] text-muted-foreground">jogatinas</p>
+            </div>
+            <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 }

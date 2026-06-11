@@ -11,6 +11,7 @@ const TOP_GAMES_LIMIT = 20
 interface LandingTopGamesProps {
   jogatinas: (Jogatina & { game: Game })[]
   jogatinaPlayers: JogatinaPlayer[]
+  showExtended?: boolean
 }
 
 interface GameRankCardProps {
@@ -205,6 +206,7 @@ function TopGamesPodium({ topGames }: { topGames: GameRankingStat[] }) {
 export function LandingTopGames({
   jogatinas,
   jogatinaPlayers,
+  showExtended = true,
 }: LandingTopGamesProps) {
   const rankedGames = calculateTopGames(
     jogatinas,
@@ -225,7 +227,9 @@ export function LandingTopGames({
   return (
     <div className="space-y-5">
       <TopGamesPodium topGames={topGames} />
-      <LandingTopGamesExtended games={extendedGames} />
+      {showExtended && extendedGames.length > 0 && (
+        <LandingTopGamesExtended games={extendedGames} />
+      )}
     </div>
   )
 }

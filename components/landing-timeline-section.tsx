@@ -15,13 +15,16 @@ interface LandingTimelineSectionProps {
     jogatina_players?: (JogatinaPlayer & { player: Player })[]
   })[]
   jogatinaPlayers: (JogatinaPlayer & { player: Player })[]
+  limit?: number
+  compact?: boolean
 }
 
 function buildRecentEvents(
   jogatinas: LandingTimelineSectionProps["jogatinas"],
   jogatinaPlayers: LandingTimelineSectionProps["jogatinaPlayers"],
+  limit: number,
 ): TimelineEvent[] {
-  return jogatinas.slice(0, 8).map((jogatina) => {
+  return jogatinas.slice(0, limit).map((jogatina) => {
     const playersFromJogatina = jogatina.jogatina_players || []
     const playersFromSeparate = jogatinaPlayers.filter(
       (jp) => jp.jogatina_id === jogatina.id,
@@ -42,12 +45,14 @@ function buildRecentEvents(
 export function LandingTimelineSection({
   jogatinas,
   jogatinaPlayers,
+  limit = 8,
+  compact = false,
 }: LandingTimelineSectionProps) {
   const isClient = useIsClient()
 
   const recentEvents = useMemo(
-    () => buildRecentEvents(jogatinas, jogatinaPlayers),
-    [jogatinas, jogatinaPlayers],
+    () => buildRecentEvents(jogatinas, jogatinaPlayers, limit),
+    [jogatinas, jogatinaPlayers, limit],
   )
 
   const groupedEvents = useMemo(() => {
@@ -67,11 +72,17 @@ export function LandingTimelineSection({
   }
 
   return (
-    <div className="space-y-8">
+    <div className={compact ? "space-y-4" : "space-y-8"}>
       {groupedEvents.map(([label, events]) => (
         <section key={label || "timeline-events"}>
           {label && (
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <h3
+              className={
+                compact
+                  ? "mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
+                  : "mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground"
+              }
+            >
               {label}
             </h3>
           )}
@@ -81,6 +92,7 @@ export function LandingTimelineSection({
                 key={event.jogatina.id}
                 event={event}
                 isLast={index === events.length - 1}
+                compact={compact}
               />
             ))}
           </div>

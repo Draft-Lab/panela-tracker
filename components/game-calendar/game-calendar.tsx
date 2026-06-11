@@ -8,26 +8,41 @@ import { GameCalendarGrid } from "@/components/game-calendar/game-calendar-grid"
 interface GameCalendarProps {
   jogatinas: JogatinaWithGame[];
   compact?: boolean;
+  viewDate?: Date;
+  onViewDateChange?: (date: Date) => void;
+  hideTodayButton?: boolean;
 }
 
-export function GameCalendar({ jogatinas, compact = false }: GameCalendarProps) {
-  const [viewDate, setViewDate] = useState(() => {
+export function GameCalendar({
+  jogatinas,
+  compact = false,
+  viewDate: controlledViewDate,
+  onViewDateChange,
+  hideTodayButton = false,
+}: GameCalendarProps) {
+  const [internalViewDate, setInternalViewDate] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
+  const isControlled = controlledViewDate !== undefined;
+  const viewDate = isControlled ? controlledViewDate : internalViewDate;
+
+  const setViewDate = (date: Date) => {
+    if (!isControlled) {
+      setInternalViewDate(date);
+    }
+    onViewDateChange?.(date);
+  };
+
   const dayMap = useMemo(() => groupJogatinasByDay(jogatinas), [jogatinas]);
 
   const goToPreviousMonth = () => {
-    setViewDate(
-      (current) => new Date(current.getFullYear(), current.getMonth() - 1, 1),
-    );
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
   };
 
   const goToNextMonth = () => {
-    setViewDate(
-      (current) => new Date(current.getFullYear(), current.getMonth() + 1, 1),
-    );
+    setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
   };
 
   const goToToday = () => {
@@ -41,7 +56,7 @@ export function GameCalendar({ jogatinas, compact = false }: GameCalendarProps) 
         viewDate={viewDate}
         onPrevious={goToPreviousMonth}
         onNext={goToNextMonth}
-        onToday={goToToday}
+        onToday={hideTodayButton ? undefined : goToToday}
         compact={compact}
       />
 
