@@ -34,7 +34,9 @@ export default async function JogatinasPage() {
         <h1 className="text-4xl font-bold text-foreground mb-2">
           Todas as Jogatinas
         </h1>
-        <p className="text-muted-foreground">Histórico completo de sessões</p>
+        <p className="text-muted-foreground">
+          Histórico completo de sessões, agrupado por data
+        </p>
       </div>
 
       <JogatinaList jogatinas={jogatinas || []} allPlayers={allPlayers || []} />

@@ -2,6 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Calendar, Gamepad2, Trophy, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  formatSeasonPlaytime,
+  getSeasonDaysActive,
+  getSeasonTotalMinutes,
+} from "@/lib/season-display-helpers";
 import type { SeasonWithDetails } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -10,10 +15,9 @@ interface ActiveSeasonsWidgetProps {
 }
 
 function SeasonCard({ season }: { season: SeasonWithDetails }) {
-  const daysActive = Math.floor(
-    (Date.now() - new Date(season.started_at).getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const daysActive = getSeasonDaysActive(season);
   const participants = season.season_participants?.length || 0;
+  const playtime = formatSeasonPlaytime(getSeasonTotalMinutes(season));
   const coverUrl = season.game?.cover_url;
 
   return (
@@ -75,9 +79,9 @@ function SeasonCard({ season }: { season: SeasonWithDetails }) {
               {participants}{" "}
               {participants === 1 ? "jogador" : "jogadores"}
             </span>
-            <span className="inline-flex items-center gap-1 text-success">
-              <Trophy className="h-3 w-3" />
-              Ativa
+            <span className="inline-flex items-center gap-1">
+              <Trophy className="h-3 w-3 text-green-400" />
+              {playtime}
             </span>
           </div>
         </div>

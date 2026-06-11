@@ -43,20 +43,18 @@ export default async function JogadoresPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
-        <div className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">Jogadores</h1>
-              <p className="text-muted-foreground">Gerencie os perfis dos seus amigos</p>
-            </div>
-            <AddPlayerDialog />
-          </div>
-
-          <PlayerList players={playersWithMinutes} />
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="mb-2 text-4xl font-bold text-foreground">Jogadores</h1>
+          <p className="text-muted-foreground">
+            Gerencie os perfis e acompanhe o tempo de cada um
+          </p>
         </div>
+        <AddPlayerDialog />
       </div>
+
+      <PlayerList players={playersWithMinutes} />
     </div>
   )
 }
