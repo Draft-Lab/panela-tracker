@@ -22,11 +22,39 @@ function verifyAuth(request: Request) {
   return token === DISCORD_BOT_API_KEY;
 }
 
+async function syncPlayerFromDiscord(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  playerId: string,
+  discord_name?: string,
+  discord_avatar?: string
+) {
+  const updates: { name?: string; avatar_url?: string | null } = {};
+
+  if (discord_name?.trim()) {
+    updates.name = discord_name.trim();
+  }
+  if (discord_avatar?.trim()) {
+    updates.avatar_url = discord_avatar.trim();
+  }
+
+  if (Object.keys(updates).length === 0) return;
+
+  console.log(`[Discord Events] Sincronizando perfil do jogador ${playerId}:`, updates);
+  const { error } = await supabase.from("players").update(updates).eq("id", playerId);
+
+  if (error) {
+    console.error(
+      `[Discord Events] Erro ao sincronizar perfil do jogador ${playerId}:`,
+      error
+    );
+  }
+}
+
 // NOVA FUNÇÃO: Associar jogatina à temporada ativa
 async function associateToActiveSeason(
   supabase: Awaited<ReturnType<typeof createClient>>,
   jogatinaId: string,
-  gameId: string,
+  gameId: string
 ) {
   try {
     const now = new Date().toISOString();
@@ -49,7 +77,7 @@ async function associateToActiveSeason(
         .eq("id", jogatinaId);
 
       console.log(
-        `[Discord Events] Jogatina ${jogatinaId} associada à temporada ${activeSeason.id}`,
+        `[Discord Events] Jogatina ${jogatinaId} associada à temporada ${activeSeason.id}`
       );
       return activeSeason.id;
     }
@@ -69,21 +97,20 @@ export async function POST(request: Request) {
     }
 
     const body: GameEventPayload = await request.json();
-    const { discord_id, game_title, event_type, discord_name, discord_avatar } =
-      body;
+    const { discord_id, game_title, event_type, discord_name, discord_avatar } = body;
 
     // Validação
     if (!discord_id || !game_title || !event_type) {
       return NextResponse.json(
         { error: "discord_id, game_title e event_type são obrigatórios" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (!["player_joined", "player_left"].includes(event_type)) {
       return NextResponse.json(
         { error: "event_type deve ser 'player_joined' ou 'player_left'" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -102,7 +129,7 @@ export async function POST(request: Request) {
         .insert({
           discord_id: discord_id,
           name: discord_name || discord_id,
-          avatar_url: discord_avatar || "",
+          avatar_url: discord_avatar?.trim() || null,
         })
         .select("id")
         .single();
@@ -110,11 +137,13 @@ export async function POST(request: Request) {
       if (error) {
         return NextResponse.json(
           { error: `Failed to create player: ${error.message}` },
-          { status: 500 },
+          { status: 500 }
         );
       }
       player = newPlayer;
     }
+
+    await syncPlayerFromDiscord(supabase, player.id, discord_name, discord_avatar);
 
     // 2. Buscar ou criar jogo
     let { data: game } = await supabase
@@ -133,7 +162,7 @@ export async function POST(request: Request) {
       if (error) {
         return NextResponse.json(
           { error: `Failed to create game: ${error.message}` },
-          { status: 500 },
+          { status: 500 }
         );
       }
       game = newGame;
@@ -148,23 +177,14 @@ export async function POST(request: Request) {
         player.id,
         game.id,
         game_title,
-        timestamp,
+        timestamp
       );
     } else {
-      return await handlePlayerLeft(
-        supabase,
-        player.id,
-        game.id,
-        game_title,
-        timestamp,
-      );
+      return await handlePlayerLeft(supabase, player.id, game.id, game_title, timestamp);
     }
   } catch (error) {
     console.error("[Discord Events API] Error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -173,7 +193,7 @@ async function handlePlayerJoined(
   playerId: string,
   gameId: string,
   gameTitle: string,
-  timestamp: string,
+  timestamp: string
 ) {
   // Buscar jogatina ativa para este jogo
   const { data: activeJogatina } = await supabase
@@ -206,7 +226,7 @@ async function handlePlayerJoined(
     if (error) {
       return NextResponse.json(
         { error: `Failed to create jogatina: ${error.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
     jogatina = newJogatina;
@@ -225,19 +245,17 @@ async function handlePlayerJoined(
 
   // Se o jogador não está na jogatina, adicionar
   if (!existingPlayer) {
-    const { error: playerError } = await supabase
-      .from("jogatina_players")
-      .insert({
-        jogatina_id: jogatina.id,
-        player_id: playerId,
-        status: "Jogatina",
-        is_active: true,
-      });
+    const { error: playerError } = await supabase.from("jogatina_players").insert({
+      jogatina_id: jogatina.id,
+      player_id: playerId,
+      status: "Jogatina",
+      is_active: true,
+    });
 
     if (playerError) {
       return NextResponse.json(
         { error: `Failed to add player to jogatina: ${playerError.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
   } else {
@@ -251,7 +269,7 @@ async function handlePlayerJoined(
       if (activateError) {
         return NextResponse.json(
           { error: `Failed to reactivate player: ${activateError.message}` },
-          { status: 500 },
+          { status: 500 }
         );
       }
     }
@@ -268,7 +286,7 @@ async function handlePlayerJoined(
   if (eventError) {
     return NextResponse.json(
       { error: `Failed to register event: ${eventError.message}` },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -288,7 +306,7 @@ async function handlePlayerJoined(
   if (updateError) {
     return NextResponse.json(
       { error: `Failed to update jogatina: ${updateError.message}` },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -308,7 +326,7 @@ async function handlePlayerLeft(
   playerId: string,
   gameId: string,
   gameTitle: string,
-  timestamp: string,
+  timestamp: string
 ) {
   // Buscar jogatina ativa para este jogo
   const { data: activeJogatina } = await supabase
@@ -322,7 +340,7 @@ async function handlePlayerLeft(
   if (!activeJogatina) {
     return NextResponse.json(
       { error: "No active jogatina found for this game" },
-      { status: 404 },
+      { status: 404 }
     );
   }
 
@@ -336,14 +354,14 @@ async function handlePlayerLeft(
   if (!jogatinaPlayer) {
     return NextResponse.json(
       { error: "Player is not in this jogatina" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
   if (!jogatinaPlayer.is_active) {
     return NextResponse.json(
       { error: "Player is not currently active in this jogatina" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -356,7 +374,7 @@ async function handlePlayerLeft(
   if (deactivateError) {
     return NextResponse.json(
       { error: `Failed to deactivate player: ${deactivateError.message}` },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -371,7 +389,7 @@ async function handlePlayerLeft(
   if (eventError) {
     return NextResponse.json(
       { error: `Failed to register event: ${eventError.message}` },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
@@ -384,12 +402,12 @@ async function handlePlayerLeft(
   const activePlayerCount = activePlayers?.length || 0;
 
   console.log(
-    `[Discord Events] Jogador ${playerId} saiu. Jogadores ativos: ${activePlayerCount}`,
+    `[Discord Events] Jogador ${playerId} saiu. Jogadores ativos: ${activePlayerCount}`
   );
 
   if (activePlayerCount === 0) {
     console.log(
-      `[Discord Events] Nenhum jogador ativo! Finalizando jogatina ${activeJogatina.id} automaticamente...`,
+      `[Discord Events] Nenhum jogador ativo! Finalizando jogatina ${activeJogatina.id} automaticamente...`
     );
 
     // Calcular estatísticas de duração para cada jogador
@@ -399,7 +417,7 @@ async function handlePlayerLeft(
     const firstEvent = new Date(activeJogatina.first_event_at);
     const lastEvent = new Date(timestamp);
     const durationMinutes = Math.floor(
-      (lastEvent.getTime() - firstEvent.getTime()) / 60000,
+      (lastEvent.getTime() - firstEvent.getTime()) / 60000
     );
 
     const { error: updateError } = await supabase
@@ -414,21 +432,17 @@ async function handlePlayerLeft(
 
     if (updateError) {
       console.error(
-        `[Discord Events] Erro ao finalizar jogatina: ${updateError.message}`,
+        `[Discord Events] Erro ao finalizar jogatina: ${updateError.message}`
       );
       return NextResponse.json(
         { error: `Failed to finish jogatina: ${updateError.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     // Atualizar métricas da temporada (se associada)
     if (activeJogatina.season_id) {
-      await updateSeasonMetrics(
-        supabase,
-        activeJogatina.season_id,
-        activeJogatina.id,
-      );
+      await updateSeasonMetrics(supabase, activeJogatina.season_id, activeJogatina.id);
     }
 
     return NextResponse.json({
@@ -457,7 +471,7 @@ async function handlePlayerLeft(
     if (updateError) {
       return NextResponse.json(
         { error: `Failed to update jogatina: ${updateError.message}` },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -478,14 +492,14 @@ async function handlePlayerLeft(
 async function updateSeasonMetrics(
   supabase: Awaited<ReturnType<typeof createClient>>,
   seasonId: string,
-  jogatinaId: string,
+  jogatinaId: string
 ) {
   try {
     // Buscar todos os participantes da jogatina finalizada
     const { data: jogatinaPlayers } = await supabase
       .from("jogatina_players")
       .select(
-        "player_id, total_duration_minutes, solo_duration_minutes, group_duration_minutes",
+        "player_id, total_duration_minutes, solo_duration_minutes, group_duration_minutes"
       )
       .eq("jogatina_id", jogatinaId);
 
@@ -508,14 +522,11 @@ async function updateSeasonMetrics(
           .update({
             total_sessions: participant.total_sessions + 1,
             total_duration_minutes:
-              participant.total_duration_minutes +
-              (jp.total_duration_minutes || 0),
+              participant.total_duration_minutes + (jp.total_duration_minutes || 0),
             solo_duration_minutes:
-              participant.solo_duration_minutes +
-              (jp.solo_duration_minutes || 0),
+              participant.solo_duration_minutes + (jp.solo_duration_minutes || 0),
             group_duration_minutes:
-              participant.group_duration_minutes +
-              (jp.group_duration_minutes || 0),
+              participant.group_duration_minutes + (jp.group_duration_minutes || 0),
           })
           .eq("id", participant.id);
       } else {
@@ -532,20 +543,15 @@ async function updateSeasonMetrics(
       }
     }
 
-    console.log(
-      `[Discord Events] Métricas da temporada ${seasonId} atualizadas`,
-    );
+    console.log(`[Discord Events] Métricas da temporada ${seasonId} atualizadas`);
   } catch (error) {
-    console.error(
-      "[Discord Events] Erro ao atualizar métricas da temporada:",
-      error,
-    );
+    console.error("[Discord Events] Erro ao atualizar métricas da temporada:", error);
   }
 }
 
 async function calculatePlayerDurations(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  jogatinaId: string,
+  jogatinaId: string
 ) {
   // [Código existente permanece o mesmo]
   const { data: events, error: eventsError } = await supabase
@@ -555,10 +561,7 @@ async function calculatePlayerDurations(
     .order("timestamp", { ascending: true });
 
   if (eventsError || !events || events.length === 0) {
-    console.error(
-      "[calculatePlayerDurations] Error fetching events:",
-      eventsError,
-    );
+    console.error("[calculatePlayerDurations] Error fetching events:", eventsError);
     return;
   }
 
@@ -568,18 +571,13 @@ async function calculatePlayerDurations(
     .eq("jogatina_id", jogatinaId);
 
   if (playersError || !jogatinaPlayers) {
-    console.error(
-      "[calculatePlayerDurations] Error fetching players:",
-      playersError,
-    );
+    console.error("[calculatePlayerDurations] Error fetching players:", playersError);
     return;
   }
 
   for (const jp of jogatinaPlayers) {
     const playerId = jp.player_id;
-    const playerEvents = events.filter(
-      (e: JogatinaEvent) => e.player_id === playerId,
-    );
+    const playerEvents = events.filter((e: JogatinaEvent) => e.player_id === playerId);
 
     if (playerEvents.length === 0) continue;
 
@@ -598,8 +596,7 @@ async function calculatePlayerDurations(
 
         if (nextLeaveEvent) {
           const leaveTime = new Date(nextLeaveEvent.timestamp);
-          const sessionDuration =
-            (leaveTime.getTime() - joinTime.getTime()) / 60000;
+          const sessionDuration = (leaveTime.getTime() - joinTime.getTime()) / 60000;
 
           totalTime += sessionDuration;
 
@@ -613,13 +610,10 @@ async function calculatePlayerDurations(
                 (le: JogatinaEvent) =>
                   le.player_id === e.player_id &&
                   le.event_type === "player_left" &&
-                  new Date(le.timestamp) >= joinTime,
+                  new Date(le.timestamp) >= joinTime
               );
 
-              return (
-                !otherLeaveEvent ||
-                new Date(otherLeaveEvent.timestamp) > joinTime
-              );
+              return !otherLeaveEvent || new Date(otherLeaveEvent.timestamp) > joinTime;
             }
 
             return false;
@@ -646,7 +640,7 @@ async function calculatePlayerDurations(
     if (updateError) {
       console.error(
         `[calculatePlayerDurations] Error updating player ${playerId}:`,
-        updateError,
+        updateError
       );
     }
   }
