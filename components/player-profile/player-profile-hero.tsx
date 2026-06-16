@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -14,6 +15,10 @@ interface PlayerProfileHeroProps {
   achievements?: PlayerAchievement[];
   totalMinutes: number;
   bannerCoverUrl: string | null;
+  backHref?: string;
+  backLabel?: string;
+  metaExtra?: ReactNode;
+  actions?: ReactNode;
 }
 
 export function PlayerProfileHero({
@@ -21,6 +26,10 @@ export function PlayerProfileHero({
   achievements = [],
   totalMinutes,
   bannerCoverUrl,
+  backHref = "/#perfis",
+  backLabel = "Voltar aos perfis",
+  metaExtra,
+  actions,
 }: PlayerProfileHeroProps) {
   return (
     <section className="relative overflow-hidden rounded-xl border border-border/60">
@@ -44,9 +53,9 @@ export function PlayerProfileHero({
 
       <div className="relative z-10 px-5 pb-6 pt-5 sm:px-8 sm:pb-8">
         <Button asChild variant="ghost" size="sm" className="mb-6 -ml-2">
-          <Link href="/#perfis">
+          <Link href={backHref}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar aos perfis
+            {backLabel}
           </Link>
         </Button>
 
@@ -69,6 +78,7 @@ export function PlayerProfileHero({
                 year: "numeric",
               })}
             </p>
+            {metaExtra}
             {achievements.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {achievements.map((achievement) => (
@@ -85,11 +95,14 @@ export function PlayerProfileHero({
             )}
           </div>
 
-          <div className="shrink-0 text-right">
-            <p className="text-3xl font-bold tabular-nums tracking-tight sm:text-4xl">
-              {formatPlayerDuration(totalMinutes)}
-            </p>
-            <p className="text-sm text-muted-foreground">tempo total</p>
+          <div className="flex shrink-0 flex-col items-end gap-3 sm:items-end">
+            <div className="text-right">
+              <p className="text-3xl font-bold tabular-nums tracking-tight sm:text-4xl">
+                {formatPlayerDuration(totalMinutes)}
+              </p>
+              <p className="text-sm text-muted-foreground">tempo total</p>
+            </div>
+            {actions}
           </div>
         </div>
       </div>
