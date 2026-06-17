@@ -1,0 +1,1 @@
+export const STORY_SLIDE_DURATION_MS = 6000;

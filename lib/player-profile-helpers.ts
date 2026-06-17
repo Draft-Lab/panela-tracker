@@ -15,7 +15,10 @@ import type {
 export type { PlayerProfileSummary };
 
 export type JogatinaPlayerWithDetails = JogatinaPlayer & {
-  jogatina: Jogatina & { game: Game };
+  jogatina: Jogatina & {
+    game: Game;
+    jogatina_players?: (JogatinaPlayer & { player: Player })[];
+  };
 };
 
 export type SeasonParticipantWithDetails = SeasonParticipant & {

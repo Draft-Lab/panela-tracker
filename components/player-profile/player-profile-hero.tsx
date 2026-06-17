@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ interface PlayerProfileHeroProps {
   backLabel?: string;
   metaExtra?: ReactNode;
   actions?: ReactNode;
+  retrospectivaHref?: string;
 }
 
 export function PlayerProfileHero({
@@ -30,6 +31,7 @@ export function PlayerProfileHero({
   backLabel = "Voltar aos perfis",
   metaExtra,
   actions,
+  retrospectivaHref,
 }: PlayerProfileHeroProps) {
   return (
     <section className="relative overflow-hidden rounded-xl border border-border/60">
@@ -103,6 +105,14 @@ export function PlayerProfileHero({
               <p className="text-sm text-muted-foreground">tempo total</p>
             </div>
             {actions}
+            {retrospectivaHref && (
+              <Button asChild size="sm" className="gap-2">
+                <Link href={retrospectivaHref}>
+                  <Sparkles className="h-4 w-4" />
+                  Ver retrospectiva
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>

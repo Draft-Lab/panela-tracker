@@ -161,4 +161,18 @@
   .dark *::-webkit-scrollbar-thumb:hover {
     background: oklch(0.623 0.214 259.815 / 0.6);
   }
+
+  @keyframes story-progress-fill {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .story-progress-fill {
+    animation: story-progress-fill var(--story-duration, 6s) linear forwards;
+    transform-origin: left center;
+  }
 }

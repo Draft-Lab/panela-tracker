@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { RetrospectiveHero } from "@/components/retrospective/retrospective-hero";
+import { RetrospectivePersonalPicker } from "@/components/retrospective/retrospective-personal-picker";
 import { RetrospectiveYearNav } from "@/components/retrospective/retrospective-year-nav";
 import { RetrospectiveYearView } from "@/components/retrospective/retrospective-year-view";
 import { filterJogatinasByYear } from "@/lib/retrospective-helpers";
@@ -38,6 +39,11 @@ export default async function RetrospectivaPage({
       jogatina:jogatinas(*, game:games(*))
     `);
 
+  const { data: players } = await supabase
+    .from("players")
+    .select("*")
+    .order("name", { ascending: true });
+
   const gameJogatinas = (jogatinas?.filter((j) => !j.game?.is_app) ||
     []) as RetrospectiveJogatina[];
   const gameJogatinaPlayers =
@@ -71,6 +77,8 @@ export default async function RetrospectivaPage({
         months={months}
         jogatinas={yearJogatinas}
       />
+
+      <RetrospectivePersonalPicker players={players ?? []} year={year} />
     </div>
   );
 }

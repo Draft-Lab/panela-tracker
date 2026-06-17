@@ -28,6 +28,8 @@ export function PlayerProfileContent({
   } = data;
 
   const isAdmin = variant === "admin";
+  const currentYear = new Date().getFullYear();
+  const retrospectivaHref = `/jogadores/${player.id}/retrospectiva?year=${currentYear}`;
 
   return (
     <>
@@ -38,6 +40,7 @@ export function PlayerProfileContent({
         bannerCoverUrl={bannerCoverUrl}
         backHref={isAdmin ? "/dashboard/jogadores" : "/#perfis"}
         backLabel={isAdmin ? "Voltar para Jogadores" : "Voltar aos perfis"}
+        retrospectivaHref={retrospectivaHref}
         metaExtra={
           isAdmin ? <PlayerProfileAdminMeta discordId={player.discord_id} /> : undefined
         }
