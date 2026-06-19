@@ -1,6 +1,11 @@
 "use client"
 
 import { Fragment, useState, type MouseEvent } from "react"
+import { getDateKey } from "@/lib/calendar-helpers"
+import {
+  getJogatinaActivityDays,
+  splitMinutesAcrossActivityDays,
+} from "@/lib/jogatina-date-helpers"
 import type { Jogatina, Game } from "@/lib/types"
 
 interface ActivityHeatmapProps {
@@ -29,18 +34,20 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
   const dayDataMap = new Map<string, DayData>()
 
   jogatinas.forEach((jogatina) => {
-    const jogatinaDate = new Date(jogatina.date)
-    jogatinaDate.setHours(0, 0, 0, 0)
+    const activityDays = getJogatinaActivityDays(jogatina)
+    const minutesByDay = splitMinutesAcrossActivityDays(
+      jogatina,
+      jogatina.total_duration_minutes || 0,
+    )
 
-    if (jogatinaDate >= startDate && jogatinaDate <= endDate) {
-      const year = jogatinaDate.getFullYear()
-      const month = String(jogatinaDate.getMonth() + 1).padStart(2, "0")
-      const day = String(jogatinaDate.getDate()).padStart(2, "0")
-      const key = `${year}-${month}-${day}`
+    activityDays.forEach((activityDay) => {
+      if (activityDay < startDate || activityDay > endDate) return
+
+      const key = getDateKey(activityDay)
 
       if (!dayDataMap.has(key)) {
         dayDataMap.set(key, {
-          date: new Date(jogatinaDate),
+          date: new Date(activityDay),
           count: 0,
           totalMinutes: 0,
         })
@@ -48,18 +55,15 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
 
       const dayData = dayDataMap.get(key)!
       dayData.count++
-      dayData.totalMinutes += jogatina.total_duration_minutes || 0
-    }
+      dayData.totalMinutes += minutesByDay.get(key) || 0
+    })
   })
 
   const allDays: DayData[] = []
   const currentDate = new Date(startDate)
 
   while (currentDate <= endDate) {
-    const year = currentDate.getFullYear()
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0")
-    const day = String(currentDate.getDate()).padStart(2, "0")
-    const key = `${year}-${month}-${day}`
+    const key = getDateKey(currentDate)
 
     const existingData = dayDataMap.get(key)
 

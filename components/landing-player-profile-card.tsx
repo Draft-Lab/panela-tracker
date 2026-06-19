@@ -70,15 +70,16 @@ export function LandingPlayerProfileCard({
             <h3 className="truncate text-lg font-bold tracking-tight">
               {player.name}
             </h3>
-            <p className="text-sm text-muted-foreground">
-              {formatPlayerDuration(totalMinutes)} jogados
+            <p className="text-xs text-muted-foreground">Tempo total</p>
+            <p className="text-sm font-medium tabular-nums">
+              {formatPlayerDuration(totalMinutes)}
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-lg border border-border/40 bg-background/40 px-3 py-2.5">
-            <p className="text-xs text-muted-foreground">Sessões</p>
+            <p className="text-xs text-muted-foreground">Sessões totais</p>
             <p className="mt-0.5 text-2xl font-bold tabular-nums text-foreground">
               {totalSessions}
             </p>

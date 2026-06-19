@@ -6,6 +6,8 @@ import { PlayerProfileContent } from "@/components/player-profile/player-profile
 import { loadPlayerProfile } from "@/lib/load-player-profile";
 import { formatPlayerDuration } from "@/lib/player-profile-helpers";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {
@@ -23,7 +25,7 @@ export async function generateMetadata({
   const { player, summary, achievements } = data;
   const title = `${player.name} · Panela Tracker`;
   const achievementLabels = (achievements ?? []).map((a) => a.label);
-  const description = `${formatPlayerDuration(summary.totalMinutes)} jogados · ${summary.totalSessions} sessões${
+  const description = `${formatPlayerDuration(summary.totalMinutes)} no total · ${summary.totalSessions} sessões${
     achievementLabels.length > 0
       ? ` · ${achievementLabels.slice(0, 2).join(", ")}`
       : ""
@@ -63,7 +65,7 @@ export default async function PlayerProfilePage({
     <div className="min-h-screen bg-background">
       <LandingHeader />
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 lg:px-8 lg:py-10">
+      <main className="mx-auto max-w-7xl space-y-5 px-4 py-8 lg:px-8 lg:py-10">
         <PlayerProfileContent data={data} variant="public" />
       </main>
 

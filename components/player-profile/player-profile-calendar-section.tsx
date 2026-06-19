@@ -1,4 +1,8 @@
 import { GameCalendar } from "@/components/game-calendar/game-calendar";
+import {
+  PlayerProfilePanel,
+  PlayerProfileSectionHeader,
+} from "@/components/player-profile/player-profile-panel";
 import type { JogatinaWithGame } from "@/lib/player-profile-helpers";
 
 interface PlayerProfileCalendarSectionProps {
@@ -12,10 +16,10 @@ export function PlayerProfileCalendarSection({
 }: PlayerProfileCalendarSectionProps) {
   return (
     <section>
-      {!compact && (
-        <h2 className="mb-4 text-xl font-bold">Calendário pessoal</h2>
-      )}
-      <GameCalendar jogatinas={jogatinas} compact={compact} />
+      {!compact && <PlayerProfileSectionHeader title="Calendário pessoal" />}
+      <PlayerProfilePanel padding="compact">
+        <GameCalendar jogatinas={jogatinas} compact={compact} />
+      </PlayerProfilePanel>
     </section>
   );
 }

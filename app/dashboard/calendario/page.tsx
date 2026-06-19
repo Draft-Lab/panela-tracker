@@ -7,7 +7,9 @@ export default async function CalendarioPage() {
   const { data: jogatinas, error } = await supabase
     .from("jogatinas")
     .select("*, game:games(*)")
-    .order("date", { ascending: false });
+    .order("last_event_at", { ascending: false, nullsFirst: false })
+    .order("date", { ascending: false })
+    .limit(5000);
 
   if (error) {
     console.error("[calendario] Error fetching jogatinas:", error);

@@ -1,5 +1,12 @@
 import { formatDuration } from "@/lib/calendar-helpers";
 import {
+  comparePlayerSessionRecency,
+  getJogatinaLastActivityAt,
+  getPlayerSessionActivityTimestamps,
+  getPlayerSessionLastActivityAt,
+  splitMinutesAcrossActivityDays,
+} from "@/lib/jogatina-date-helpers";
+import {
   getPlayerAchievements,
   type PlayerProfileSummary,
 } from "@/lib/player-achievements";
@@ -34,6 +41,14 @@ export interface PlayerProfileGameEntry {
   totalMinutes: number;
   sessionCount: number;
   lastPlayedAt: string | null;
+  isPlayingNow?: boolean;
+}
+
+export interface PlayerCurrentlyPlaying {
+  gameId: string;
+  gameTitle: string;
+  gameCoverUrl: string | null;
+  sessionType: "solo" | "group";
 }
 
 export interface PlayerParticipationDay {
@@ -83,19 +98,12 @@ export function buildPlayerProfileSummary(
     gameJogatinaPlayers.filter((jp) => jp.status === "Dava pra jogar").length +
     gameSeasonParticipants.filter((sp) => sp.status === "Dava pra jogar").length;
 
-  const totalSessions =
-    gameJogatinaPlayers.length +
-    gameSeasonParticipants.reduce((acc, sp) => acc + (sp.total_sessions || 0), 0);
+  const totalSessions = gameJogatinaPlayers.length;
 
-  const totalMinutes =
-    gameJogatinaPlayers.reduce(
-      (acc, jp) => acc + (jp.total_duration_minutes || 0),
-      0,
-    ) +
-    gameSeasonParticipants.reduce(
-      (acc, sp) => acc + (sp.total_duration_minutes || 0),
-      0,
-    );
+  const totalMinutes = gameJogatinaPlayers.reduce(
+    (acc, jp) => acc + (jp.total_duration_minutes || 0),
+    0,
+  );
 
   const uniqueGameIds = new Set<string>();
   gameJogatinaPlayers.forEach((jp) => uniqueGameIds.add(jp.jogatina.game_id));
@@ -120,7 +128,7 @@ export function buildPlayerGameLibrary(
 
   filterGameJogatinaPlayers(jogatinaPlayers).forEach((jp) => {
     const game = jp.jogatina.game;
-    const jogatinaDate = jp.jogatina.date;
+    const lastActivityAt = getPlayerSessionLastActivityAt(jp);
 
     if (!library.has(game.id)) {
       library.set(game.id, {
@@ -137,15 +145,23 @@ export function buildPlayerGameLibrary(
     entry.totalMinutes += jp.total_duration_minutes || 0;
     entry.sessionCount += 1;
 
-    if (!entry.lastPlayedAt || new Date(jogatinaDate) > new Date(entry.lastPlayedAt)) {
-      entry.lastPlayedAt = jogatinaDate;
+    if (
+      !entry.lastPlayedAt ||
+      new Date(lastActivityAt) > new Date(entry.lastPlayedAt)
+    ) {
+      entry.lastPlayedAt = lastActivityAt;
     }
   });
 
   filterGameSeasonParticipants(seasonParticipants).forEach((sp) => {
     const game = sp.season.game;
+    const existing = library.get(game.id);
 
-    if (!library.has(game.id)) {
+    if (existing && existing.sessionCount > 0) {
+      return;
+    }
+
+    if (!existing) {
       library.set(game.id, {
         gameId: game.id,
         gameTitle: game.title,
@@ -171,9 +187,46 @@ export function buildPlayerGameLibrary(
 
 export function getRecentGames(
   library: PlayerProfileGameEntry[],
+  jogatinaPlayers: JogatinaPlayerWithDetails[] = [],
   limit = 6,
 ): PlayerProfileGameEntry[] {
-  return [...library]
+  const libraryByGameId = new Map(library.map((entry) => [entry.gameId, entry]));
+  const seenGameIds = new Set<string>();
+  const recentGames: PlayerProfileGameEntry[] = [];
+
+  const sortedSessions = [...filterGameJogatinaPlayers(jogatinaPlayers)].sort(
+    comparePlayerSessionRecency,
+  );
+
+  for (const jp of sortedSessions) {
+    const gameId = jp.jogatina.game.id;
+
+    if (seenGameIds.has(gameId)) {
+      continue;
+    }
+
+    const entry = libraryByGameId.get(gameId);
+    if (!entry) {
+      continue;
+    }
+
+    seenGameIds.add(gameId);
+    recentGames.push({
+      ...entry,
+      lastPlayedAt: getPlayerSessionLastActivityAt(jp),
+      isPlayingNow: Boolean(jp.is_active && jp.jogatina.is_current),
+    });
+
+    if (recentGames.length >= limit) {
+      return recentGames;
+    }
+  }
+
+  if (recentGames.length > 0) {
+    return recentGames;
+  }
+
+  return library
     .filter((entry) => entry.lastPlayedAt)
     .sort(
       (a, b) =>
@@ -188,23 +241,52 @@ export function getTopGameCover(
   return library[0]?.gameCoverUrl ?? null;
 }
 
+export function getPlayerCurrentlyPlaying(
+  jogatinaPlayers: JogatinaPlayerWithDetails[],
+): PlayerCurrentlyPlaying | null {
+  const liveSession = filterGameJogatinaPlayers(jogatinaPlayers).find(
+    (jp) => jp.is_active && jp.jogatina.is_current,
+  );
+
+  if (!liveSession) {
+    return null;
+  }
+
+  const { game } = liveSession.jogatina;
+
+  return {
+    gameId: game.id,
+    gameTitle: game.title,
+    gameCoverUrl: game.cover_url,
+    sessionType: liveSession.jogatina.session_type ?? "solo",
+  };
+}
+
 export function getPlayerParticipationDays(
   jogatinaPlayers: JogatinaPlayerWithDetails[],
 ): PlayerParticipationDay[] {
   const dayMap = new Map<string, PlayerParticipationDay>();
 
   filterGameJogatinaPlayers(jogatinaPlayers).forEach((jp) => {
-    const date = new Date(jp.jogatina.date);
-    date.setHours(0, 0, 0, 0);
-    const key = date.toISOString().slice(0, 10);
+    const minutesByDay = splitMinutesAcrossActivityDays(
+      getPlayerSessionActivityTimestamps(jp),
+      jp.total_duration_minutes || 0,
+    );
 
-    if (!dayMap.has(key)) {
-      dayMap.set(key, { date: new Date(date), count: 0, totalMinutes: 0 });
-    }
+    minutesByDay.forEach((minutes, key) => {
+      if (!dayMap.has(key)) {
+        const [year, month, day] = key.split("-").map(Number);
+        dayMap.set(key, {
+          date: new Date(year, month - 1, day),
+          count: 0,
+          totalMinutes: 0,
+        });
+      }
 
-    const day = dayMap.get(key)!;
-    day.count += 1;
-    day.totalMinutes += jp.total_duration_minutes || 0;
+      const day = dayMap.get(key)!;
+      day.count += 1;
+      day.totalMinutes += minutes;
+    });
   });
 
   return Array.from(dayMap.values());
@@ -213,18 +295,17 @@ export function getPlayerParticipationDays(
 export function getPlayerJogatinasForCalendar(
   jogatinaPlayers: JogatinaPlayerWithDetails[],
 ): JogatinaWithGame[] {
-  const jogatinaMap = new Map<string, JogatinaWithGame>();
+  return filterGameJogatinaPlayers(jogatinaPlayers).map((jp) => {
+    const activity = getPlayerSessionActivityTimestamps(jp);
 
-  filterGameJogatinaPlayers(jogatinaPlayers).forEach((jp) => {
-    if (!jogatinaMap.has(jp.jogatina.id)) {
-      jogatinaMap.set(jp.jogatina.id, {
-        ...jp.jogatina,
-        game: jp.jogatina.game,
-      });
-    }
+    return {
+      ...jp.jogatina,
+      game: jp.jogatina.game,
+      date: activity.date,
+      first_event_at: activity.first_event_at ?? null,
+      last_event_at: activity.last_event_at ?? null,
+    };
   });
-
-  return Array.from(jogatinaMap.values());
 }
 
 export function getActiveSeasonsForPlayer(

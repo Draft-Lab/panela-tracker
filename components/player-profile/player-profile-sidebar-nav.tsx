@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, Gamepad2, LayoutGrid } from "lucide-react";
+import { PlayerProfilePanel } from "@/components/player-profile/player-profile-panel";
 import { cn } from "@/lib/utils";
 
 export type PlayerProfileView = "overview" | "library" | "calendar";
@@ -28,31 +29,37 @@ export function PlayerProfileSidebarNav({
   libraryCount,
 }: PlayerProfileSidebarNavProps) {
   return (
-    <nav className="overflow-hidden rounded-xl border border-border/60 bg-card/30">
-      {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
-        const count = id === "library" ? libraryCount : undefined;
-        const isActive = activeView === id;
+    <PlayerProfilePanel padding="compact" className="p-2">
+      <div className="grid grid-cols-1 gap-1">
+        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+          const count = id === "library" ? libraryCount : undefined;
+          const isActive = activeView === id;
 
-        return (
-          <button
-            key={id}
-            type="button"
-            onClick={() => onViewChange(id)}
-            className={cn(
-              "flex w-full items-center justify-between border-b border-border/40 px-4 py-2.5 text-sm transition-colors last:border-b-0 hover:bg-muted/40",
-              isActive && "bg-muted/50 font-medium",
-            )}
-          >
-            <span className="flex items-center gap-2">
-              <Icon className="h-4 w-4 text-muted-foreground" />
-              {label}
-            </span>
-            {count !== undefined && (
-              <span className="tabular-nums text-muted-foreground">{count}</span>
-            )}
-          </button>
-        );
-      })}
-    </nav>
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onViewChange(id)}
+              className={cn(
+                "flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-colors",
+                isActive
+                  ? "bg-primary/15 font-medium text-primary"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+              )}
+            >
+              <span className="flex items-center gap-2">
+                <Icon className="h-4 w-4" />
+                {label}
+              </span>
+              {count !== undefined && (
+                <span className="rounded-full bg-background/60 px-2 py-0.5 text-xs tabular-nums">
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </PlayerProfilePanel>
   );
 }

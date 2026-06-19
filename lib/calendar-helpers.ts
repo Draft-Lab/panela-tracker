@@ -1,3 +1,7 @@
+import {
+  getJogatinaActivityDays,
+  splitMinutesAcrossActivityDays,
+} from "@/lib/jogatina-date-helpers";
 import type { Jogatina, Game } from "@/lib/types";
 
 export type JogatinaWithGame = Jogatina & { game: Game };
@@ -107,26 +111,32 @@ export function groupJogatinasByDay(
   const dayMap = new Map<string, CalendarDayData>();
 
   jogatinas.forEach((jogatina) => {
-    const jogatinaDate = new Date(jogatina.date);
-    jogatinaDate.setHours(0, 0, 0, 0);
-    const key = getDateKey(jogatinaDate);
+    const activityDays = getJogatinaActivityDays(jogatina);
+    const minutesByDay = splitMinutesAcrossActivityDays(
+      jogatina,
+      jogatina.total_duration_minutes || 0,
+    );
 
-    if (!dayMap.has(key)) {
-      dayMap.set(key, {
-        date: new Date(jogatinaDate),
-        jogatinas: [],
-        primaryJogatina: null,
-        uniqueGames: [],
-        gameCount: 0,
-        uniqueGameCount: 0,
-        totalMinutes: 0,
-      });
-    }
+    activityDays.forEach((activityDay) => {
+      const key = getDateKey(activityDay);
 
-    const dayData = dayMap.get(key)!;
-    dayData.jogatinas.push(jogatina);
-    dayData.gameCount++;
-    dayData.totalMinutes += jogatina.total_duration_minutes || 0;
+      if (!dayMap.has(key)) {
+        dayMap.set(key, {
+          date: new Date(activityDay),
+          jogatinas: [],
+          primaryJogatina: null,
+          uniqueGames: [],
+          gameCount: 0,
+          uniqueGameCount: 0,
+          totalMinutes: 0,
+        });
+      }
+
+      const dayData = dayMap.get(key)!;
+      dayData.jogatinas.push(jogatina);
+      dayData.gameCount++;
+      dayData.totalMinutes += minutesByDay.get(key) || 0;
+    });
   });
 
   dayMap.forEach((dayData) => {

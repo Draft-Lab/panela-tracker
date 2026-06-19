@@ -454,6 +454,7 @@ async function handlePlayerLeft(
         is_current: false,
         active_players: 0,
         last_event_at: timestamp,
+        date: timestamp,
         total_duration_minutes: durationMinutes,
       })
       .eq("id", activeJogatina.id);

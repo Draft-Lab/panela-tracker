@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { PlayerProfileContent } from "@/components/player-profile/player-profile-content";
 import { loadPlayerProfile } from "@/lib/load-player-profile";
 
+export const dynamic = "force-dynamic";
+
 export default async function PlayerDetailPage({
   params,
 }: {

@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { fetchPlayerJogatinaPlayers } from "@/lib/fetch-player-sessions";
 import { getPlayerAchievements } from "@/lib/player-achievements";
 import {
   buildPlayerGameLibrary,
@@ -7,6 +8,7 @@ import {
   filterGameJogatinaPlayers,
   filterGameSeasonParticipants,
   getActiveSeasonsForPlayer,
+  getPlayerCurrentlyPlaying,
   getPlayerJogatinasForCalendar,
   getPlayerParticipationDays,
   getRecentGames,
@@ -28,16 +30,6 @@ export const loadPlayerProfile = cache(async (id: string) => {
     return null;
   }
 
-  const { data: jogatinaPlayers } = await supabase
-    .from("jogatina_players")
-    .select(
-      `
-      *,
-      jogatina:jogatinas(*, game:games(*))
-    `,
-    )
-    .eq("player_id", id);
-
   const { data: seasonParticipants } = await supabase
     .from("season_participants")
     .select(
@@ -48,9 +40,16 @@ export const loadPlayerProfile = cache(async (id: string) => {
     )
     .eq("player_id", id);
 
-  const gameJogatinaPlayers = filterGameJogatinaPlayers(
-    (jogatinaPlayers || []) as JogatinaPlayerWithDetails[],
-  );
+  let jogatinaPlayers: JogatinaPlayerWithDetails[];
+
+  try {
+    jogatinaPlayers = await fetchPlayerJogatinaPlayers(supabase, id);
+  } catch (error) {
+    console.error("[loadPlayerProfile] Error fetching player sessions:", error);
+    jogatinaPlayers = [];
+  }
+
+  const gameJogatinaPlayers = filterGameJogatinaPlayers(jogatinaPlayers);
   const gameSeasonParticipants = filterGameSeasonParticipants(
     (seasonParticipants || []) as SeasonParticipantWithDetails[],
   );
@@ -70,10 +69,11 @@ export const loadPlayerProfile = cache(async (id: string) => {
     summary,
     achievements: getPlayerAchievements(summary) ?? [],
     library,
-    recentGames: getRecentGames(library),
+    recentGames: getRecentGames(library, gameJogatinaPlayers),
     participationDays: getPlayerParticipationDays(gameJogatinaPlayers),
     calendarJogatinas: getPlayerJogatinasForCalendar(gameJogatinaPlayers),
     activeSeasons: getActiveSeasonsForPlayer(gameSeasonParticipants),
     bannerCoverUrl: getTopGameCover(library),
+    currentlyPlaying: getPlayerCurrentlyPlaying(gameJogatinaPlayers),
   };
 });

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { fetchAllJogatinaPlayers } from "@/lib/fetch-all-jogatina-players";
 import { LandingHero } from "@/components/landing-hero";
 import { LandingCurrentGamesSection } from "@/components/landing-current-games-section";
 import { LandingTimelineSection } from "@/components/landing-timeline-section";
@@ -24,12 +25,14 @@ export default async function LandingPage() {
     .from("jogatinas")
     .select(`*, game:games(*), jogatina_players(*, player:players(*))`)
     .order("date", { ascending: false });
-  const { data: jogatinaPlayers } = await supabase.from("jogatina_players")
-    .select(`
-      *,
-      player:players(*),
-      jogatina:jogatinas(*, game:games(*))
-    `);
+
+  let jogatinaPlayers: Awaited<ReturnType<typeof fetchAllJogatinaPlayers>> = [];
+
+  try {
+    jogatinaPlayers = await fetchAllJogatinaPlayers(supabase);
+  } catch (error) {
+    console.error("[LandingPage] Error fetching jogatina players:", error);
+  }
 
   const { data: activeSeasons } = await supabase
     .from("seasons")
@@ -146,7 +149,7 @@ export default async function LandingPage() {
         <LandingSection
           id="perfis"
           title="Perfis do grupo"
-          description="Resumo individual de participação e comportamento."
+          description="Tempo total, sessões e comportamento de cada membro."
           tone="muted"
         >
           <LandingPlayerProfiles

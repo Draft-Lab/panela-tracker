@@ -25,11 +25,10 @@ export function PlayerProfileContent({
     calendarJogatinas,
     activeSeasons,
     bannerCoverUrl,
+    currentlyPlaying,
   } = data;
 
   const isAdmin = variant === "admin";
-  const currentYear = new Date().getFullYear();
-  const retrospectivaHref = `/jogadores/${player.id}/retrospectiva?year=${currentYear}`;
 
   return (
     <>
@@ -37,14 +36,16 @@ export function PlayerProfileContent({
         player={player}
         achievements={achievements}
         totalMinutes={summary.totalMinutes}
+        totalSessions={summary.totalSessions}
+        uniqueGames={summary.uniqueGames}
         bannerCoverUrl={bannerCoverUrl}
         backHref={isAdmin ? "/dashboard/jogadores" : "/#perfis"}
         backLabel={isAdmin ? "Voltar para Jogadores" : "Voltar aos perfis"}
-        retrospectivaHref={retrospectivaHref}
         metaExtra={
           isAdmin ? <PlayerProfileAdminMeta discordId={player.discord_id} /> : undefined
         }
         actions={isAdmin ? <PlayerProfileAdminActions player={player} /> : undefined}
+        currentlyPlaying={currentlyPlaying}
       />
 
       <PlayerProfileLayout

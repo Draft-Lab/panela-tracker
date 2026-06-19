@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useMemo, useState, type MouseEvent } from "react";
-import { formatDuration } from "@/lib/calendar-helpers";
+import { formatDuration, getDateKey } from "@/lib/calendar-helpers";
 import type { PlayerParticipationDay } from "@/lib/player-profile-helpers";
 
 interface PlayerProfileHeatmapProps {
@@ -54,7 +54,7 @@ export function PlayerProfileHeatmap({
       jogatinaDate.setHours(0, 0, 0, 0);
 
       if (jogatinaDate >= startDate && jogatinaDate <= endDate) {
-        const key = jogatinaDate.toISOString().slice(0, 10);
+        const key = getDateKey(jogatinaDate);
         dayDataMap.set(key, {
           date: new Date(jogatinaDate),
           count: entry.count,
@@ -67,7 +67,7 @@ export function PlayerProfileHeatmap({
     const currentDate = new Date(startDate);
 
     while (currentDate <= endDate) {
-      const key = currentDate.toISOString().slice(0, 10);
+      const key = getDateKey(currentDate);
       allDays.push(
         dayDataMap.get(key) || {
           date: new Date(currentDate),
@@ -180,7 +180,7 @@ export function PlayerProfileHeatmap({
             </div>
             {weeks.map((week, weekIndex) => {
               const day = week[rowIndex];
-              const dayKey = day.date.toISOString().slice(0, 10);
+              const dayKey = getDateKey(day.date);
               const uniqueKey =
                 day.count < 0 ? `empty-${weekIndex}-${rowIndex}` : dayKey;
 

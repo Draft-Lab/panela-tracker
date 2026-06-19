@@ -32,6 +32,22 @@ export function getDateGroupLabel(date: Date) {
   return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 }
 
+export function formatLastPlayedLabel(iso: string): string {
+  const date = new Date(iso)
+  const label = getDateGroupLabel(date)
+  const time = formatLocalTime(iso)
+
+  if (label === "Hoje") return `Hoje, ${time}`
+  if (label === "Ontem") return `Ontem, ${time}`
+
+  const formatted = date.toLocaleDateString(LOCALE, {
+    day: "2-digit",
+    month: "short",
+  })
+
+  return `${formatted}, ${time}`
+}
+
 export function groupByDateLabel<T>(
   items: T[],
   getDate: (item: T) => string,

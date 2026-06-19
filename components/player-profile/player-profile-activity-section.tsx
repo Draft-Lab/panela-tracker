@@ -1,4 +1,8 @@
 import { PlayerProfileHeatmap } from "@/components/player-profile/player-profile-heatmap";
+import {
+  PlayerProfilePanel,
+  PlayerProfileSectionHeader,
+} from "@/components/player-profile/player-profile-panel";
 import type { PlayerParticipationDay } from "@/lib/player-profile-helpers";
 
 interface PlayerProfileActivitySectionProps {
@@ -10,10 +14,10 @@ export function PlayerProfileActivitySection({
 }: PlayerProfileActivitySectionProps) {
   return (
     <section>
-      <h2 className="mb-4 text-xl font-bold">Atividade nos últimos 12 meses</h2>
-      <div className="rounded-xl border border-border/60 bg-card/30 p-4 sm:p-6">
+      <PlayerProfileSectionHeader title="Atividade nos últimos 12 meses" />
+      <PlayerProfilePanel padding="compact" className="sm:p-5">
         <PlayerProfileHeatmap participationDays={participationDays} />
-      </div>
+      </PlayerProfilePanel>
     </section>
   );
 }
