@@ -24,18 +24,18 @@ export function LandingHero({
   weekAgo.setDate(weekAgo.getDate() - 7)
   const weekJogatinas = jogatinas.filter((j) => new Date(j.date) >= weekAgo)
 
-  const gameCounts = weekJogatinas.reduce(
+  const gameMinutes = weekJogatinas.reduce(
     (acc, jogatina) => {
       const gameId = jogatina.game.id
-      acc[gameId] = (acc[gameId] || 0) + 1
+      acc[gameId] = (acc[gameId] || 0) + (jogatina.total_duration_minutes || 0)
       return acc
     },
     {} as Record<string, number>,
   )
 
-  const mostPlayedGameId = Object.entries(gameCounts).sort(
-    (a, b) => b[1] - a[1],
-  )[0]?.[0]
+  const mostPlayedGameId = Object.entries(gameMinutes)
+    .filter(([, minutes]) => minutes > 0)
+    .sort((a, b) => b[1] - a[1])[0]?.[0]
   const mostPlayedThisWeek = mostPlayedGameId
     ? weekJogatinas.find((j) => j.game.id === mostPlayedGameId)?.game.title ||
       "Nenhum"
