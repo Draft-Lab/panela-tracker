@@ -1,29 +1,32 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 
-const AUTH_COOKIE = "tracker_auth";
+export async function login(email: string, password: string) {
+  const supabase = await createClient();
 
-export async function login(password: string) {
-  if (password === process.env.ADMIN_PASSWORD) {
-    const cookieStore = await cookies();
-    cookieStore.set(AUTH_COOKIE, "authenticated", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
-    return { success: true };
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password,
+  });
+
+  if (error) {
+    return { success: false, error: "Email ou senha incorretos" };
   }
-  return { success: false, error: "Senha incorreta" };
+
+  return { success: true };
 }
 
 export async function logout() {
-  const cookieStore = await cookies();
-  cookieStore.delete(AUTH_COOKIE);
+  const supabase = await createClient();
+  await supabase.auth.signOut();
 }
 
 export async function isAuthenticated() {
-  const cookieStore = await cookies();
-  return cookieStore.has(AUTH_COOKIE);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return !!user;
 }

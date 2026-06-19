@@ -18,7 +18,7 @@ export default async function LoginPage() {
             <Gamepad2 className="h-12 w-12 text-primary" />
           </div>
           <h1 className="text-3xl font-bold">Área Administrativa</h1>
-          <p className="text-muted-foreground">Entre com a senha para acessar o painel de controle</p>
+          <p className="text-muted-foreground">Entre com email e senha para acessar o painel de controle</p>
         </div>
 
         <LoginForm />

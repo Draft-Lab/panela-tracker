@@ -1,5 +1,5 @@
 // app/api/discord/player-offline/route.ts
-import { createClient } from "../../../../lib/supabase/server"
+import { createServiceRoleClient } from "../../../../lib/supabase/service-role"
 import { NextResponse } from "next/server"
 import type { JogatinaEvent } from "../../../../lib/types"
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "discord_id é obrigatório" }, { status: 400 })
     }
 
-    const supabase = await createClient()
+    const supabase = createServiceRoleClient()
     const timestamp = new Date().toISOString()
 
     // 1. Buscar jogador pelo discord_id
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
 
 // Funções auxiliares reutilizadas do discord/events/route.ts
 async function updateSeasonMetrics(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   seasonId: string,
   jogatinaId: string,
 ) {
@@ -252,7 +252,7 @@ async function updateSeasonMetrics(
   }
 }
 
-async function calculatePlayerDurations(supabase: Awaited<ReturnType<typeof createClient>>, jogatinaId: string) {
+async function calculatePlayerDurations(supabase: ReturnType<typeof createServiceRoleClient>, jogatinaId: string) {
   const { data: events, error: eventsError } = await supabase
     .from("jogatina_events")
     .select("*")

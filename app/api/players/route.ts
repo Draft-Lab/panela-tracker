@@ -1,4 +1,4 @@
-import { createClient } from "../../../lib/supabase/server";
+import { createServiceRoleClient } from "../../../lib/supabase/service-role";
 import { NextResponse } from "next/server";
 
 const DISCORD_BOT_API_KEY = process.env.DISCORD_BOT_API_KEY;
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data: existingPlayer } = await supabase
       .from("players")
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data: players, error } = await supabase
       .from("players")

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 import { verifyDiscordBotAuth } from "@/lib/discord/bot-auth";
 import {
   reconcilePlayingSnapshot,
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
     const result = await reconcilePlayingSnapshot(supabase, body.playing);
 
     return NextResponse.json({

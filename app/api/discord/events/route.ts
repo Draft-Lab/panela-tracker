@@ -1,5 +1,5 @@
 // app/api/discord/events/route.ts
-import { createClient } from "../../../../lib/supabase/server";
+import { createServiceRoleClient } from "../../../../lib/supabase/service-role";
 import { NextResponse } from "next/server";
 import type { JogatinaEvent } from "../../../../lib/types";
 
@@ -23,7 +23,7 @@ function verifyAuth(request: Request) {
 }
 
 async function countActivePlayers(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   jogatinaId: string,
 ) {
   const { data } = await supabase
@@ -36,7 +36,7 @@ async function countActivePlayers(
 }
 
 async function syncPlayerFromDiscord(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   playerId: string,
   discord_name?: string,
   discord_avatar?: string
@@ -65,7 +65,7 @@ async function syncPlayerFromDiscord(
 
 // NOVA FUNÇÃO: Associar jogatina à temporada ativa
 async function associateToActiveSeason(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   jogatinaId: string,
   gameId: string
 ) {
@@ -127,7 +127,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     // 1. Buscar ou criar jogador
     let { data: player } = await supabase
@@ -202,7 +202,7 @@ export async function POST(request: Request) {
 }
 
 async function handlePlayerJoined(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   playerId: string,
   gameId: string,
   gameTitle: string,
@@ -353,7 +353,7 @@ async function handlePlayerJoined(
 }
 
 async function handlePlayerLeft(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   playerId: string,
   gameId: string,
   gameTitle: string,
@@ -518,7 +518,7 @@ async function handlePlayerLeft(
 
 // NOVA FUNÇÃO: Atualizar métricas consolidadas da temporada
 async function updateSeasonMetrics(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   seasonId: string,
   jogatinaId: string
 ) {
@@ -578,7 +578,7 @@ async function updateSeasonMetrics(
 }
 
 async function calculatePlayerDurations(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createServiceRoleClient>,
   jogatinaId: string
 ) {
   // [Código existente permanece o mesmo]
