@@ -1,46 +1,19 @@
-import { Gamepad2, Users, Zap, Clock } from "lucide-react"
-import { LandingStatCard } from "@/components/landing/landing-stat-card"
-import type { Jogatina, Player, Game, Season } from "@/lib/types"
+import { Gamepad2, Users, Zap, Clock } from "lucide-react";
+import { LandingStatCard } from "@/components/landing/landing-stat-card";
 
 interface LandingHeroProps {
-  currentGames: (Jogatina & { game: Game })[]
-  players: Player[]
-  jogatinas: (Jogatina & { game: Game })[]
-  activeSeasons: Season[]
+  playersCount: number;
+  currentGamesCount: number;
+  totalHours: number;
+  mostPlayedThisWeek: string;
 }
 
 export function LandingHero({
-  currentGames,
-  players,
-  jogatinas,
+  playersCount,
+  currentGamesCount,
+  totalHours,
+  mostPlayedThisWeek,
 }: LandingHeroProps) {
-  const totalMinutes = jogatinas.reduce(
-    (acc, j) => acc + (j.total_duration_minutes || 0),
-    0,
-  )
-  const totalHours = Math.floor(totalMinutes / 60)
-
-  const weekAgo = new Date()
-  weekAgo.setDate(weekAgo.getDate() - 7)
-  const weekJogatinas = jogatinas.filter((j) => new Date(j.date) >= weekAgo)
-
-  const gameMinutes = weekJogatinas.reduce(
-    (acc, jogatina) => {
-      const gameId = jogatina.game.id
-      acc[gameId] = (acc[gameId] || 0) + (jogatina.total_duration_minutes || 0)
-      return acc
-    },
-    {} as Record<string, number>,
-  )
-
-  const mostPlayedGameId = Object.entries(gameMinutes)
-    .filter(([, minutes]) => minutes > 0)
-    .sort((a, b) => b[1] - a[1])[0]?.[0]
-  const mostPlayedThisWeek = mostPlayedGameId
-    ? weekJogatinas.find((j) => j.game.id === mostPlayedGameId)?.game.title ||
-      "Nenhum"
-    : "Nenhum"
-
   return (
     <div className="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-12">
       <div className="max-w-lg">
@@ -56,13 +29,13 @@ export function LandingHero({
       <div className="grid grid-cols-2 gap-x-8 gap-y-6">
         <LandingStatCard
           label="Jogatinas ativas"
-          value={currentGames.length}
+          value={currentGamesCount}
           hint="Agora"
           icon={Zap}
         />
         <LandingStatCard
           label="Jogadores"
-          value={players.length}
+          value={playersCount}
           hint="No grupo"
           icon={Users}
         />
@@ -80,5 +53,5 @@ export function LandingHero({
         />
       </div>
     </div>
-  )
+  );
 }

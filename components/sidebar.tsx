@@ -137,27 +137,13 @@ export function Sidebar() {
                         href={item.href}
                         onClick={() => setIsOpen(false)}
                         className={cn(
-                          "relative flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200",
+                          "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                           "group",
                           isActive
                             ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm"
                             : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                         )}
                       >
-                        {/* Decorative corner lines for active items */}
-                        {isActive && (
-                          <>
-                            <div className='absolute top-0 left-0 w-4 h-px bg-sidebar-primary-foreground/40' />
-                            <div className='absolute top-0 left-0 w-px h-4 bg-sidebar-primary-foreground/40' />
-                            <div className='absolute top-0 right-0 w-4 h-px bg-sidebar-primary-foreground/40' />
-                            <div className='absolute top-0 right-0 w-px h-4 bg-sidebar-primary-foreground/40' />
-                            <div className='absolute bottom-0 left-0 w-4 h-px bg-sidebar-primary-foreground/40' />
-                            <div className='absolute bottom-0 left-0 w-px h-4 bg-sidebar-primary-foreground/40' />
-                            <div className='absolute bottom-0 right-0 w-4 h-px bg-sidebar-primary-foreground/40' />
-                            <div className='absolute bottom-0 right-0 w-px h-4 bg-sidebar-primary-foreground/40' />
-                          </>
-                        )}
-
                         <Icon
                           className={cn(
                             "h-4 w-4 shrink-0",

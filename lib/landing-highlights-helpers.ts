@@ -155,9 +155,15 @@ export function findBiggestGroupSession(
 
 function getZeroTimestamp(entry: {
   status_updated_at?: string | null;
-  created_at: string;
-}): number {
-  return new Date(entry.status_updated_at ?? entry.created_at).getTime();
+  created_at?: string | null;
+}): number | null {
+  const raw = entry.status_updated_at ?? entry.created_at;
+  if (!raw) {
+    return null;
+  }
+
+  const time = new Date(raw).getTime();
+  return Number.isFinite(time) ? time : null;
 }
 
 export function findLatestChampionZero(
@@ -175,9 +181,14 @@ export function findLatestChampionZero(
       return;
     }
 
+    const timestamp = getZeroTimestamp(entry);
+    if (timestamp === null) {
+      return;
+    }
+
     zeroEntries.push({
       game: entry.jogatina.game,
-      timestamp: getZeroTimestamp(entry),
+      timestamp,
       playerName: entry.player?.name,
     });
   });
@@ -187,9 +198,14 @@ export function findLatestChampionZero(
       return;
     }
 
+    const timestamp = getZeroTimestamp(entry);
+    if (timestamp === null) {
+      return;
+    }
+
     zeroEntries.push({
       game: entry.season.game,
-      timestamp: getZeroTimestamp(entry),
+      timestamp,
       playerName: entry.player?.name,
     });
   });

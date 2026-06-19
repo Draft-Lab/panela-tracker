@@ -345,3 +345,36 @@ export function buildLandingPlayerCardStats(
     achievements: getPlayerAchievements(summary, { limit: 3 }) ?? [],
   };
 }
+
+export interface LandingPlayerCardStatsInput {
+  player: Player;
+  totalSessions: number;
+  totalMinutes: number;
+  drops: number;
+  zeros: number;
+  davaPraJogar: number;
+  uniqueGames: number;
+}
+
+export function buildLandingPlayerCardStatsFromSummary(
+  input: LandingPlayerCardStatsInput,
+) {
+  const summary: PlayerProfileSummary = {
+    totalMinutes: input.totalMinutes,
+    totalSessions: input.totalSessions,
+    uniqueGames: input.uniqueGames,
+    drops: input.drops,
+    zeros: input.zeros,
+    davaPraJogar: input.davaPraJogar,
+    dropRate:
+      input.totalSessions > 0 ? (input.drops / input.totalSessions) * 100 : 0,
+  };
+
+  return {
+    player: input.player,
+    totalSessions: input.totalSessions,
+    totalMinutes: input.totalMinutes,
+    dropCount: input.drops,
+    achievements: getPlayerAchievements(summary, { limit: 3 }) ?? [],
+  };
+}
