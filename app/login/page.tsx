@@ -1,12 +1,12 @@
 import { LoginForm } from "@/components/login-form"
-import { isAuthenticated } from "@/lib/auth"
+import { isAdmin } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Gamepad2 } from "lucide-react"
 
 export default async function LoginPage() {
-  const authenticated = await isAuthenticated()
+  const admin = await isAdmin()
 
-  if (authenticated) {
+  if (admin) {
     redirect("/dashboard")
   }
 

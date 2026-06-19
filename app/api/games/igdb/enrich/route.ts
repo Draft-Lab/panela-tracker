@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { fetchIgdbGameDetails } from "@/lib/igdb/fetch-game-details";
 import { mapIgdbToGameUpdate } from "@/lib/igdb/map-to-game-update";
-import { getAuthenticatedUser } from "@/lib/supabase/auth-helpers";
+import { isAdmin } from "@/lib/supabase/auth-helpers";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
-    const user = await getAuthenticatedUser();
+    const admin = await isAdmin();
 
-    if (!user) {
+    if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

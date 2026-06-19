@@ -1,5 +1,5 @@
 import type React from "react"
-import { isAuthenticated } from "@/lib/auth"
+import { isAdmin } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
 
@@ -8,9 +8,9 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const authenticated = await isAuthenticated()
+  const admin = await isAdmin()
 
-  if (!authenticated) {
+  if (!admin) {
     redirect("/login")
   }
 
