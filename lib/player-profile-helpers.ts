@@ -375,6 +375,8 @@ export function buildLandingPlayerCardStatsFromSummary(
     totalSessions: input.totalSessions,
     totalMinutes: input.totalMinutes,
     dropCount: input.drops,
+    uniqueGames: input.uniqueGames,
+    dropRate: summary.dropRate,
     achievements: getPlayerAchievements(summary, { limit: 3 }) ?? [],
   };
 }

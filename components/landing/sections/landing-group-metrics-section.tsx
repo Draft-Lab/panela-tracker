@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { fetchJogatinaPlayerSlimRows } from "@/lib/fetch-landing-data";
-import { LandingGroupMetrics } from "@/components/landing-group-metrics";
+import { LandingGroupMetrics } from "@/components/landing-group-metrics/index";
 
 export async function LandingGroupMetricsSection() {
   const supabase = await createClient();

@@ -6,7 +6,7 @@ import {
   fetchLandingPlayers,
   fetchSeasonParticipantsSlim,
 } from "@/lib/fetch-landing-data";
-import { LandingPlayerProfiles } from "@/components/landing-player-profiles";
+import { LandingPlayerProfiles } from "@/components/landing-player-profiles/index";
 
 export async function LandingPlayerProfilesSection() {
   const supabase = await createClient();
