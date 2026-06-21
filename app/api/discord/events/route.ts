@@ -424,6 +424,8 @@ async function handlePlayerLeft(
     );
   }
 
+  await calculatePlayerDurations(supabase, activeJogatina.id);
+
   const activePlayerCount = await countActivePlayers(
     supabase,
     activeJogatina.id,

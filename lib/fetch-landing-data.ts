@@ -4,6 +4,7 @@ import { buildLandingPlayerCardStatsFromSummary } from "@/lib/player-profile-hel
 import type {
   Game,
   Jogatina,
+  JogatinaEvent,
   JogatinaPlayer,
   Player,
   SeasonParticipant,
@@ -16,6 +17,7 @@ const PAGE_SIZE = 1000;
 export type LandingCurrentJogatina = Jogatina & {
   game: Game;
   jogatina_players?: (JogatinaPlayer & { player: Player })[];
+  jogatina_events?: Pick<JogatinaEvent, "player_id" | "event_type" | "timestamp">[];
 };
 
 export type LandingHeatmapJogatina = Jogatina & {
@@ -96,7 +98,8 @@ export async function fetchCurrentJogatinas(
       `
       *,
       game:games(*),
-      jogatina_players(*, player:players(*))
+      jogatina_players(*, player:players(*)),
+      jogatina_events(player_id, event_type, timestamp)
     `,
     )
     .eq("is_current", true)

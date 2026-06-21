@@ -1,18 +1,20 @@
 import { Badge } from "@/components/ui/badge"
 import { Gamepad2, X } from "lucide-react"
-import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
+import type { Jogatina, Game, JogatinaPlayer, Player, JogatinaEvent } from "@/lib/types"
 import Image from "next/image"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 import { LiveSessionMeta } from "@/components/landing/live-session-meta"
+import { CurrentSessionParticipants } from "@/components/landing/current-session-participants"
 import { getLiveSessionStartedAt } from "@/lib/live-session-helpers"
+import { buildCurrentSessionParticipants } from "@/lib/current-session-player-helpers"
 
 interface CurrentGameCardProps {
   jogatina: Jogatina & {
     game: Game
     jogatina_players?: (JogatinaPlayer & { player: Player })[]
+    jogatina_events?: Pick<JogatinaEvent, "player_id" | "event_type" | "timestamp">[]
   }
   isInteractive?: boolean
   onFinish?: (jogatinaId: string, gameTitle: string) => void
@@ -23,11 +25,14 @@ export function CurrentGameCard({
   isInteractive = false,
   onFinish,
 }: CurrentGameCardProps) {
-  const activePlayers = jogatina.jogatina_players?.filter((jp) => jp.is_active) || []
-  const sessionType = activePlayers.length > 1 ? "Grupo" : "Solo"
+  const sessionEvents = jogatina.jogatina_events ?? []
+  const sessionType =
+    buildCurrentSessionParticipants(jogatina.jogatina_players ?? [], sessionEvents)
+      .active.length > 1
+      ? "Grupo"
+      : "Solo"
   const coverUrl = jogatina.game.cover_url
   const sessionStartedAt = getLiveSessionStartedAt(jogatina)
-  const playerNames = activePlayers.map((jp) => jp.player.name).join(", ")
 
   return (
     <article className="relative overflow-hidden rounded-xl border border-border/50">
@@ -106,31 +111,11 @@ export function CurrentGameCard({
             <LiveSessionMeta startedAt={sessionStartedAt} />
           </div>
 
-          {activePlayers.length > 0 && (
-            <div className="flex items-center gap-2 pt-0.5">
-              <div className="flex -space-x-1.5">
-                {activePlayers.map((jp) => (
-                  <Avatar
-                    key={jp.player.id}
-                    className="h-6 w-6 ring-2 ring-background"
-                    title={jp.player.name}
-                  >
-                    {jp.player.avatar_url && (
-                      <AvatarImage
-                        src={jp.player.avatar_url}
-                        alt={jp.player.name}
-                      />
-                    )}
-                    <AvatarFallback className="text-[9px]">
-                      {jp.player.name.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-              <p className="min-w-0 truncate text-xs text-muted-foreground">
-                {playerNames}
-              </p>
-            </div>
+          {(jogatina.jogatina_players?.length ?? 0) > 0 && (
+            <CurrentSessionParticipants
+              jogatinaPlayers={jogatina.jogatina_players ?? []}
+              events={sessionEvents}
+            />
           )}
 
           {isInteractive && onFinish && (
