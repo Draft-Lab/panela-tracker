@@ -15,6 +15,7 @@ import {
   Trophy,
   Calendar,
   Sparkles,
+  Scale,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -24,10 +25,7 @@ import { logout } from "@/lib/auth";
 const navigationGroups = [
   {
     label: "Principal",
-    items: [
-      { name: "Dashboard", href: "/dashboard", icon: Home },
-      { name: "Retrospectiva", href: "/dashboard/retrospectiva", icon: Sparkles },
-    ],
+    items: [{ name: "Dashboard", href: "/dashboard", icon: Home }],
   },
   {
     label: "Jogos",
@@ -44,6 +42,8 @@ const navigationGroups = [
     items: [
       { name: "Jogadores", href: "/dashboard/jogadores", icon: Users },
       { name: "Roleta", href: "/dashboard/roleta", icon: Dices },
+      { name: "Retrospectiva", href: "/dashboard/retrospectiva", icon: Sparkles },
+      { name: "Auditoria de horas", href: "/dashboard/auditoria-horas", icon: Scale },
     ],
   },
 ];

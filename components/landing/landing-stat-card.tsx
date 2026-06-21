@@ -5,6 +5,7 @@ interface LandingStatCardProps {
   label: string
   value: string | number
   hint?: string
+  detail?: string
   icon: LucideIcon
   className?: string
 }
@@ -13,6 +14,7 @@ export function LandingStatCard({
   label,
   value,
   hint,
+  detail,
   icon: Icon,
   className,
 }: LandingStatCardProps) {
@@ -24,6 +26,11 @@ export function LandingStatCard({
           <p className="mt-1 truncate text-2xl font-bold tabular-nums tracking-tight md:text-3xl">
             {value}
           </p>
+          {detail && (
+            <p className="mt-0.5 text-[11px] tabular-nums text-muted-foreground/65">
+              {detail}
+            </p>
+          )}
           {hint && (
             <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
           )}

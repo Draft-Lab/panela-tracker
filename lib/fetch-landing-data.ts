@@ -1,6 +1,10 @@
 import type { createClient } from "@/lib/supabase/server";
 import type { PlayerAggregateStats } from "@/lib/fetch-all-jogatina-players";
 import { buildLandingPlayerCardStatsFromSummary } from "@/lib/player-profile-helpers";
+import {
+  fetchPlaytimeDurationTotals,
+  playtimeTotalsToHours,
+} from "@/lib/landing-playtime-totals";
 import type {
   Game,
   Jogatina,
@@ -50,6 +54,7 @@ export interface LandingHeroData {
   playersCount: number;
   currentGamesCount: number;
   totalHours: number;
+  appHours: number;
   mostPlayedThisWeek: string;
 }
 
@@ -121,7 +126,7 @@ export async function fetchLandingHeroData(
   weekAgo.setDate(weekAgo.getDate() - 7);
   const weekAgoIso = weekAgo.toISOString();
 
-  const [players, currentGames, weekJogatinas, totalMinutes] = await Promise.all([
+  const [players, currentGames, weekJogatinas, durationTotals] = await Promise.all([
     fetchLandingPlayers(supabase),
     fetchCurrentJogatinas(supabase),
     supabase
@@ -131,7 +136,7 @@ export async function fetchLandingHeroData(
       .then(({ data }) =>
         (data ?? []).filter((j) => j.game && !j.game.is_app),
       ),
-    sumJogatinaMinutes(supabase),
+    fetchPlaytimeDurationTotals(supabase),
   ]);
 
   const gameMinutes = weekJogatinas.reduce(
@@ -156,32 +161,16 @@ export async function fetchLandingHeroData(
       "Nenhum"
     : "Nenhum";
 
+  const playtimeHours = playtimeTotalsToHours(durationTotals);
+  const totalHours = playtimeHours.gameHours + playtimeHours.appHours;
+
   return {
     playersCount: players.length,
     currentGamesCount: currentGames.length,
-    totalHours: Math.floor(totalMinutes / 60),
+    totalHours,
+    appHours: playtimeHours.appHours,
     mostPlayedThisWeek,
   };
-}
-
-async function sumJogatinaMinutes(supabase: SupabaseClient): Promise<number> {
-  const rows = await paginate(async (from, to) => {
-    const { data, error } = await supabase
-      .from("jogatinas")
-      .select("total_duration_minutes, game:games(is_app)")
-      .range(from, to);
-
-    if (error) {
-      throw error;
-    }
-
-    return (data ?? []).filter((row) => row.game && !row.game.is_app);
-  });
-
-  return rows.reduce(
-    (sum, row) => sum + (row.total_duration_minutes || 0),
-    0,
-  );
 }
 
 export async function fetchRecentJogatinas(

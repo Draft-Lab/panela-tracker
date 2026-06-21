@@ -5,6 +5,7 @@ interface LandingHeroProps {
   playersCount: number;
   currentGamesCount: number;
   totalHours: number;
+  appHours: number;
   mostPlayedThisWeek: string;
 }
 
@@ -12,6 +13,7 @@ export function LandingHero({
   playersCount,
   currentGamesCount,
   totalHours,
+  appHours,
   mostPlayedThisWeek,
 }: LandingHeroProps) {
   return (
@@ -48,6 +50,7 @@ export function LandingHero({
         <LandingStatCard
           label="Tempo total"
           value={`${totalHours}h`}
+          detail={appHours > 0 ? `${appHours}h em apps` : undefined}
           hint="Histórico do grupo"
           icon={Clock}
         />
