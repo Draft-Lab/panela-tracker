@@ -1,13 +1,16 @@
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { PlaytimeAuditDiagnostics } from "@/components/dashboard/playtime-audit/playtime-audit-diagnostics";
+import { PlaytimeAuditLiveState } from "@/components/dashboard/playtime-audit/playtime-audit-live-state";
 import { PlaytimeAuditMethods } from "@/components/dashboard/playtime-audit/playtime-audit-methods";
 import { PlaytimeAuditOutliers } from "@/components/dashboard/playtime-audit/playtime-audit-outliers";
 import { Badge } from "@/components/ui/badge";
+import type { LiveStateAuditReport } from "@/lib/live-state-audit";
 import type { PlaytimeAuditReport } from "@/lib/playtime-audit";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 
 interface PlaytimeAuditPanelProps {
   report: PlaytimeAuditReport;
+  liveState: LiveStateAuditReport;
 }
 
 function formatGeneratedAt(value: string): string {
@@ -21,7 +24,7 @@ function formatGeneratedAt(value: string): string {
   });
 }
 
-export function PlaytimeAuditPanel({ report }: PlaytimeAuditPanelProps) {
+export function PlaytimeAuditPanel({ report, liveState }: PlaytimeAuditPanelProps) {
   const landing = report.methods.find((method) => method.id === "landing");
   const independent = report.methods.find(
     (method) => method.id === "independent",
@@ -87,6 +90,13 @@ export function PlaytimeAuditPanel({ report }: PlaytimeAuditPanelProps) {
           )}
         </div>
       </div>
+
+      <DashboardSection
+        title="Estado ao vivo"
+        description="Lista jogatinas e jogadores ainda marcados como ativos no banco. Ajuda a achar sessão presa quando o bot caiu."
+      >
+        <PlaytimeAuditLiveState report={liveState} />
+      </DashboardSection>
 
       <DashboardSection
         title="Comparação de métodos"
