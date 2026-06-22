@@ -5,7 +5,7 @@ import { MemorialClosing } from "@/components/memorial/memorial-closing"
 
 export function SuperviveMemorial() {
   return (
-    <div className="space-y-0">
+    <div>
       <MemorialHero />
       <MemorialTribute />
       <MemorialAnnouncement />

@@ -1,23 +1,14 @@
 import { MemorialReveal } from "@/components/memorial/memorial-reveal"
+import { MemorialSection } from "@/components/memorial/memorial-section"
 
 export function MemorialAnnouncement() {
   return (
-    <section className="border-t border-border/60 pt-12 lg:pt-16">
-      <MemorialReveal>
-        <div className="max-w-3xl">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-            O anúncio
-          </h2>
-          <p className="mt-3 max-w-[65ch] text-base leading-relaxed text-muted-foreground">
-            O encerramento oficial dos servidores marcou o fim de uma era para
-            quem jogou desde o começo. O vídeo abaixo registra o momento em que
-            a comunidade se despediu.
-          </p>
-        </div>
-      </MemorialReveal>
-
-      <MemorialReveal delay={80} className="mt-8">
-        <div className="relative aspect-video w-full overflow-hidden border border-border/60 bg-muted/30">
+    <MemorialSection
+      title="O anúncio"
+      description="O encerramento oficial dos servidores marcou o fim de uma era. O vídeo abaixo registra o momento em que a comunidade se despediu."
+    >
+      <MemorialReveal delay={60}>
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border/50 bg-muted/20">
           <iframe
             src="https://www.youtube.com/embed/wBmClCPOHeU"
             title="Supervive - Anúncio de encerramento"
@@ -28,8 +19,8 @@ export function MemorialAnnouncement() {
         </div>
       </MemorialReveal>
 
-      <MemorialReveal delay={140} className="mt-6">
-        <blockquote className="max-w-2xl border-l-2 border-primary/40 pl-6">
+      <MemorialReveal delay={120} className="mt-6">
+        <blockquote className="max-w-2xl border-l-2 border-primary/30 pl-5">
           <p className="text-sm leading-relaxed text-muted-foreground">
             Agradecemos a cada jogador que entrou na fila, gravou clipes e
             manteve o jogo vivo enquanto durou. O legado continua nas histórias
@@ -37,6 +28,6 @@ export function MemorialAnnouncement() {
           </p>
         </blockquote>
       </MemorialReveal>
-    </section>
+    </MemorialSection>
   )
 }

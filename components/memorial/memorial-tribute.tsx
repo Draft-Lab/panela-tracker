@@ -1,5 +1,6 @@
 import { Users, Swords, Heart } from "lucide-react"
 import { MemorialReveal } from "@/components/memorial/memorial-reveal"
+import { MemorialSection } from "@/components/memorial/memorial-section"
 
 const MEMORIES = [
   {
@@ -10,7 +11,7 @@ const MEMORIES = [
   {
     icon: Swords,
     title: "Batalhas em equipe",
-    body: "Mecânica de hero shooter em terceira pessoa que pedia coordenação e improviso a cada round.",
+    body: "Hero shooter em terceira pessoa que pedia coordenação e improviso a cada round.",
   },
   {
     icon: Heart,
@@ -21,50 +22,37 @@ const MEMORIES = [
 
 export function MemorialTribute() {
   return (
-    <section className="border-t border-border/60 pt-12 lg:pt-16">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
+    <MemorialSection
+      title="O que ficou"
+      description="Supervive foi mais que um jogo — era sessão de sexta à noite, call aberta e a sensação de que qualquer round podia virar highlight."
+    >
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-14">
         <MemorialReveal>
-          <div className="max-w-[65ch] space-y-5">
-            <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-              O que ficou
-            </h2>
-            <p className="text-base leading-relaxed text-muted-foreground">
-              Supervive foi mais que um jogo. Era sessão de sexta à noite, call
-              aberta e aquela sensação de que qualquer round podia virar highlight.
+          <div className="max-w-[65ch] space-y-4 text-base leading-relaxed text-muted-foreground">
+            <p>
               A arte, o ritmo das partidas e a comunidade criaram um legado que
               ainda aparece nas conversas do grupo.
             </p>
-            <p className="text-base leading-relaxed text-muted-foreground">
+            <p>
               Quando os servidores foram desligados, a decisão pesou para todo
-              mundo que construiu história dentro do jogo. O que permanece são as
-              vitórias, os fails engraçados e as amizades que nasceram nas filas.
+              mundo que construiu história dentro do jogo. O que permanece são
+              as vitórias, os fails engraçados e as amizades que nasceram nas
+              filas.
             </p>
           </div>
         </MemorialReveal>
 
-        <MemorialReveal delay={100}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {MEMORIES.map((memory, index) => {
+        <MemorialReveal delay={80}>
+          <div className="grid gap-3 md:grid-cols-3">
+            {MEMORIES.map((memory) => {
               const Icon = memory.icon
               return (
                 <article
                   key={memory.title}
-                  className={
-                    index === 0
-                      ? "col-span-full border border-primary/20 bg-primary/5 p-6 sm:p-7"
-                      : "border border-border/60 bg-muted/20 p-5"
-                  }
+                  className="rounded-xl border border-border/50 bg-card/20 p-4 sm:p-5"
                 >
-                  <Icon className="h-5 w-5 text-primary" strokeWidth={2} />
-                  <h3
-                    className={
-                      index === 0
-                        ? "mt-4 text-lg font-semibold"
-                        : "mt-3 text-base font-semibold"
-                    }
-                  >
-                    {memory.title}
-                  </h3>
+                  <Icon className="h-4 w-4 text-primary" strokeWidth={2} />
+                  <h3 className="mt-3 text-sm font-semibold">{memory.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {memory.body}
                   </p>
@@ -74,6 +62,6 @@ export function MemorialTribute() {
           </div>
         </MemorialReveal>
       </div>
-    </section>
+    </MemorialSection>
   )
 }

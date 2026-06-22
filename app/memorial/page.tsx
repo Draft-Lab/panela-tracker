@@ -8,7 +8,7 @@ export default function MemorialPage() {
       <LandingHeader />
 
       <main className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="scroll-mt-[7.5rem] pt-8 pb-4 lg:pt-10">
+        <div className="scroll-mt-[7.5rem] pt-8 pb-10 lg:pt-10">
           <SuperviveMemorial />
         </div>
       </main>
