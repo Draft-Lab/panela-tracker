@@ -1,9 +1,8 @@
-import { Badge } from "@/components/ui/badge"
-import { Gamepad2, X } from "lucide-react"
+import { X } from "lucide-react"
 import type { Jogatina, Game, JogatinaPlayer, Player, JogatinaEvent } from "@/lib/types"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { LandingCoverThumb, LandingLiveIndicator } from "@/components/landing/landing-glass-cell"
+import { LandingGlassMediaCard } from "@/components/landing/landing-glass-media-card"
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 import { LiveSessionMeta } from "@/components/landing/live-session-meta"
 import { CurrentSessionParticipants } from "@/components/landing/current-session-participants"
@@ -26,111 +25,72 @@ export function CurrentGameCard({
   onFinish,
 }: CurrentGameCardProps) {
   const sessionEvents = jogatina.jogatina_events ?? []
-  const sessionType =
-    buildCurrentSessionParticipants(jogatina.jogatina_players ?? [], sessionEvents)
-      .active.length > 1
-      ? "Grupo"
-      : "Solo"
+  const activeCount = buildCurrentSessionParticipants(
+    jogatina.jogatina_players ?? [],
+    sessionEvents,
+  ).active.length
+  const sessionType = activeCount > 1 ? "Grupo" : "Solo"
   const coverUrl = jogatina.game.cover_url
   const sessionStartedAt = getLiveSessionStartedAt(jogatina)
+  const hasParticipants = (jogatina.jogatina_players?.length ?? 0) > 0
 
   return (
-    <article className="relative overflow-hidden rounded-xl border border-border/50">
-      <div className="absolute inset-0 overflow-hidden" aria-hidden>
-        {coverUrl ? (
-          <>
-            <Image
-              src={coverUrl}
-              alt=""
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover object-center blur-lg brightness-[0.5] saturate-110"
-            />
-            <div className="absolute inset-0 bg-background/50" />
-            <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-background/20" />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-muted/40 via-card/30 to-background" />
-        )}
-      </div>
+    <LandingGlassMediaCard
+      coverSrc={coverUrl}
+      coverAlt={jogatina.game.title}
+      contentClassName="p-4 md:p-5"
+    >
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:justify-between">
+        <div className="flex min-w-0 flex-1 gap-4">
+          <LandingCoverThumb
+            src={coverUrl}
+            alt={jogatina.game.title}
+            size="lg"
+            imageSizes="80px"
+          />
 
-      <div className="absolute right-3 top-3 z-20 flex items-center gap-1">
-        <Badge
-          variant="outline"
-          className="h-5 border-green-500/35 bg-green-500/10 px-1.5 text-[10px] text-green-400 backdrop-blur-sm"
-        >
-          Jogando
-        </Badge>
-        <Badge
-          variant="outline"
-          className={cn(
-            "h-5 px-1.5 text-[10px] backdrop-blur-sm",
-            sessionType === "Solo"
-              ? "border-blue-500/35 bg-blue-500/10 text-blue-400"
-              : "border-purple-500/35 bg-purple-500/10 text-purple-400",
-          )}
-        >
-          {sessionType}
-        </Badge>
-      </div>
+          <div className="min-w-0 flex-1 space-y-3">
+            <div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <h3 className="text-lg font-semibold leading-snug tracking-tight text-foreground md:text-xl">
+                  {jogatina.game.title}
+                </h3>
+                <span className="text-xs text-muted-foreground">{sessionType}</span>
+              </div>
 
-      <div className="relative z-10 flex gap-3 p-4 pr-28">
-        <div
-          className={cn(
-            "relative h-12 w-12 shrink-0 overflow-hidden rounded-md bg-muted ring-1",
-            coverUrl ? "ring-white/10" : "ring-border/60",
-          )}
-        >
-          {coverUrl ? (
-            <Image
-              src={coverUrl}
-              alt={jogatina.game.title}
-              fill
-              sizes="48px"
-              className="object-cover object-center"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted/80">
-              <Gamepad2 className="h-5 w-5 text-muted-foreground" strokeWidth={1.75} />
+              <GameIgdbMetaInline
+                game={jogatina.game}
+                variant="chips"
+                className="mt-2 opacity-90"
+              />
             </div>
-          )}
-        </div>
-
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="space-y-1.5">
-            <p className="truncate text-sm font-semibold text-foreground">
-              {jogatina.game.title}
-            </p>
-
-            <GameIgdbMetaInline
-              game={jogatina.game}
-              variant="chips"
-              className="opacity-90"
-            />
 
             <LiveSessionMeta startedAt={sessionStartedAt} />
-          </div>
 
-          {(jogatina.jogatina_players?.length ?? 0) > 0 && (
+            {isInteractive && onFinish && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 border-border/80 bg-background/40 text-xs active:scale-[0.98]"
+                onClick={() => onFinish(jogatina.id, jogatina.game.title)}
+              >
+                <X className="mr-1 h-3.5 w-3.5" strokeWidth={1.75} />
+                Finalizar
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {hasParticipants && (
+          <div className="flex flex-col justify-center gap-3 border-t border-white/[0.06] pt-4 lg:min-w-[14rem] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <LandingLiveIndicator />
             <CurrentSessionParticipants
               jogatinaPlayers={jogatina.jogatina_players ?? []}
               events={sessionEvents}
             />
-          )}
-
-          {isInteractive && onFinish && (
-            <Button
-              size="sm"
-              variant="destructive"
-              className="h-7 backdrop-blur-sm"
-              onClick={() => onFinish(jogatina.id, jogatina.game.title)}
-            >
-              <X className="mr-1 h-3.5 w-3.5" />
-              Finalizar
-            </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </article>
+    </LandingGlassMediaCard>
   )
 }

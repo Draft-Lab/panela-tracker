@@ -1,17 +1,12 @@
 import Link from "next/link"
-import Image from "next/image"
 import { ArrowUpRight, Calendar, Clock, Gamepad2, TrendingDown } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { PlayerProfileStat } from "@/components/landing-player-profiles/player-profile-stat"
 import type { PlayerAchievement } from "@/lib/player-achievements"
-import {
-  getPlayerCardAccentIndex,
-  PLAYER_CARD_ACCENTS,
-} from "@/lib/player-card-accent"
 import { formatPlayerDuration } from "@/lib/player-profile-helpers"
 import { cn } from "@/lib/utils"
 import type { Player } from "@/lib/types"
+import { LandingGlassCell } from "@/components/landing/landing-glass-cell"
 
 interface LandingPlayerProfileCardProps {
   player: Player
@@ -23,6 +18,27 @@ interface LandingPlayerProfileCardProps {
   achievements?: PlayerAchievement[]
 }
 
+function AchievementPill({
+  achievement,
+  className,
+}: {
+  achievement: PlayerAchievement
+  className?: string
+}) {
+  return (
+    <span
+      title={achievement.description}
+      className={cn(
+        "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em]",
+        achievement.style,
+        className,
+      )}
+    >
+      {achievement.label}
+    </span>
+  )
+}
+
 export function LandingPlayerProfileCard({
   player,
   totalSessions,
@@ -32,89 +48,64 @@ export function LandingPlayerProfileCard({
   dropRate,
   achievements = [],
 }: LandingPlayerProfileCardProps) {
-  const accent = PLAYER_CARD_ACCENTS[getPlayerCardAccentIndex(player.id)]
   const initials = player.name.slice(0, 2).toUpperCase()
   const avatarUrl = player.avatar_url || ""
   const primaryAchievement = achievements[0]
+  const secondaryAchievements = achievements.slice(1)
 
   return (
-    <Link
-      href={`/jogadores/${player.id}`}
-      className={cn(
-        "group relative flex h-full min-h-[300px] flex-col overflow-hidden rounded-xl border border-border/50 bg-card/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20",
-        accent.hoverBorder,
-      )}
-    >
-      <div className="absolute inset-0 overflow-hidden" aria-hidden>
-        {avatarUrl ? (
-          <>
-            <Image
-              src={avatarUrl}
-              alt=""
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105 blur-md brightness-[0.38] saturate-125"
+    <Link href={`/jogadores/${player.id}`} className="group block h-full">
+      <LandingGlassCell
+        className="h-full transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.99]"
+        innerClassName="flex h-full flex-col gap-4 p-4 sm:p-5"
+      >
+        <div className="flex items-start gap-4">
+          <div className="relative shrink-0">
+            <div
+              className="absolute -inset-1 rounded-full bg-primary/20 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+              aria-hidden
             />
-            <div className="absolute inset-0 bg-background/55" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-background/50" />
-          </>
-        ) : (
-          <div
-            className={cn(
-              "absolute inset-0 bg-gradient-to-br",
-              accent.surface,
-            )}
-          />
-        )}
-      </div>
+            <Avatar className="relative h-14 w-14 ring-2 ring-white/15 transition-transform duration-300 group-hover:scale-[1.03] sm:h-16 sm:w-16">
+              <AvatarImage src={avatarUrl} alt={player.name} />
+              <AvatarFallback className="text-sm font-semibold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </div>
 
-      <article className="relative z-10 flex h-full flex-col p-5 sm:p-6">
-        <div className="flex items-start gap-3">
-          <Avatar
-            className={cn(
-              "h-16 w-16 shrink-0 ring-2 transition-transform duration-300 group-hover:scale-[1.03] sm:h-[4.5rem] sm:w-[4.5rem]",
-              accent.ring,
-            )}
-          >
-            <AvatarImage src={avatarUrl} alt={player.name} />
-            <AvatarFallback className={cn("text-base font-bold sm:text-lg", accent.fallback)}>
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="min-w-0 flex-1 pt-1">
+          <div className="min-w-0 flex-1 pt-0.5">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="line-clamp-2 text-lg font-bold tracking-tight text-foreground group-hover:text-primary">
+              <h3 className="line-clamp-2 text-base font-semibold tracking-tight text-foreground transition-colors duration-200 group-hover:text-primary sm:text-lg">
                 {player.name}
               </h3>
               <ArrowUpRight
-                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                strokeWidth={2}
+                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:opacity-100"
+                strokeWidth={1.75}
               />
             </div>
 
-            <div className="mt-2 flex items-center gap-1.5 text-muted-foreground">
-              <Clock className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-              <span className="text-sm font-medium tabular-nums text-foreground">
-                {formatPlayerDuration(totalMinutes)}
-              </span>
-            </div>
-            <p className="text-[11px] text-muted-foreground">tempo total no grupo</p>
+            {primaryAchievement ? (
+              <div className="mt-2">
+                <AchievementPill achievement={primaryAchievement} />
+              </div>
+            ) : null}
           </div>
         </div>
 
-        {primaryAchievement ? (
-          <Badge
-            variant="outline"
-            title={primaryAchievement.description}
-            className={cn("mt-4 w-fit text-xs", primaryAchievement.style)}
-          >
-            {primaryAchievement.label}
-          </Badge>
-        ) : null}
+        <div className="rounded-[1.25rem] border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            Tempo no grupo
+          </p>
+          <div className="mt-1.5 flex items-center gap-2">
+            <Clock className="h-4 w-4 shrink-0 text-primary/80" strokeWidth={1.75} />
+            <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
+              {formatPlayerDuration(totalMinutes)}
+            </p>
+          </div>
+        </div>
 
-        <div className="mt-4 overflow-hidden rounded-lg border border-border/40">
-          <div className="grid grid-cols-3 divide-x divide-border/40">
+        <div className="rounded-[1.25rem] bg-white/[0.03] p-1 ring-1 ring-white/[0.06]">
+          <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[calc(1.25rem-0.25rem)] bg-white/[0.04]">
             <PlayerProfileStat
               label="Sessões"
               value={totalSessions.toLocaleString("pt-BR")}
@@ -142,31 +133,35 @@ export function LandingPlayerProfileCard({
           </div>
         </div>
 
-        {achievements.length > 1 ? (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {achievements.slice(1).map((achievement) => (
-              <Badge
-                key={achievement.id}
-                variant="outline"
-                title={achievement.description}
-                className={cn("text-[11px]", achievement.style)}
-              >
-                {achievement.label}
-              </Badge>
+        {secondaryAchievements.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {secondaryAchievements.map((achievement) => (
+              <AchievementPill key={achievement.id} achievement={achievement} />
             ))}
           </div>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-4">
-          <span className="text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+        <div className="mt-auto pt-1">
+          <span
+            className={cn(
+              "flex w-full items-center justify-between rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-muted-foreground",
+              "transition-[background-color,color,border-color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+              "group-hover:border-white/[0.12] group-hover:bg-white/[0.05] group-hover:text-foreground",
+            )}
+          >
             Ver perfil
+            <span
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06]",
+                "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+                "group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:bg-white/[0.1]",
+              )}
+            >
+              <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
+            </span>
           </span>
-          <ArrowUpRight
-            className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground"
-            strokeWidth={2}
-          />
         </div>
-      </article>
+      </LandingGlassCell>
     </Link>
   )
 }

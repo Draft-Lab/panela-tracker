@@ -4,6 +4,8 @@ import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
 import { useState } from "react"
 import { FinishCurrentGameDialog } from "@/components/finish-current-game-dialog"
 import { CurrentGameCard } from "@/components/landing/current-game-card"
+import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
+import { cn } from "@/lib/utils"
 
 interface LandingCurrentGamesSectionProps {
   currentGames: (Jogatina & {
@@ -28,16 +30,17 @@ export function LandingCurrentGamesSection({
   }
 
   if (currentGames.length === 0) {
-    return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
-        Ninguém está jogando agora
-      </p>
-    )
+    return <LandingEmptyState>Ninguém está jogando agora</LandingEmptyState>
   }
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      <div
+        className={cn(
+          "grid gap-3",
+          currentGames.length > 1 && "lg:grid-cols-2",
+        )}
+      >
         {currentGames.map((jogatina) => (
           <CurrentGameCard
             key={jogatina.id}

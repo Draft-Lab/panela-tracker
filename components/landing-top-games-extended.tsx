@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
-import { ChevronDown, ChevronUp, Gamepad2 } from "lucide-react"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { GameRankingStat } from "@/lib/game-stats-helpers"
+import {
+  LandingCoverThumb,
+  LandingGlassCell,
+} from "@/components/landing/landing-glass-cell"
 
 interface LandingTopGamesExtendedProps {
   games: GameRankingStat[]
@@ -19,35 +22,24 @@ function GameRankingRow({
   stat: GameRankingStat
   rank: number
 }) {
-  const coverUrl = stat.game.cover_url
-
   return (
     <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5">
-      <span className="w-5 shrink-0 text-center text-xs font-medium tabular-nums text-muted-foreground sm:w-6 sm:text-sm">
+      <span className="w-5 shrink-0 text-center text-xs font-medium tabular-nums text-muted-foreground sm:w-6">
         {rank}
       </span>
 
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border/40 sm:h-11 sm:w-11">
-        {coverUrl ? (
-          <Image
-            src={coverUrl}
-            alt={stat.game.title}
-            fill
-            sizes="44px"
-            className="object-cover object-center"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted/80">
-            <Gamepad2 className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
-          </div>
-        )}
-      </div>
+      <LandingCoverThumb
+        src={stat.game.cover_url}
+        alt={stat.game.title}
+        size="sm"
+        imageSizes="56px"
+      />
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-foreground">
           {stat.game.title}
         </p>
-        <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">
+        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
           {stat.participations} participações
         </p>
       </div>
@@ -102,15 +94,13 @@ export function LandingTopGamesExtended({
 
       <div
         className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
-          expanded
-            ? "grid-rows-[1fr] opacity-100"
-            : "grid-rows-[0fr] opacity-0",
+          "grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
+          expanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
         )}
         aria-hidden={!expanded}
       >
         <div className="overflow-hidden">
-          <div className="divide-y divide-border/40 rounded-xl border border-border/50 bg-card/20">
+          <LandingGlassCell innerClassName="divide-y divide-white/[0.06] p-0">
             {games.map((stat, index) => (
               <GameRankingRow
                 key={stat.game.id}
@@ -118,7 +108,7 @@ export function LandingTopGamesExtended({
                 rank={startRank + index}
               />
             ))}
-          </div>
+          </LandingGlassCell>
         </div>
       </div>
     </div>

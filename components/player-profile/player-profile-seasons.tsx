@@ -26,7 +26,7 @@ export function PlayerProfileSeasons({ seasons }: PlayerProfileSeasonsProps) {
         {seasons.map(({ season, game, participant }) => (
           <li
             key={season.id}
-            className="rounded-xl border border-border/40 bg-background/30 p-3"
+            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3"
           >
             <p className="font-medium">{season.name}</p>
             <p className="text-sm text-muted-foreground">{game.title}</p>

@@ -17,18 +17,16 @@ export function MetricStatTile({
   valueClassName,
 }: MetricStatTileProps) {
   return (
-    <div className="flex min-h-[108px] flex-col justify-between gap-3 bg-card/30 p-4 sm:p-5">
+    <div className="flex min-h-[108px] flex-col justify-between gap-3 bg-white/[0.02] p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {label}
-        </p>
-        <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" strokeWidth={2} />
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" strokeWidth={1.75} />
       </div>
 
       <div>
         <p
           className={cn(
-            "text-2xl font-bold tabular-nums tracking-tight sm:text-3xl",
+            "text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl",
             valueClassName,
           )}
         >

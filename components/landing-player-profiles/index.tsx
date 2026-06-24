@@ -1,4 +1,5 @@
 import { LandingPlayerProfileCard } from "@/components/landing-player-profiles/player-profile-card"
+import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import type { PlayerAchievement } from "@/lib/player-achievements"
 import type { Player } from "@/lib/types"
 
@@ -25,14 +26,12 @@ export function LandingPlayerProfiles({
 
   if (sortedStats.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
-        Nenhum perfil cadastrado ainda.
-      </p>
+      <LandingEmptyState>Nenhum perfil cadastrado ainda.</LandingEmptyState>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {sortedStats.map((stat) => (
         <LandingPlayerProfileCard
           key={stat.player.id}

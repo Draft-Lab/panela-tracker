@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, TrendingDown } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { LandingGlassCell } from "@/components/landing/landing-glass-cell"
 import {
   type DropperStat,
   formatDropRate,
@@ -100,7 +101,7 @@ export function DropperRankExtended({
 
       <div
         className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-300 ease-out",
+          "grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
           expanded
             ? "grid-rows-[1fr] opacity-100"
             : "grid-rows-[0fr] opacity-0",
@@ -108,7 +109,7 @@ export function DropperRankExtended({
         aria-hidden={!expanded}
       >
         <div className="overflow-hidden">
-          <div className="divide-y divide-border/40 rounded-xl border border-border/50 bg-card/20">
+          <LandingGlassCell innerClassName="divide-y divide-white/[0.06] p-0">
             {droppers.map((stat, index) => (
               <DropperRankingRow
                 key={stat.playerId}
@@ -116,7 +117,7 @@ export function DropperRankExtended({
                 rank={startRank + index}
               />
             ))}
-          </div>
+          </LandingGlassCell>
         </div>
       </div>
     </div>

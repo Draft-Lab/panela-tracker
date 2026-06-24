@@ -36,7 +36,7 @@ export function PlayerProfileLayout({
   const [activeView, setActiveView] = useState<PlayerProfileView>("overview");
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-6">
       <div className="min-w-0">
         {activeView === "overview" && (
           <div className="space-y-8">
@@ -54,7 +54,7 @@ export function PlayerProfileLayout({
         )}
       </div>
 
-      <aside className="space-y-3 lg:sticky lg:top-20 lg:self-start">
+      <aside className="space-y-3 lg:sticky lg:top-28 lg:self-start">
         <PlayerProfileSidebarNav
           activeView={activeView}
           onViewChange={setActiveView}

@@ -14,7 +14,7 @@ export function DropperRankPodium({ topDroppers }: DropperRankPodiumProps) {
 
   if (topDroppers.length === 2) {
     return (
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-5">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <DropperRankCard stat={first} rank={1} variant="hero" runnerUp={second} />
         <DropperRankCard stat={second} rank={2} variant="compact" />
       </div>
@@ -22,7 +22,7 @@ export function DropperRankPodium({ topDroppers }: DropperRankPodiumProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:grid-rows-2 lg:gap-5 lg:min-h-[360px]">
+    <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:grid-rows-2">
       <DropperRankCard
         stat={first}
         rank={1}

@@ -1,26 +1,27 @@
-import { Suspense } from "react";
-import { LandingHeader } from "@/components/landing/landing-header";
-import { LandingFooter } from "@/components/landing/landing-footer";
-import { LandingSection } from "@/components/landing/landing-section";
-import { LandingHeroSkeleton } from "@/components/landing/skeletons/landing-hero-skeleton";
-import { LandingSectionSkeleton } from "@/components/landing/skeletons/landing-section-skeleton";
-import { LandingHeroSection } from "@/components/landing/sections/landing-hero-section";
-import { LandingCurrentGamesSectionAsync } from "@/components/landing/sections/landing-current-games-section";
-import { LandingTopGamesSection } from "@/components/landing/sections/landing-top-games-section";
-import { LandingActivitySection } from "@/components/landing/sections/landing-activity-section";
-import { LandingHallOfShameSection } from "@/components/landing/sections/landing-hall-of-shame-section";
-import { LandingTimelineSectionAsync } from "@/components/landing/sections/landing-timeline-section";
-import { LandingGroupMetricsSection } from "@/components/landing/sections/landing-group-metrics-section";
-import { LandingPlayerProfilesSection } from "@/components/landing/sections/landing-player-profiles-section";
-import { LandingHighlightsSection } from "@/components/landing/sections/landing-highlights-section";
+import { Suspense } from "react"
+import { LandingHeader } from "@/components/landing/landing-header"
+import { LandingFooter } from "@/components/landing/landing-footer"
+import { LandingSection } from "@/components/landing/landing-section"
+import { LandingShell } from "@/components/landing/landing-shell"
+import { LandingHeroSkeleton } from "@/components/landing/skeletons/landing-hero-skeleton"
+import { LandingSectionSkeleton } from "@/components/landing/skeletons/landing-section-skeleton"
+import { LandingHeroSection } from "@/components/landing/sections/landing-hero-section"
+import { LandingCurrentGamesSectionAsync } from "@/components/landing/sections/landing-current-games-section"
+import { LandingTopGamesSection } from "@/components/landing/sections/landing-top-games-section"
+import { LandingActivitySection } from "@/components/landing/sections/landing-activity-section"
+import { LandingHallOfShameSection } from "@/components/landing/sections/landing-hall-of-shame-section"
+import { LandingTimelineSectionAsync } from "@/components/landing/sections/landing-timeline-section"
+import { LandingGroupMetricsSection } from "@/components/landing/sections/landing-group-metrics-section"
+import { LandingPlayerProfilesSection } from "@/components/landing/sections/landing-player-profiles-section"
+import { LandingHighlightsSection } from "@/components/landing/sections/landing-highlights-section"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <LandingShell>
       <LandingHeader />
 
-      <main className="mx-auto max-w-7xl px-4 lg:px-8">
-        <section id="overview" className="scroll-mt-[7.5rem] pt-8 pb-4 lg:pt-10">
+      <main className="mx-auto max-w-6xl px-4 pt-28 pb-8 lg:px-8 lg:pt-32">
+        <section id="overview" className="scroll-mt-28 pb-6 lg:pb-10">
           <Suspense fallback={<LandingHeroSkeleton />}>
             <LandingHeroSection />
           </Suspense>
@@ -28,6 +29,7 @@ export default function LandingPage() {
 
         <LandingSection
           id="agora"
+          eyebrow="Ao vivo"
           title="O que estamos jogando"
           description="Sessões em andamento e quem está online agora."
         >
@@ -38,10 +40,9 @@ export default function LandingPage() {
 
         <LandingSection
           id="jogos"
+          eyebrow="Ranking"
           title="Jogos do grupo"
           description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
-          tone="muted"
-          className="mb-8 lg:mb-10"
         >
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
             <LandingTopGamesSection />
@@ -50,9 +51,9 @@ export default function LandingPage() {
 
         <LandingSection
           id="atividade"
+          eyebrow="Histórico"
           title="Atividade ao longo do tempo"
           description="Heatmap dos últimos 12 meses e resumo de frequência."
-          tone="muted"
         >
           <Suspense fallback={<LandingSectionSkeleton variant="heatmap" />}>
             <LandingActivitySection />
@@ -61,6 +62,7 @@ export default function LandingPage() {
 
         <LandingSection
           id="vergonha"
+          eyebrow="Estatísticas"
           title="Hall da vergonha"
           description="Os três maiores dropadores do grupo."
         >
@@ -71,9 +73,9 @@ export default function LandingPage() {
 
         <LandingSection
           id="timeline"
+          eyebrow="Eventos"
           title="Timeline global"
           description="Últimos eventos registrados pelo grupo."
-          tone="muted"
         >
           <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
             <LandingTimelineSectionAsync />
@@ -82,6 +84,7 @@ export default function LandingPage() {
 
         <LandingSection
           id="metricas"
+          eyebrow="Padrões"
           title="Como a gente joga"
           description="Distribuição de status e duração média das sessões."
         >
@@ -92,9 +95,9 @@ export default function LandingPage() {
 
         <LandingSection
           id="perfis"
+          eyebrow="Membros"
           title="Perfis do grupo"
           description="Tempo total, sessões e comportamento de cada membro."
-          tone="muted"
         >
           <Suspense fallback={<LandingSectionSkeleton variant="profiles" />}>
             <LandingPlayerProfilesSection />
@@ -103,8 +106,9 @@ export default function LandingPage() {
 
         <LandingSection
           id="destaques"
+          eyebrow="Recordes"
           title="Momentos marcantes"
-          description="Recordes raros: quem voltou, quem lotou a sessão e quem zerou de verdade."
+          description="Quem voltou, quem lotou a sessão e quem zerou de verdade."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
             <LandingHighlightsSection />
@@ -113,6 +117,6 @@ export default function LandingPage() {
       </main>
 
       <LandingFooter />
-    </div>
-  );
+    </LandingShell>
+  )
 }

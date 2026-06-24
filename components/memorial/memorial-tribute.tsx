@@ -1,6 +1,7 @@
 import { Users, Swords, Heart } from "lucide-react"
 import { MemorialReveal } from "@/components/memorial/memorial-reveal"
 import { MemorialSection } from "@/components/memorial/memorial-section"
+import { LandingGlassCell } from "@/components/landing/landing-glass-cell"
 
 const MEMORIES = [
   {
@@ -23,40 +24,46 @@ const MEMORIES = [
 export function MemorialTribute() {
   return (
     <MemorialSection
+      eyebrow="Legado"
       title="O que ficou"
       description="Supervive foi mais que um jogo — era sessão de sexta à noite, call aberta e a sensação de que qualquer round podia virar highlight."
     >
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-14">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10">
         <MemorialReveal>
-          <div className="max-w-[65ch] space-y-4 text-base leading-relaxed text-muted-foreground">
-            <p>
-              A arte, o ritmo das partidas e a comunidade criaram um legado que
-              ainda aparece nas conversas do grupo.
-            </p>
-            <p>
-              Quando os servidores foram desligados, a decisão pesou para todo
-              mundo que construiu história dentro do jogo. O que permanece são
-              as vitórias, os fails engraçados e as amizades que nasceram nas
-              filas.
-            </p>
-          </div>
+          <LandingGlassCell innerClassName="p-5 sm:p-6">
+            <div className="max-w-[65ch] space-y-4 text-base leading-relaxed text-muted-foreground">
+              <p>
+                A arte, o ritmo das partidas e a comunidade criaram um legado que
+                ainda aparece nas conversas do grupo.
+              </p>
+              <p>
+                Quando os servidores foram desligados, a decisão pesou para todo
+                mundo que construiu história dentro do jogo. O que permanece são
+                as vitórias, os fails engraçados e as amizades que nasceram nas
+                filas.
+              </p>
+            </div>
+          </LandingGlassCell>
         </MemorialReveal>
 
         <MemorialReveal delay={80}>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
             {MEMORIES.map((memory) => {
               const Icon = memory.icon
               return (
-                <article
-                  key={memory.title}
-                  className="rounded-xl border border-border/50 bg-card/20 p-4 sm:p-5"
-                >
-                  <Icon className="h-4 w-4 text-primary" strokeWidth={2} />
-                  <h3 className="mt-3 text-sm font-semibold">{memory.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {memory.body}
-                  </p>
-                </article>
+                <LandingGlassCell key={memory.title} className="h-full">
+                  <article className="flex h-full flex-col">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
+                      <Icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
+                    </div>
+                    <h3 className="mt-4 text-sm font-semibold text-foreground">
+                      {memory.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {memory.body}
+                    </p>
+                  </article>
+                </LandingGlassCell>
               )
             })}
           </div>

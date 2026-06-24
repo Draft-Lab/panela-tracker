@@ -1,19 +1,15 @@
 import { LandingHeader } from "@/components/landing/landing-header"
-import { LandingFooter } from "@/components/landing/landing-footer"
+import { LandingShell } from "@/components/landing/landing-shell"
 import { SuperviveMemorial } from "@/components/memorial/supervive-memorial"
 
 export default function MemorialPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <LandingShell>
       <LandingHeader />
 
-      <main className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="scroll-mt-[7.5rem] pt-8 pb-10 lg:pt-10">
-          <SuperviveMemorial />
-        </div>
+      <main className="mx-auto max-w-6xl px-4 pb-16 pt-24 lg:px-8 lg:pt-28">
+        <SuperviveMemorial />
       </main>
-
-      <LandingFooter />
-    </div>
+    </LandingShell>
   )
 }

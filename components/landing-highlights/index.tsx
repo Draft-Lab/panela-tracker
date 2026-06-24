@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { History, Trophy, Users } from "lucide-react"
 import { HighlightCard } from "@/components/landing-highlights/highlight-card"
+import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import {
   findBiggestGroupSession,
   findLatestChampionZero,
@@ -39,7 +40,6 @@ export function LandingHighlights({
           game={comeback.game}
           label="Resurgiu das cinzas"
           icon={History}
-          accent="violet"
           badge={formatGapDays(comeback.gapDays)}
           meta={`Voltou em ${formatHighlightDate(comeback.returnDate)}`}
         />
@@ -52,7 +52,6 @@ export function LandingHighlights({
           game={biggestGroup.game}
           label="A galera toda"
           icon={Users}
-          accent="sky"
           badge={`${biggestGroup.playerCount} jogadores`}
           meta={formatHighlightDate(biggestGroup.date)}
         />
@@ -65,7 +64,6 @@ export function LandingHighlights({
           game={champion.game}
           label="We are the champions"
           icon={Trophy}
-          accent="amber"
           badge={`${champion.totalZeros} ${champion.totalZeros === 1 ? "zero no grupo" : "zeros no grupo"}`}
           meta={[
             formatHighlightDate(champion.latestZeroDate),
@@ -80,14 +78,14 @@ export function LandingHighlights({
 
   if (cards.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
+      <LandingEmptyState>
         Ainda não há momentos marcantes registrados
-      </p>
+      </LandingEmptyState>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
       {cards.map((card) => (
         <div key={card.key}>{card.node}</div>
       ))}

@@ -6,8 +6,10 @@ import {
   TimelineEventItem,
   type TimelineEvent,
 } from "@/components/landing/timeline-event-item"
+import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import { useIsClient } from "@/hooks/use-is-client"
 import { groupByDateLabel } from "@/lib/local-date"
+import { cn } from "@/lib/utils"
 
 interface LandingTimelineSectionProps {
   jogatinas: (Jogatina & {
@@ -45,7 +47,7 @@ function buildRecentEvents(
 export function LandingTimelineSection({
   jogatinas,
   jogatinaPlayers,
-  limit = 8,
+  limit = 6,
   compact = false,
 }: LandingTimelineSectionProps) {
   const isClient = useIsClient()
@@ -64,40 +66,37 @@ export function LandingTimelineSection({
   }, [isClient, recentEvents])
 
   if (recentEvents.length === 0) {
-    return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-muted-foreground">
-        Nenhum evento recente
-      </p>
-    )
+    return <LandingEmptyState>Nenhum evento recente</LandingEmptyState>
   }
 
   return (
-    <div className={compact ? "space-y-4" : "space-y-8"}>
-      {groupedEvents.map(([label, events]) => (
-        <section key={label || "timeline-events"}>
-          {label && (
-            <h3
-              className={
-                compact
-                  ? "mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"
-                  : "mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground"
-              }
-            >
-              {label}
-            </h3>
-          )}
-          <div>
-            {events.map((event, index) => (
-              <TimelineEventItem
-                key={event.jogatina.id}
-                event={event}
-                isLast={index === events.length - 1}
-                compact={compact}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+    <div className={cn("rounded-[1.5rem] border border-white/[0.08] bg-card/25 p-3 sm:p-4", compact && "p-2.5")}>
+      <div className="space-y-3">
+        {groupedEvents.map(([label, events]) => (
+          <section key={label || "timeline-events"}>
+            {label && (
+              <div className="mb-2 grid grid-cols-[0.875rem_minmax(0,1fr)] gap-x-3">
+                <div aria-hidden />
+                <h3 className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  {label}
+                </h3>
+              </div>
+            )}
+
+            <div>
+              {events.map((event, index) => (
+                <TimelineEventItem
+                  key={event.jogatina.id}
+                  event={event}
+                  isFirst={index === 0}
+                  isLast={index === events.length - 1}
+                  compact={compact}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   )
 }

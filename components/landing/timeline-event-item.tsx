@@ -1,11 +1,10 @@
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Clock, Gamepad2, Users } from "lucide-react"
+import { Users } from "lucide-react"
 import Image from "next/image"
 import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
 import { LocalTime } from "@/components/local-time"
 import { cn } from "@/lib/utils"
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
+import { LandingTimelineCard } from "@/components/landing/landing-glass-media-card"
 
 export interface TimelineEvent {
   jogatina: Jogatina & { game: Game }
@@ -16,6 +15,7 @@ export interface TimelineEvent {
 
 interface TimelineEventItemProps {
   event: TimelineEvent
+  isFirst: boolean
   isLast: boolean
   compact?: boolean
 }
@@ -30,133 +30,104 @@ function formatDuration(minutes: number | null) {
 
 export function TimelineEventItem({
   event,
+  isFirst,
   isLast,
-  compact = false,
 }: TimelineEventItemProps) {
   const { jogatina, firstPlayer, playerCount, players } = event
   const coverUrl = jogatina.game.cover_url
   const sessionType = jogatina.session_type === "solo" ? "Solo" : "Grupo"
   const duration = formatDuration(jogatina.total_duration_minutes)
-  const visiblePlayers = players.slice(0, 4)
+  const visiblePlayers = players.slice(0, 3)
+  const isLive = Boolean(jogatina.is_current)
 
   return (
-    <div className={cn("relative pl-8", !isLast && (compact ? "pb-4" : "pb-8"))}>
-      {!isLast && (
+    <div
+      className={cn(
+        "grid grid-cols-[0.875rem_minmax(0,1fr)] gap-x-3",
+        !isLast && "pb-2",
+      )}
+    >
+      <div className="relative flex flex-col items-center">
+        {!isFirst && <div className="w-px flex-1 bg-white/10" aria-hidden />}
+
         <div
-          className="absolute left-[11px] top-6 bottom-0 w-px bg-border/70"
+          className={cn(
+            "relative z-10 my-0.5 size-2 shrink-0 rounded-full border-2 border-background",
+            isLive
+              ? "bg-emerald-500 shadow-[0_0_0_2px_rgba(16,185,129,0.2)]"
+              : "bg-primary shadow-[0_0_0_2px_rgba(99,102,241,0.12)]",
+          )}
           aria-hidden
         />
-      )}
 
-      <div
-        className={cn(
-          "absolute left-0 top-5 z-10 h-[10px] w-[10px] rounded-full border-2 border-background",
-          jogatina.is_current ? "bg-green-500 ring-4 ring-green-500/20" : "bg-primary ring-4 ring-primary/15",
-        )}
-        aria-hidden
-      />
+        {!isLast && <div className="w-px flex-1 bg-white/10" aria-hidden />}
+      </div>
 
-      <article className="overflow-hidden rounded-xl border border-border/50 bg-card/20 transition-colors hover:border-border hover:bg-card/40">
-        <div className="flex gap-4 p-4">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border/50">
-            {coverUrl ? (
-              <Image
-                src={coverUrl}
-                alt={jogatina.game.title}
-                fill
-                sizes="56px"
-                className="object-cover object-center"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <Gamepad2 className="h-6 w-6 text-muted-foreground" strokeWidth={1.75} />
-              </div>
-            )}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-foreground">
-                  {jogatina.game.title}
-                </p>
-                <GameIgdbMetaInline
-                  game={jogatina.game}
-                  variant="line"
-                  className="mt-1"
-                />
-                <p className="mt-1 text-sm text-muted-foreground">
-                  <span className="font-medium text-foreground/90">{firstPlayer}</span>
-                  {" "}iniciou a sessão
-                </p>
-              </div>
-              <LocalTime
-                iso={jogatina.date}
-                className="shrink-0 text-xs text-muted-foreground"
-              />
-            </div>
-
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {jogatina.is_current && (
-                <Badge
-                  variant="outline"
-                  className="border-green-500/40 bg-green-500/10 text-green-400"
-                >
-                  Ao vivo
-                </Badge>
-              )}
-              <Badge
-                variant="outline"
-                className={cn(
-                  sessionType === "Solo"
-                    ? "border-blue-500/35 bg-blue-500/10 text-blue-400"
-                    : "border-purple-500/35 bg-purple-500/10 text-purple-400",
-                )}
-              >
-                {sessionType}
-              </Badge>
-              <Badge variant="secondary" className="gap-1 text-xs">
-                <Users className="h-3 w-3" />
-                {playerCount}
-              </Badge>
-              {duration && (
-                <Badge variant="outline" className="gap-1 text-xs">
-                  <Clock className="h-3 w-3" />
-                  {duration}
-                </Badge>
-              )}
-            </div>
-
-            {visiblePlayers.length > 0 && (
-              <div className="mt-3 flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {visiblePlayers.map((jp) => (
-                    <Avatar
-                      key={jp.player.id}
-                      className="h-7 w-7 border-2 border-background ring-1 ring-border/40"
-                    >
-                      {jp.player.avatar_url && (
-                        <AvatarImage
-                          src={jp.player.avatar_url}
-                          alt={jp.player.name}
-                        />
-                      )}
-                      <AvatarFallback className="text-[9px]">
-                        {jp.player.name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  ))}
-                </div>
-                {playerCount > visiblePlayers.length && (
-                  <span className="text-xs text-muted-foreground">
-                    +{playerCount - visiblePlayers.length}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+      <LandingTimelineCard
+        coverSrc={coverUrl}
+        coverAlt={jogatina.game.title}
+        isLive={isLive}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <p className="line-clamp-1 text-sm font-semibold tracking-tight text-foreground">
+            {jogatina.game.title}
+          </p>
+          <LocalTime
+            iso={jogatina.date}
+            className="shrink-0 text-[10px] tabular-nums text-muted-foreground"
+          />
         </div>
-      </article>
+
+        <GameIgdbMetaInline
+          game={jogatina.game}
+          variant="line"
+          className="mt-0.5"
+        />
+
+        <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground/85">{firstPlayer}</span>
+          {" "}iniciou · {sessionType}
+          {duration ? ` · ${duration}` : ""}
+        </p>
+
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground">
+            <Users className="h-2.5 w-2.5" strokeWidth={1.75} />
+            {playerCount}
+          </span>
+
+          {visiblePlayers.length > 0 && (
+            <div className="flex -space-x-1.5">
+              {visiblePlayers.map((jp) => (
+                <div
+                  key={jp.player.id}
+                  className="relative h-5 w-5 overflow-hidden rounded-full border border-background"
+                >
+                  {jp.player.avatar_url ? (
+                    <Image
+                      src={jp.player.avatar_url}
+                      alt={jp.player.name}
+                      fill
+                      sizes="20px"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-muted text-[7px] font-medium">
+                      {jp.player.name.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isLive && (
+            <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-500">
+              Ao vivo
+            </span>
+          )}
+        </div>
+      </LandingTimelineCard>
     </div>
   )
 }

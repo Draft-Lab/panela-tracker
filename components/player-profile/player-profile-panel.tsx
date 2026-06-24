@@ -1,17 +1,18 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
+import { LandingGlassCell } from "@/components/landing/landing-glass-cell"
 
 interface PlayerProfilePanelProps {
-  children: ReactNode;
-  className?: string;
-  padding?: "default" | "none" | "compact";
+  children: ReactNode
+  className?: string
+  padding?: "default" | "none" | "compact"
 }
 
 const paddingClass = {
-  default: "p-5 sm:p-6",
-  compact: "p-4",
-  none: "",
-} as const;
+  default: "p-4 sm:p-5",
+  compact: "p-3 sm:p-4",
+  none: "p-0",
+} as const
 
 export function PlayerProfilePanel({
   children,
@@ -19,22 +20,19 @@ export function PlayerProfilePanel({
   padding = "default",
 }: PlayerProfilePanelProps) {
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border border-border/50 bg-card/40 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm",
-        paddingClass[padding],
-        className,
-      )}
+    <LandingGlassCell
+      className={cn("h-full", className)}
+      innerClassName={paddingClass[padding]}
     >
       {children}
-    </div>
-  );
+    </LandingGlassCell>
+  )
 }
 
 interface PlayerProfileSectionHeaderProps {
-  title: string;
-  description?: string;
-  action?: ReactNode;
+  title: string
+  description?: string
+  action?: ReactNode
 }
 
 export function PlayerProfileSectionHeader({
@@ -45,12 +43,14 @@ export function PlayerProfileSectionHeader({
   return (
     <div className="mb-4 flex items-start justify-between gap-3">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-foreground">
+          {title}
+        </h2>
         {description && (
           <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
       {action}
     </div>
-  );
+  )
 }

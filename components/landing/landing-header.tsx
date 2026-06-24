@@ -1,7 +1,8 @@
 import Link from "next/link"
-import { Gamepad2, Lock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowUpRight, Lock } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { LandingMobileNav } from "@/components/landing/landing-mobile-nav"
+import { PanelaLogo } from "@/components/landing/panela-logo"
 
 const SECTION_LINKS = [
   { href: "/#agora", label: "Agora" },
@@ -14,69 +15,72 @@ const SECTION_LINKS = [
   { href: "/#destaques", label: "Destaques" },
 ] as const
 
-export function LandingHeader() {
+interface LandingHeaderProps {
+  wide?: boolean
+}
+
+export function LandingHeader({ wide = false }: LandingHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-8">
-        <Link href="/" className="flex min-w-0 items-center gap-3">
-          <div className="rounded-lg border border-primary/20 bg-primary/10 p-2">
-            <Gamepad2 className="h-5 w-5 text-primary" strokeWidth={2} />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-base font-bold leading-none">Panela Tracker</p>
-            <p className="truncate text-xs text-muted-foreground">
-              Dashboard do grupo
-            </p>
-          </div>
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 pt-4 md:pt-6">
+      <div
+        className={cn(
+          "pointer-events-auto mx-auto flex h-14 w-[calc(100%-2rem)] items-center justify-between gap-3 px-4 md:px-5",
+          wide ? "max-w-7xl" : "max-w-6xl",
+          "rounded-full border border-border/80 bg-background/80 shadow-[0_2px_16px_rgba(0,0,0,0.35)] backdrop-blur-md",
+        )}
+      >
+        <Link href="/" className="flex min-w-0 items-center gap-2.5">
+          <PanelaLogo size="lg" className="shrink-0" />
+          <span className="truncate text-sm font-semibold tracking-tight">
+            Panela Tracker
+          </span>
         </Link>
 
         <nav
           aria-label="Seções da página"
-          className="hidden items-center gap-1 xl:flex"
+          className="hidden items-center gap-0.5 xl:flex"
         >
           {SECTION_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={cn(
-                "rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors",
-                "hover:bg-muted/60 hover:text-foreground",
-              )}
+              className="rounded-md px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-muted hover:text-foreground"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link href="/memorial">Memorial</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/login">
-              <Lock className="h-4 w-4" strokeWidth={2} />
-              <span className="hidden sm:inline">Admin</span>
-            </Link>
-          </Button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Link
+            href="/memorial"
+            className="hidden rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-muted hover:text-foreground sm:inline-flex"
+          >
+            Memorial
+          </Link>
+
+          <Link
+            href="/login"
+            className={cn(
+              "group inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground",
+              "transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] active:scale-[0.98] hover:bg-primary/90",
+            )}
+          >
+            <Lock className="h-3.5 w-3.5" strokeWidth={1.75} />
+            <span className="hidden sm:inline">Admin</span>
+            <span
+              className={cn(
+                "flex h-5 w-5 items-center justify-center rounded-full bg-background/15",
+                "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:-translate-y-px",
+              )}
+            >
+              <ArrowUpRight className="h-3 w-3" strokeWidth={2} />
+            </span>
+          </Link>
+
+          <LandingMobileNav />
         </div>
       </div>
-
-      <nav
-        aria-label="Navegacao rapida"
-        className="border-t border-border/40 xl:hidden"
-      >
-        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 lg:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {SECTION_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="shrink-0 rounded-full border border-border/60 bg-muted/30 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
-      </nav>
     </header>
   )
 }

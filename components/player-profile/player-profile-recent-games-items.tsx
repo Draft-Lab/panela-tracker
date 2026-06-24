@@ -37,7 +37,7 @@ function RecentGameGridCard({ game }: { game: PlayerProfileGameEntry }) {
 
   return (
     <article className="group min-w-0">
-      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card/30 shadow-sm transition-colors hover:border-border hover:bg-card/50">
+      <div className="flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-card/35 transition-[background-color,border-color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-white/[0.12] hover:bg-card/45">
         <div className="relative aspect-[3/4] shrink-0 overflow-hidden bg-muted">
           {game.gameCoverUrl ? (
             <Image
@@ -84,7 +84,7 @@ function RecentGameListRow({ game }: { game: PlayerProfileGameEntry }) {
     : null;
 
   return (
-    <article className="flex items-center gap-3 rounded-xl border border-border/40 bg-card/30 p-2.5 transition-colors hover:border-border hover:bg-card/45 sm:p-3">
+    <article className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5 transition-[background-color,border-color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-white/[0.1] hover:bg-white/[0.04] sm:p-3">
       <div className="relative h-14 w-10 shrink-0 overflow-hidden rounded-md bg-muted sm:h-16 sm:w-12">
         {game.gameCoverUrl ? (
           <Image

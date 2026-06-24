@@ -1,6 +1,7 @@
 import { calculatePlayerStats } from "@/lib/status-helpers"
 import { DropperRankExtended } from "@/components/hall-of-shame/dropper-rank-extended"
 import { DropperRankPodium } from "@/components/hall-of-shame/dropper-rank-podium"
+import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types"
 
 const TOP_PODIUM = 3
@@ -24,14 +25,12 @@ export function HallOfShame({
 
   if (topDroppers.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
-        Ninguém dropou ainda. Milagre.
-      </p>
+      <LandingEmptyState>Ninguém dropou ainda. Milagre.</LandingEmptyState>
     )
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
       <DropperRankPodium topDroppers={topDroppers} />
       {extendedDroppers.length > 0 && (
         <DropperRankExtended droppers={extendedDroppers} startRank={TOP_PODIUM + 1} />
