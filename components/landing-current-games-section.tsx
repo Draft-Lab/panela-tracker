@@ -37,14 +37,15 @@ export function LandingCurrentGamesSection({
     <>
       <div
         className={cn(
-          "grid gap-3",
-          currentGames.length > 1 && "lg:grid-cols-2",
+          "grid items-stretch gap-4",
+          currentGames.length > 1 && "md:grid-cols-2",
         )}
       >
         {currentGames.map((jogatina) => (
           <CurrentGameCard
             key={jogatina.id}
             jogatina={jogatina}
+            compact={currentGames.length > 1}
             isInteractive={isInteractive}
             onFinish={isInteractive ? handleFinishClick : undefined}
           />

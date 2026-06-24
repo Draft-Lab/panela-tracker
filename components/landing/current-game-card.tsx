@@ -8,6 +8,7 @@ import { LiveSessionMeta } from "@/components/landing/live-session-meta"
 import { CurrentSessionParticipants } from "@/components/landing/current-session-participants"
 import { getLiveSessionStartedAt } from "@/lib/live-session-helpers"
 import { buildCurrentSessionParticipants } from "@/lib/current-session-player-helpers"
+import { cn } from "@/lib/utils"
 
 interface CurrentGameCardProps {
   jogatina: Jogatina & {
@@ -17,12 +18,15 @@ interface CurrentGameCardProps {
   }
   isInteractive?: boolean
   onFinish?: (jogatinaId: string, gameTitle: string) => void
+  /** Cards lado a lado precisam de layout empilhado para não esmagar capa e participantes */
+  compact?: boolean
 }
 
 export function CurrentGameCard({
   jogatina,
   isInteractive = false,
   onFinish,
+  compact = false,
 }: CurrentGameCardProps) {
   const sessionEvents = jogatina.jogatina_events ?? []
   const activeCount = buildCurrentSessionParticipants(
@@ -38,32 +42,39 @@ export function CurrentGameCard({
     <LandingGlassMediaCard
       coverSrc={coverUrl}
       coverAlt={jogatina.game.title}
-      contentClassName="p-4 md:p-5"
+      className="h-full"
+      contentClassName="flex h-full flex-col p-4 md:p-5"
     >
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:justify-between">
-        <div className="flex min-w-0 flex-1 gap-4">
+      <div
+        className={cn(
+          "flex min-h-0 flex-1 flex-col gap-4",
+          !compact &&
+            "@min-[640px]:flex-row @min-[640px]:items-stretch @min-[640px]:justify-between @min-[640px]:gap-5",
+        )}
+      >
+        <div className="flex min-w-0 flex-1 gap-3 md:gap-4">
           <LandingCoverThumb
             src={coverUrl}
             alt={jogatina.game.title}
-            size="lg"
-            imageSizes="80px"
+            size={compact ? "md" : "lg"}
+            imageSizes={compact ? "52px" : "76px"}
           />
 
-          <div className="min-w-0 flex-1 space-y-3">
-            <div>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h3 className="text-lg font-semibold leading-snug tracking-tight text-foreground md:text-xl">
-                  {jogatina.game.title}
-                </h3>
-                <span className="text-xs text-muted-foreground">{sessionType}</span>
-              </div>
-
-              <GameIgdbMetaInline
-                game={jogatina.game}
-                variant="chips"
-                className="mt-2 opacity-90"
-              />
+          <div className="min-w-0 flex-1 space-y-2.5">
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="line-clamp-2 text-base font-semibold leading-snug tracking-tight text-foreground md:text-lg">
+                {jogatina.game.title}
+              </h3>
+              <span className="shrink-0 rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground ring-1 ring-white/[0.08]">
+                {sessionType}
+              </span>
             </div>
+
+            <GameIgdbMetaInline
+              game={jogatina.game}
+              variant={compact ? "line" : "chips"}
+              className="opacity-90"
+            />
 
             <LiveSessionMeta startedAt={sessionStartedAt} />
 
@@ -71,7 +82,7 @@ export function CurrentGameCard({
               <Button
                 size="sm"
                 variant="outline"
-                className="h-8 border-border/80 bg-background/40 text-xs active:scale-[0.98]"
+                className="h-8 border-white/10 bg-background/40 text-xs active:scale-[0.98]"
                 onClick={() => onFinish(jogatina.id, jogatina.game.title)}
               >
                 <X className="mr-1 h-3.5 w-3.5" strokeWidth={1.75} />
@@ -82,12 +93,25 @@ export function CurrentGameCard({
         </div>
 
         {hasParticipants && (
-          <div className="flex flex-col justify-center gap-3 border-t border-white/[0.06] pt-4 lg:min-w-[14rem] lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-            <LandingLiveIndicator />
-            <CurrentSessionParticipants
-              jogatinaPlayers={jogatina.jogatina_players ?? []}
-              events={sessionEvents}
-            />
+          <div
+            className={cn(
+              "shrink-0 border-t border-white/[0.06] pt-3",
+              !compact &&
+                "@min-[640px]:flex @min-[640px]:w-auto @min-[640px]:max-w-[42%] @min-[640px]:flex-col @min-[640px]:justify-center @min-[640px]:border-l @min-[640px]:border-t-0 @min-[640px]:pl-5 @min-[640px]:pt-0",
+            )}
+          >
+            <div
+              className={cn(
+                "space-y-2",
+                compact && "flex flex-col gap-2 space-y-0",
+              )}
+            >
+              <LandingLiveIndicator />
+              <CurrentSessionParticipants
+                jogatinaPlayers={jogatina.jogatina_players ?? []}
+                events={sessionEvents}
+              />
+            </div>
           </div>
         )}
       </div>

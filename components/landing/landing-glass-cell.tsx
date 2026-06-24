@@ -111,9 +111,9 @@ export function LandingLiveIndicator({
 }
 
 const COVER_SIZES = {
-  sm: "h-14 w-14 rounded-[calc(0.875rem-0.2rem)]",
-  md: "h-[4.5rem] w-[4.5rem] rounded-[calc(1rem-0.25rem)]",
-  lg: "h-20 w-20 rounded-[calc(1.125rem-0.25rem)]",
+  sm: "aspect-[3/4] w-11 rounded-[calc(0.875rem-0.2rem)]",
+  md: "aspect-[3/4] w-[3.25rem] rounded-[calc(1rem-0.25rem)]",
+  lg: "aspect-[3/4] w-[4.75rem] rounded-[calc(1.125rem-0.25rem)]",
 } as const
 
 interface LandingCoverThumbProps {
@@ -130,7 +130,7 @@ export function LandingCoverThumb({
   imageSizes = "72px",
 }: LandingCoverThumbProps) {
   return (
-    <div className="shrink-0 rounded-2xl bg-white/[0.04] p-1 ring-1 ring-white/10">
+    <div className="size-fit shrink-0 rounded-2xl bg-white/[0.04] p-1 ring-1 ring-white/10">
       <div
         className={cn(
           "relative overflow-hidden bg-muted shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]",
