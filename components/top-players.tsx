@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { calculatePlayerStats } from "@/lib/status-helpers";
 import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { DashboardEmptyState, DashboardPanel } from "@/components/dashboard/dashboard-panel";
 
 interface TopPlayersProps {
   jogatinaPlayers: (JogatinaPlayer & { player: Player })[];
@@ -23,29 +24,22 @@ export function TopPlayers({
 
   if (topPlayers.length === 0) {
     return (
-      <div
-        className={cn(
-          "rounded-xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground",
-          className,
-        )}
-      >
-        Nenhum jogador registrado ainda
+      <div className={className}>
+        <DashboardEmptyState>Nenhum jogador registrado ainda</DashboardEmptyState>
       </div>
     );
   }
 
   return (
-    <div
-      className={cn(
-        "divide-y divide-border/50 overflow-hidden rounded-xl border border-border/50 bg-card/30",
-        className,
-      )}
+    <DashboardPanel
+      className={className}
+      innerClassName="divide-y divide-white/[0.06] overflow-hidden p-0"
     >
       {topPlayers.map((stat, index) => (
         <Link
           key={stat.playerId}
           href={`/dashboard/jogadores/${stat.playerId}`}
-          className="group flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-muted/30 sm:px-5"
+          className="group flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-white/[0.03] sm:px-5"
         >
           <span className="w-5 shrink-0 text-center text-xs font-semibold tabular-nums text-muted-foreground">
             {index + 1}
@@ -91,6 +85,6 @@ export function TopPlayers({
           </div>
         </Link>
       ))}
-    </div>
+    </DashboardPanel>
   );
 }

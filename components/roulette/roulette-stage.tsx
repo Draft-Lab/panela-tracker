@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline";
 import { cn } from "@/lib/utils";
+import { glassInnerFlush, glassOuter, glassSubtle } from "@/lib/glass-styles";
 import { Dices, ExternalLink, Gamepad2 } from "lucide-react";
 
 export type RouletteStageState = "idle" | "spinning" | "winner";
@@ -31,7 +32,7 @@ function StageCover({ game, highlighted }: { game: Game; highlighted?: boolean }
         "relative mx-auto aspect-[3/4] w-full max-w-[220px] overflow-hidden rounded-xl bg-muted shadow-lg ring-1",
         highlighted
           ? "ring-primary/60 shadow-primary/20"
-          : "ring-border/60",
+          : "ring-white/10",
       )}
     >
       {coverUrl ? (
@@ -68,10 +69,12 @@ export function RouletteStage({
   return (
     <article
       className={cn(
-        "relative flex h-full min-h-[340px] flex-col overflow-hidden rounded-xl border border-border/50",
+        "relative flex h-full min-h-[340px] flex-col overflow-hidden",
+        glassOuter,
         className,
       )}
     >
+      <div className={cn(glassInnerFlush, "relative flex h-full min-h-[340px] flex-col")}>
       <div className="absolute inset-0 overflow-hidden" aria-hidden>
         {coverUrl ? (
           <>
@@ -156,6 +159,7 @@ export function RouletteStage({
             </>
           )}
         </div>
+      </div>
       </div>
     </article>
   );

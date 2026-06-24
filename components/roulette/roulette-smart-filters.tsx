@@ -16,6 +16,7 @@ import type {
   UnderplayedMode,
 } from "@/lib/roulette/types";
 import { cn } from "@/lib/utils";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 
 interface RouletteSmartFiltersPanelProps {
   filters: RouletteSmartFilters;
@@ -43,11 +44,9 @@ export function RouletteSmartFiltersPanel({
   };
 
   return (
-    <div
-      className={cn(
-        "flex h-full min-h-[340px] min-w-0 flex-col rounded-xl border border-border/50 bg-card/30 p-4",
-        className,
-      )}
+    <DashboardPanel
+      className={cn("h-full", className)}
+      innerClassName="flex h-full min-h-[340px] min-w-0 flex-col"
     >
       <div className="flex shrink-0 items-center justify-between gap-3">
         <div>
@@ -180,10 +179,10 @@ export function RouletteSmartFiltersPanel({
       </div>
 
       {footerMessage && (
-        <p className="mt-3 shrink-0 text-xs text-muted-foreground rounded-lg border border-dashed border-border/60 px-3 py-2">
+        <p className="mt-3 shrink-0 rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-muted-foreground">
           {footerMessage}
         </p>
       )}
-    </div>
+    </DashboardPanel>
   );
 }

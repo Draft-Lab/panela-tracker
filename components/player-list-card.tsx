@@ -19,6 +19,7 @@ import {
 import { formatPlayerDuration } from "@/lib/player-profile-helpers";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
 
 interface PlayerListCardProps {
   player: Player;
@@ -41,7 +42,8 @@ export function PlayerListCard({
   });
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-border/50 bg-card/30 transition-all hover:border-border hover:bg-card/40">
+    <article className={cn("group overflow-hidden", glassOuter)}>
+      <div className={cn(glassInnerFlush, "transition-colors hover:bg-card/60")}>
       <div
         className={cn(
           "relative h-14 overflow-hidden bg-gradient-to-br",
@@ -134,6 +136,7 @@ export function PlayerListCard({
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
+      </div>
       </div>
     </article>
   );

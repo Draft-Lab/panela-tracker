@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Gamepad2, Trophy } from "lucide-react";
 import type { YearSummary } from "@/lib/retrospective-helpers";
-import { cn } from "@/lib/utils";
+import { LandingGlassMediaCard } from "@/components/landing/landing-glass-media-card";
 
 interface RetrospectiveHeroFeaturedProps {
   summary: YearSummary;
@@ -15,28 +15,12 @@ export function RetrospectiveHeroFeatured({
   const game = summary.topGame;
 
   return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-2xl border border-border/50 bg-card",
-        "min-h-[220px] sm:min-h-[260px]",
-      )}
+    <LandingGlassMediaCard
+      coverSrc={game?.cover_url}
+      coverAlt={game?.title || "Jogo em destaque"}
+      minHeight="min-h-[220px] sm:min-h-[260px]"
+      contentClassName="flex h-full flex-col justify-between gap-6 p-6 sm:flex-row sm:items-center sm:p-8"
     >
-      {game?.cover_url && (
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <Image
-            src={game.cover_url}
-            alt=""
-            fill
-            sizes="1200px"
-            className="object-cover object-center scale-105 blur-3xl"
-            priority
-          />
-          <div className="absolute inset-0 bg-card/80" />
-          <div className="absolute inset-0 bg-gradient-to-r from-card via-card/75 to-card/50" />
-        </div>
-      )}
-
-      <div className="relative flex h-full flex-col justify-between gap-6 p-6 sm:flex-row sm:items-center sm:p-8">
         {game ? (
           <>
             <div className="relative mx-auto h-40 w-28 shrink-0 overflow-hidden rounded-xl bg-muted shadow-2xl ring-1 ring-border/60 sm:mx-0 sm:h-48 sm:w-36">
@@ -89,7 +73,6 @@ export function RetrospectiveHeroFeatured({
             </p>
           </div>
         )}
-      </div>
-    </div>
+    </LandingGlassMediaCard>
   );
 }

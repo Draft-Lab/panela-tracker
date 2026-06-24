@@ -18,6 +18,9 @@ import {
   Clock,
   Users,
 } from "lucide-react";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { glassSubtle } from "@/lib/glass-styles";
+import { cn } from "@/lib/utils";
 
 interface PlaytimeAuditLiveStateProps {
   report: LiveStateAuditReport;
@@ -205,12 +208,13 @@ export function PlaytimeAuditLiveState({ report }: PlaytimeAuditLiveStateProps) 
 
   return (
     <div className="space-y-5">
-      <div
-        className={`rounded-xl border p-4 ${
+      <DashboardPanel
+        innerClassName={cn(
+          "p-4",
           report.hasIssues
-            ? "border-amber-500/40 bg-amber-500/5"
-            : "border-emerald-500/30 bg-emerald-500/5"
-        }`}
+            ? "ring-1 ring-amber-500/30 bg-amber-500/[0.04]"
+            : "ring-1 ring-emerald-500/20 bg-emerald-500/[0.03]",
+        )}
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
@@ -249,16 +253,16 @@ export function PlaytimeAuditLiveState({ report }: PlaytimeAuditLiveStateProps) 
             stuckSessions={stuckSessions}
           />
         </div>
-      </div>
+      </DashboardPanel>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg border border-border/50 bg-card/40 px-4 py-3">
+        <div className={cn(glassSubtle, "px-4 py-3")}>
           <p className="text-xs text-muted-foreground">Sessões ativas</p>
           <p className="mt-1 text-2xl font-bold tabular-nums">
             {summary.currentSessions}
           </p>
         </div>
-        <div className="rounded-lg border border-border/50 bg-card/40 px-4 py-3">
+        <div className={cn(glassSubtle, "px-4 py-3")}>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <Users className="h-3 w-3" />
             Jogadores ativos
@@ -267,7 +271,7 @@ export function PlaytimeAuditLiveState({ report }: PlaytimeAuditLiveStateProps) 
             {summary.totalActivePlayers}
           </p>
         </div>
-        <div className="rounded-lg border border-border/50 bg-card/40 px-4 py-3">
+        <div className={cn(glassSubtle, "px-4 py-3")}>
           <p className="text-xs text-muted-foreground">Sessões com alerta</p>
           <p
             className={`mt-1 text-2xl font-bold tabular-nums ${
@@ -279,7 +283,7 @@ export function PlaytimeAuditLiveState({ report }: PlaytimeAuditLiveStateProps) 
             {summary.sessionsWithIssues}
           </p>
         </div>
-        <div className="rounded-lg border border-border/50 bg-card/40 px-4 py-3">
+        <div className={cn(glassSubtle, "px-4 py-3")}>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <Clock className="h-3 w-3" />
             Jogadores órfãos

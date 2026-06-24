@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline";
 import { cn } from "@/lib/utils";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import { CheckCheck, Gamepad2, Search, X } from "lucide-react";
 
 interface RouletteGamePoolProps {
@@ -46,8 +47,8 @@ export function RouletteGamePool({
   ).length;
 
   return (
-    <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border/50 bg-card/20">
-      <div className="flex flex-col gap-3 border-b border-border/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <DashboardPanel innerClassName="flex min-w-0 flex-col overflow-hidden p-0">
+      <div className="flex flex-col gap-3 border-b border-white/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium">Pool de jogos</p>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -169,6 +170,6 @@ export function RouletteGamePool({
           </div>
         )}
       </div>
-    </div>
+    </DashboardPanel>
   );
 }

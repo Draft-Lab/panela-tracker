@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import {
   Table,
   TableBody,
@@ -74,7 +75,7 @@ export function PlaytimeAuditMethods({
   landingMinutesMatch,
 }: PlaytimeAuditMethodsProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-border/60">
+    <DashboardPanel innerClassName="overflow-hidden p-0">
       <Table>
         <TableHeader>
           <TableRow>
@@ -124,6 +125,6 @@ export function PlaytimeAuditMethods({
           ))}
         </TableBody>
       </Table>
-    </div>
+    </DashboardPanel>
   );
 }

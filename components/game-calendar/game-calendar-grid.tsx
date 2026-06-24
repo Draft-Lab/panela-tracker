@@ -10,7 +10,8 @@ import {
   GameCalendarWeekRow,
   WEEKDAY_LABELS,
 } from "@/components/game-calendar/game-calendar-day-cell";
-
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { cn } from "@/lib/utils";
 interface GameCalendarGridProps {
   viewDate: Date;
   dayMap: Map<string, CalendarDayData>;
@@ -34,12 +35,11 @@ export function GameCalendarGrid({
   const weeks = chunkWeeks(cells);
 
   return (
-    <div
-      className={
-        compact
-          ? "rounded-lg border border-border/40 bg-background/40 p-2"
-          : "rounded-xl border border-border/60 bg-card/30 p-3 sm:p-4"
-      }
+    <DashboardPanel
+      innerClassName={cn(
+        compact ? "p-2" : "p-3 sm:p-4",
+        compact && "rounded-[1.25rem]",
+      )}
     >
       <div
         className={
@@ -73,6 +73,6 @@ export function GameCalendarGrid({
           />
         ))}
       </div>
-    </div>
+    </DashboardPanel>
   );
 }

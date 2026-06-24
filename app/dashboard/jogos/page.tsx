@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { GameListWithSearch } from "@/components/game-list-with-search"
 import { AddGameDialog } from "@/components/add-game-dialog"
 import { EnrichAllGamesIgdb } from "@/components/enrich-all-games-igdb"
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header"
 
 export default async function JogosPage() {
   const supabase = await createClient()
@@ -13,23 +14,20 @@ export default async function JogosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8 px-4">
-        <div className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">Jogos</h1>
-              <p className="text-muted-foreground">Gerencie os jogos do seu grupo</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <EnrichAllGamesIgdb games={games || []} />
-              <AddGameDialog />
-            </div>
-          </div>
+    <div className="flex flex-col gap-10">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Jogos"
+        description="Gerencie os jogos do seu grupo"
+        actions={
+          <>
+            <EnrichAllGamesIgdb games={games || []} />
+            <AddGameDialog />
+          </>
+        }
+      />
 
-          <GameListWithSearch games={games || []} />
-        </div>
-      </div>
+      <GameListWithSearch games={games || []} />
     </div>
   )
 }

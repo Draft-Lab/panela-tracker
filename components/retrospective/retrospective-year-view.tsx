@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import { GitBranch } from "lucide-react";
 import { RetrospectiveSteamTimeline } from "@/components/retrospective/retrospective-steam-timeline";
 import { RetrospectiveMonthModal } from "@/components/retrospective/retrospective-month-modal";
@@ -117,10 +118,8 @@ export function RetrospectiveYearView({
           onSelectMonth={handleSelectMonth}
         />
       ) : (
-        <div
-          ref={timelineSectionRef}
-          className="scroll-mt-24 overflow-hidden rounded-xl border border-border/60 bg-gradient-to-b from-card/40 via-background to-card/20 py-4 sm:py-8"
-        >
+        <div ref={timelineSectionRef} className="scroll-mt-24">
+        <DashboardPanel innerClassName="overflow-hidden py-4 sm:py-8">
           <div className="mb-6 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
               Linha do tempo
@@ -134,6 +133,7 @@ export function RetrospectiveYearView({
             selectedMonthIndex={selectedMonthIndex}
             onMonthClick={handleSelectMonth}
           />
+        </DashboardPanel>
         </div>
       )}
 

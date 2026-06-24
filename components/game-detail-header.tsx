@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft, CalendarPlus, Monitor, Star } from "lucide-react";
 import { AddJogatinaDialog } from "@/components/add-jogatina-dialog";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
+import { cn } from "@/lib/utils";
 
 interface GameDetailHeaderProps {
   game: Game;
@@ -27,7 +29,8 @@ export function GameDetailHeader({ game }: GameDetailHeaderProps) {
 
       <div className="grid gap-6 lg:grid-cols-[220px_1fr] lg:items-start">
         <div className="relative mx-auto w-full max-w-[220px] lg:mx-0">
-          <div className="aspect-[3/4] overflow-hidden rounded-xl border border-border/80 bg-muted shadow-[0_24px_48px_-28px_rgba(0,0,0,0.8)]">
+          <div className={cn(glassOuter, "p-1 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.8)]")}>
+            <div className={cn(glassInnerFlush, "aspect-[3/4] bg-muted")}>
             {game.cover_url ? (
               <img
                 src={game.cover_url}
@@ -41,6 +44,7 @@ export function GameDetailHeader({ game }: GameDetailHeaderProps) {
                 </span>
               </div>
             )}
+            </div>
           </div>
         </div>
 

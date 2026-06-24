@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { PlayerList } from "@/components/player-list"
 import { AddPlayerDialog } from "@/components/add-player-dialog"
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header"
 import { fetchPlayerAggregateStatsMap } from "@/lib/fetch-all-jogatina-players"
 import type { Player } from "@/lib/types"
 
@@ -27,16 +28,13 @@ export default async function JogadoresPage() {
   }))
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="mb-2 text-4xl font-bold text-foreground">Jogadores</h1>
-          <p className="text-muted-foreground">
-            Gerencie os perfis e acompanhe o tempo de cada um
-          </p>
-        </div>
-        <AddPlayerDialog />
-      </div>
+    <div className="flex flex-col gap-10">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Jogadores"
+        description="Gerencie os perfis e acompanhe o tempo de cada um"
+        actions={<AddPlayerDialog />}
+      />
 
       <PlayerList players={playersWithMinutes} />
     </div>

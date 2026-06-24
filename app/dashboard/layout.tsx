@@ -1,7 +1,7 @@
 import type React from "react"
 import { isAdmin } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { Sidebar } from "@/components/sidebar"
+import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
 export default async function DashboardLayout({
   children,
@@ -14,12 +14,5 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 lg:ml-64">
-        <div className="container mx-auto px-4 py-8 lg:px-8 lg:py-12">{children}</div>
-      </main>
-    </div>
-  )
+  return <DashboardShell>{children}</DashboardShell>
 }

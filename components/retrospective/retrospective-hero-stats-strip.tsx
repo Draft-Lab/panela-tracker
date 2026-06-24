@@ -3,6 +3,9 @@ import type { LucideIcon } from "lucide-react";
 import { Calendar, Clock, Gamepad2, Users } from "lucide-react";
 import type { Game } from "@/lib/types";
 import type { YearSummary } from "@/lib/retrospective-helpers";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { glassDivider } from "@/lib/glass-styles";
+import { cn } from "@/lib/utils";
 
 interface RetrospectiveHeroStatsStripProps {
   summary: YearSummary;
@@ -66,8 +69,8 @@ export function RetrospectiveHeroStatsStrip({
   const isEmpty = summary.totalSessions === 0;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
-      <div className="grid grid-cols-1 divide-y divide-border/50 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+    <DashboardPanel innerClassName={cn("overflow-hidden p-0", glassDivider)}>
+      <div className="grid grid-cols-1 divide-y divide-white/[0.06] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
         <StatItem
           label="Jogatinas"
           value={String(summary.totalSessions)}
@@ -101,6 +104,6 @@ export function RetrospectiveHeroStatsStrip({
           spotlight={summary.spotlightBusiestMonth}
         />
       </div>
-    </div>
+    </DashboardPanel>
   );
 }

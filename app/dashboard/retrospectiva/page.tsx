@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { RetrospectiveHero } from "@/components/retrospective/retrospective-hero";
 import { RetrospectivePersonalPicker } from "@/components/retrospective/retrospective-personal-picker";
 import { RetrospectiveYearNav } from "@/components/retrospective/retrospective-year-nav";
@@ -60,17 +61,12 @@ export default async function RetrospectivaPage({
   const yearJogatinas = filterJogatinasByYear(gameJogatinas, year);
 
   return (
-    <div className="space-y-10">
+    <div className="flex flex-col gap-10">
       <RetrospectiveYearNav year={year} availableYears={availableYears} />
 
-      <section className="space-y-4">
-        <div className="relative inline-block">
-          <div className="absolute -top-1 -left-1 h-6 w-px bg-primary/30" />
-          <div className="absolute -top-1 -left-1 h-px w-6 bg-primary/30" />
-          <h2 className="text-2xl font-bold">Destaques do ano</h2>
-        </div>
+      <DashboardSection title="Destaques do ano">
         <RetrospectiveHero summary={summary} />
-      </section>
+      </DashboardSection>
 
       <RetrospectiveYearView
         year={year}

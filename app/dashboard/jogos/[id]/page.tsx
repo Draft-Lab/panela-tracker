@@ -51,7 +51,7 @@ export default async function GameDetailPage({
   const hasIgdbDetails = Boolean(game.igdb_id);
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto flex max-w-7xl flex-col gap-10">
       <GameDetailHeader game={game} />
 
       <div

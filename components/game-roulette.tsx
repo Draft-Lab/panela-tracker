@@ -22,6 +22,7 @@ import {
   type RouletteStageState,
 } from "@/components/roulette/roulette-stage";
 import { useRouletteSpin } from "@/components/roulette/use-roulette-spin";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
 import { toast } from "sonner";
 
 interface GameRouletteProps {
@@ -139,15 +140,12 @@ export function GameRoulette({
         : null;
 
   return (
-    <div className="min-w-0 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-balance tracking-tight">
-          Roleta de Jogos
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Filtros inteligentes e sorteio justo para o próximo jogo do grupo.
-        </p>
-      </div>
+    <div className="flex min-w-0 flex-col gap-10">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Roleta de jogos"
+        description="Filtros inteligentes e sorteio justo para o próximo jogo do grupo."
+      />
 
       <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:items-stretch">
         <RouletteStage

@@ -23,6 +23,7 @@ import {
 } from "@/lib/jogatina-display-helpers";
 import type { JogatinaWithDetails } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
 
 interface JogatinaListCardProps {
   jogatina: JogatinaWithDetails;
@@ -45,7 +46,8 @@ export function JogatinaListCard({
   const isSolo = jogatina.session_type === "solo";
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/30 transition-colors hover:border-border hover:bg-card/40">
+    <article className={cn("group relative overflow-hidden", glassOuter)}>
+      <div className={cn(glassInnerFlush, "relative transition-colors hover:bg-card/60")}>
       {coverUrl && (
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <Image
@@ -186,6 +188,7 @@ export function JogatinaListCard({
 
           <JogatinaListPlayers jogatina={jogatina} />
         </div>
+      </div>
       </div>
     </article>
   );

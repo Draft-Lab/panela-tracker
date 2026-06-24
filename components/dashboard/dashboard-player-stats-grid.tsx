@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculatePlayerStats } from "@/lib/status-helpers";
 import type { JogatinaPlayer, SeasonParticipant, Player, JogatinaWithDetails } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { DashboardEmptyState } from "@/components/dashboard/dashboard-panel";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
 
 interface DashboardPlayerStatsGridProps {
   jogatinaPlayers: (JogatinaPlayer & { player: Player; jogatina?: JogatinaWithDetails })[];
@@ -23,7 +25,7 @@ function StatPill({
   className?: string;
 }) {
   return (
-    <div className="rounded-md border border-border/40 bg-background/40 px-2 py-1.5 text-center">
+    <div className="rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-1.5 text-center">
       <p className={cn("text-sm font-bold tabular-nums", className)}>{value}</p>
       <p className="text-[10px] text-muted-foreground">{label}</p>
     </div>
@@ -41,9 +43,7 @@ export function DashboardPlayerStatsGrid({
 
   if (stats.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
-        Nenhuma estatística disponível ainda
-      </p>
+      <DashboardEmptyState>Nenhuma estatística disponível ainda</DashboardEmptyState>
     );
   }
 
@@ -53,11 +53,12 @@ export function DashboardPlayerStatsGrid({
         <Link
           key={stat.playerId}
           href={`/dashboard/jogadores/${stat.playerId}`}
-          className="group rounded-xl border border-border/50 bg-card/30 p-4 transition-colors hover:border-border hover:bg-card/50"
+          className={cn("group block", glassOuter)}
         >
+          <div className={cn(glassInnerFlush, "p-4 transition-colors hover:bg-card/60")}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <Avatar className="h-11 w-11 ring-1 ring-border/50">
+              <Avatar className="h-11 w-11 ring-1 ring-white/10">
                 <AvatarImage
                   src={stat.avatarUrl || undefined}
                   alt={stat.playerName}
@@ -87,6 +88,7 @@ export function DashboardPlayerStatsGrid({
               label="% drop"
               value={Number(stat.dropoPercentage.toFixed(0))}
             />
+          </div>
           </div>
         </Link>
       ))}

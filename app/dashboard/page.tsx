@@ -12,6 +12,8 @@ import {
   buildYearSummary,
 } from "@/lib/retrospective-helpers";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import { DashboardStatsOverview } from "@/components/dashboard/dashboard-stats-overview";
 import { LandingTopGames } from "@/components/landing-top-games";
 import { LandingTimelineSection } from "@/components/landing-timeline-section";
@@ -85,24 +87,13 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="space-y-10">
-      <div className="relative">
-        <div className="absolute top-0 left-0 h-px w-12 bg-primary/40" />
-        <div className="absolute top-0 left-0 h-12 w-px bg-primary/40" />
-        <div className="absolute top-0 right-0 h-px w-12 bg-primary/40" />
-        <div className="absolute top-0 right-0 h-12 w-px bg-primary/40" />
-
-        <div className="mb-6">
-          <h1 className="mb-2 text-4xl font-bold text-balance text-foreground md:text-5xl">
-            Dashboard
-          </h1>
-          <p className="text-base text-muted-foreground text-balance sm:text-lg">
-            Resumo do grupo, jogos em destaque e atividade recente
-          </p>
-        </div>
-
-        <QuickActions players={players || []} games={games || []} />
-      </div>
+    <div className="flex flex-col gap-10">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Dashboard"
+        description="Resumo do grupo, jogos em destaque e atividade recente"
+        actions={<QuickActions players={players || []} games={games || []} />}
+      />
 
       <RetrospectiveTeaser
         summary={retrospectiveSummary}
@@ -138,16 +129,16 @@ export default async function DashboardPage() {
         title="Atividade"
         description="Últimos 6 meses e resumo de frequência."
       >
-        <div className="overflow-hidden rounded-xl border border-border/50 bg-card/30 lg:grid lg:grid-cols-[minmax(0,1fr)_220px]">
+        <DashboardPanel innerClassName="overflow-visible p-0 lg:grid lg:grid-cols-[minmax(0,1fr)_220px]">
           <ActivityChart
             jogatinas={gameJogatinas}
             compact
             borderless
           />
-          <div className="border-t border-border/50 px-4 py-2 lg:border-t-0 lg:border-l">
+          <div className="border-t border-white/[0.06] px-4 py-2 lg:border-t-0 lg:border-l lg:pl-0">
             <ActivitySummaryCards jogatinas={gameJogatinas} className="lg:pl-2" />
           </div>
-        </div>
+        </DashboardPanel>
       </DashboardSection>
 
       <DashboardSection
@@ -176,18 +167,18 @@ export default async function DashboardPage() {
           title="Atividades recentes"
           description="As 3 jogatinas mais recentes."
         >
-          <div className="rounded-xl border border-border/50 bg-card/20 p-4 sm:p-5">
+          <DashboardPanel innerClassName="p-3 sm:p-4">
             <LandingTimelineSection
               jogatinas={gameJogatinas}
               jogatinaPlayers={gameJogatinaPlayers}
               limit={3}
               compact
             />
-          </div>
+          </DashboardPanel>
         </DashboardSection>
       </div>
 
-      <div className="space-y-8 border-t border-border/50 pt-8">
+      <div className="flex flex-col gap-8 border-t border-white/[0.06] pt-8">
         <DashboardSection
           title="Estatísticas por jogador"
           description="Resumo individual com drops, zeros e taxa de drop."

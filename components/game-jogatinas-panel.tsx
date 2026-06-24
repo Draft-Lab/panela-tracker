@@ -3,6 +3,7 @@
 import type { JogatinaWithDetails, Player } from "@/lib/types";
 import { JogatinaList } from "@/components/jogatina-list";
 import { Badge } from "@/components/ui/badge";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 
 interface GameJogatinasPanelProps {
   jogatinas: JogatinaWithDetails[];
@@ -14,8 +15,8 @@ export function GameJogatinasPanel({
   allPlayers,
 }: GameJogatinasPanelProps) {
   return (
-    <section className="flex flex-col rounded-xl border border-border/80 bg-card/30">
-      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-4 sm:px-5">
+    <DashboardPanel innerClassName="flex flex-col p-0">
+      <div className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-4 sm:px-5">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold tracking-tight">Jogatinas</h2>
           <Badge variant="secondary" className="tabular-nums">
@@ -35,6 +36,6 @@ export function GameJogatinasPanel({
           hideGameTitle
         />
       </div>
-    </section>
+    </DashboardPanel>
   );
 }

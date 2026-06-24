@@ -1,4 +1,6 @@
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { glassSubtle } from "@/lib/glass-styles";
 import { PlaytimeAuditDiagnostics } from "@/components/dashboard/playtime-audit/playtime-audit-diagnostics";
 import { PlaytimeAuditLiveState } from "@/components/dashboard/playtime-audit/playtime-audit-live-state";
 import { PlaytimeAuditMethods } from "@/components/dashboard/playtime-audit/playtime-audit-methods";
@@ -7,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import type { LiveStateAuditReport } from "@/lib/live-state-audit";
 import type { PlaytimeAuditReport } from "@/lib/playtime-audit";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PlaytimeAuditPanelProps {
   report: PlaytimeAuditReport;
@@ -32,7 +35,7 @@ export function PlaytimeAuditPanel({ report, liveState }: PlaytimeAuditPanelProp
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-border/60 bg-card/30 p-5">
+      <DashboardPanel>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -62,25 +65,25 @@ export function PlaytimeAuditPanel({ report, liveState }: PlaytimeAuditPanelProp
 
           {landing && independent && (
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-lg border border-border/50 px-3 py-2">
+              <div className={cn(glassSubtle, "px-3 py-2")}>
                 <p className="text-xs text-muted-foreground">Landing · Jogos</p>
                 <p className="text-lg font-bold tabular-nums">
                   {landing.hours.gameHours}h
                 </p>
               </div>
-              <div className="rounded-lg border border-border/50 px-3 py-2">
+              <div className={cn(glassSubtle, "px-3 py-2")}>
                 <p className="text-xs text-muted-foreground">Varredura · Jogos</p>
                 <p className="text-lg font-bold tabular-nums">
                   {independent.hours.gameHours}h
                 </p>
               </div>
-              <div className="rounded-lg border border-border/50 px-3 py-2">
+              <div className={cn(glassSubtle, "px-3 py-2")}>
                 <p className="text-xs text-muted-foreground">Landing · Apps</p>
                 <p className="text-lg font-bold tabular-nums">
                   {landing.hours.appHours}h
                 </p>
               </div>
-              <div className="rounded-lg border border-border/50 px-3 py-2">
+              <div className={cn(glassSubtle, "px-3 py-2")}>
                 <p className="text-xs text-muted-foreground">Varredura · Apps</p>
                 <p className="text-lg font-bold tabular-nums">
                   {independent.hours.appHours}h
@@ -89,7 +92,7 @@ export function PlaytimeAuditPanel({ report, liveState }: PlaytimeAuditPanelProp
             </div>
           )}
         </div>
-      </div>
+      </DashboardPanel>
 
       <DashboardSection
         title="Estado ao vivo"

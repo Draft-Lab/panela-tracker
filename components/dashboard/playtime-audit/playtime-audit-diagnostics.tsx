@@ -1,4 +1,6 @@
 import type { PlaytimeAuditDiagnostics } from "@/lib/playtime-audit";
+import { glassSubtle } from "@/lib/glass-styles";
+import { cn } from "@/lib/utils";
 
 interface PlaytimeAuditDiagnosticsProps {
   diagnostics: PlaytimeAuditDiagnostics;
@@ -71,7 +73,7 @@ export function PlaytimeAuditDiagnostics({
         return (
           <div
             key={item.key}
-            className="rounded-lg border border-border/50 bg-card/40 px-4 py-3"
+            className={cn(glassSubtle, "px-4 py-3")}
           >
             <p className="text-xs text-muted-foreground">{item.label}</p>
             <p

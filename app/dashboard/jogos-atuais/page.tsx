@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { AddGameButton } from "@/components/add-game-button"
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header"
 import { LandingCurrentGamesSection } from "@/components/landing-current-games-section"
 import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
 
@@ -31,14 +32,13 @@ export default async function JogosAtuaisPage() {
   })[]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Jogos Atuais</h1>
-          <p className="text-muted-foreground mt-1">Gerencie os jogos que estão sendo jogados agora</p>
-        </div>
-        <AddGameButton />
-      </div>
+    <div className="flex flex-col gap-10">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Jogos atuais"
+        description="Gerencie os jogos que estão sendo jogados agora"
+        actions={<AddGameButton />}
+      />
 
       <LandingCurrentGamesSection currentGames={formattedJogatinas} isInteractive={true} />
     </div>

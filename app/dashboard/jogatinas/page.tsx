@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { JogatinaList } from "@/components/jogatina-list";
+import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header";
 
 export default async function JogatinasPage() {
   const supabase = await createClient();
@@ -18,7 +19,6 @@ export default async function JogatinasPage() {
     )
     .order("date", { ascending: false });
 
-  // Buscar todos os jogadores para o dialog de edição
   const { data: allPlayers } = await supabase
     .from("players")
     .select("*")
@@ -29,15 +29,12 @@ export default async function JogatinasPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold text-foreground mb-2">
-          Todas as Jogatinas
-        </h1>
-        <p className="text-muted-foreground">
-          Histórico completo de sessões, agrupado por data
-        </p>
-      </div>
+    <div className="flex flex-col gap-10">
+      <DashboardPageHeader
+        eyebrow="Admin"
+        title="Todas as jogatinas"
+        description="Histórico completo de sessões, agrupado por data"
+      />
 
       <JogatinaList jogatinas={jogatinas || []} allPlayers={allPlayers || []} />
     </div>

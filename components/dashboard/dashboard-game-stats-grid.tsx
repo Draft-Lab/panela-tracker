@@ -8,6 +8,8 @@ import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline";
 import { buildDashboardGameStats } from "@/lib/dashboard-stats-helpers";
 import type { Game, Jogatina, JogatinaPlayer } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { DashboardEmptyState } from "@/components/dashboard/dashboard-panel";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
 
 interface DashboardGameStatsGridProps {
   jogatinas: (Jogatina & { game?: Game })[];
@@ -48,9 +50,7 @@ export function DashboardGameStatsGrid({
 
   if (visibleStats.length === 0) {
     return (
-      <p className="rounded-xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
-        Nenhuma estatística disponível ainda
-      </p>
+      <DashboardEmptyState>Nenhuma estatística disponível ainda</DashboardEmptyState>
     );
   }
 
@@ -61,8 +61,9 @@ export function DashboardGameStatsGrid({
           <Link
             key={stat.gameId}
             href={`/dashboard/jogos/${stat.gameId}`}
-            className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/30 transition-colors hover:border-border"
+            className={cn("group relative block", glassOuter)}
           >
+            <div className={cn(glassInnerFlush, "relative transition-colors hover:bg-card/60")}>
             {stat.coverUrl && (
               <div className="pointer-events-none absolute inset-0" aria-hidden>
                 <Image
@@ -77,7 +78,7 @@ export function DashboardGameStatsGrid({
             )}
 
             <div className="relative flex gap-3 p-4">
-              <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-border/50">
+              <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-md bg-muted ring-1 ring-white/10">
                 {stat.coverUrl ? (
                   <Image
                     src={stat.coverUrl}
@@ -109,7 +110,7 @@ export function DashboardGameStatsGrid({
                   />
                 )}
 
-                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border/40 pt-3 sm:grid-cols-5">
+                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-white/[0.06] pt-3 sm:grid-cols-5">
                   <MiniStat label="Sessões" value={stat.totalJogatinas} />
                   <MiniStat label="Partic." value={stat.totalParticipations} />
                   <MiniStat
@@ -129,6 +130,7 @@ export function DashboardGameStatsGrid({
                   />
                 </div>
               </div>
+            </div>
             </div>
           </Link>
         ))}

@@ -1,5 +1,6 @@
 import { RetrospectiveHeroFeatured } from "@/components/retrospective/retrospective-hero-featured";
 import { RetrospectiveHeroStatsStrip } from "@/components/retrospective/retrospective-hero-stats-strip";
+import { DashboardEmptyState } from "@/components/dashboard/dashboard-panel";
 import type { YearSummary } from "@/lib/retrospective-helpers";
 
 interface RetrospectiveHeroProps {
@@ -13,10 +14,10 @@ export function RetrospectiveHero({ summary }: RetrospectiveHeroProps) {
   return (
     <div className="space-y-4">
       {isEmpty && (
-        <p className="rounded-xl border border-dashed border-border/60 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+        <DashboardEmptyState>
           Ainda estamos construindo o histórico do grupo neste ano. Cada jogatina
           conta para a retrospectiva.
-        </p>
+        </DashboardEmptyState>
       )}
 
       <RetrospectiveHeroFeatured summary={summary} emptyCopy={emptyCopy} />

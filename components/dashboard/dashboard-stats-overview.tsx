@@ -9,6 +9,8 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
+import { glassDivider } from "@/lib/glass-styles";
 
 interface DashboardStatsOverviewProps {
   totalPlayers: number;
@@ -75,8 +77,8 @@ export function DashboardStatsOverview({
       : "0";
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border/50 bg-card/30">
-      <div className="grid grid-cols-2 divide-y divide-border/50 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+    <DashboardPanel innerClassName={cn("overflow-hidden p-0", glassDivider)}>
+      <div className="grid grid-cols-2 divide-y divide-white/[0.06] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
         <StatCell
           label="Jogadores"
           value={String(totalPlayers)}
@@ -103,7 +105,7 @@ export function DashboardStatsOverview({
         />
       </div>
 
-      <div className="grid grid-cols-2 divide-y divide-border/50 border-t border-border/50 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+      <div className="grid grid-cols-2 divide-y divide-white/[0.06] border-t border-white/[0.06] sm:grid-cols-4 sm:divide-x sm:divide-y-0">
         <StatCell
           label="Taxa de drop"
           value={`${dropRate}%`}
@@ -132,6 +134,6 @@ export function DashboardStatsOverview({
           icon={Users}
         />
       </div>
-    </div>
+    </DashboardPanel>
   );
 }

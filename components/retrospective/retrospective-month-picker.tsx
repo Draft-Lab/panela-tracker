@@ -4,6 +4,7 @@ import { CalendarDays } from "lucide-react";
 import { formatDuration } from "@/lib/calendar-helpers";
 import { RetrospectiveMonthGamePreview } from "@/components/retrospective/retrospective-month-game-preview";
 import type { MonthlyRetrospectiveEntry } from "@/lib/retrospective-helpers";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
 import { cn } from "@/lib/utils";
 
 interface RetrospectiveMonthPickerProps {
@@ -34,14 +35,20 @@ export function RetrospectiveMonthPicker({
             onClick={() => !isEmpty && onSelectMonth(month.monthIndex)}
             disabled={isEmpty}
             className={cn(
-              "group relative flex min-h-[140px] flex-col overflow-hidden rounded-xl border text-left transition-colors",
-              isEmpty
-                ? "cursor-default border-border/40 bg-muted/20 opacity-60"
-                : "border-border/60 bg-card/30 hover:border-primary/40 hover:bg-card/50",
-              isSelected && !isEmpty && "border-primary/60 ring-2 ring-primary/20",
+              "group relative flex min-h-[140px] flex-col overflow-hidden text-left transition-colors",
+              glassOuter,
+              isEmpty && "opacity-60",
+              isSelected && !isEmpty && "ring-2 ring-primary/20",
             )}
           >
-            <div className="flex flex-1 flex-col p-4">
+            <div
+              className={cn(
+                glassInnerFlush,
+                "flex flex-1 flex-col p-4 transition-colors",
+                !isEmpty && "hover:bg-card/60",
+                isSelected && !isEmpty && "bg-card/60",
+              )}
+            >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="text-sm font-semibold">{month.monthName}</span>
                 {!isEmpty && (
@@ -69,7 +76,7 @@ export function RetrospectiveMonthPicker({
                       compact
                     />
                   </div>
-                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-border/40 pt-2">
+                  <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-2">
                     <p className="text-[10px] text-muted-foreground">
                       {month.sessionCount}{" "}
                       {month.sessionCount === 1 ? "jogatina" : "jogatinas"}

@@ -9,6 +9,8 @@ import {
 } from "@/lib/season-display-helpers";
 import type { SeasonWithDetails } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { DashboardEmptyState } from "@/components/dashboard/dashboard-panel";
+import { glassInnerFlush, glassOuter } from "@/lib/glass-styles";
 
 interface ActiveSeasonsWidgetProps {
   seasons: SeasonWithDetails[];
@@ -23,8 +25,9 @@ function SeasonCard({ season }: { season: SeasonWithDetails }) {
   return (
     <Link
       href={`/dashboard/temporadas/${season.id}`}
-      className="group relative overflow-hidden rounded-xl border border-border/50 bg-card/30 transition-colors hover:border-border"
+      className={cn("group relative block", glassOuter)}
     >
+      <div className={cn(glassInnerFlush, "relative transition-colors hover:bg-card/60")}>
       {coverUrl && (
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <Image
@@ -40,7 +43,7 @@ function SeasonCard({ season }: { season: SeasonWithDetails }) {
       )}
 
       <div className="relative flex items-center gap-4 p-4 sm:p-5">
-        <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-border/50 shadow-md">
+        <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg bg-muted ring-1 ring-white/10 shadow-md">
           {coverUrl ? (
             <Image
               src={coverUrl}
@@ -86,6 +89,7 @@ function SeasonCard({ season }: { season: SeasonWithDetails }) {
           </div>
         </div>
       </div>
+      </div>
     </Link>
   );
 }
@@ -93,14 +97,12 @@ function SeasonCard({ season }: { season: SeasonWithDetails }) {
 export function ActiveSeasonsWidget({ seasons }: ActiveSeasonsWidgetProps) {
   if (seasons.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-border/60 py-10 text-center">
-        <p className="text-sm text-muted-foreground">
-          Nenhuma temporada ativa no momento
-        </p>
-        <Button variant="outline" className="mt-4" asChild>
+      <DashboardEmptyState>
+        <span className="block">Nenhuma temporada ativa no momento</span>
+        <Button variant="outline" className="mt-4 border-white/10 bg-white/[0.03]" asChild>
           <Link href="/dashboard/temporadas">Criar temporada</Link>
         </Button>
-      </div>
+      </DashboardEmptyState>
     );
   }
 

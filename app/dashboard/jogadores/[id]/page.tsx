@@ -17,7 +17,7 @@ export default async function PlayerDetailPage({
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
+    <div className="mx-auto max-w-7xl flex flex-col gap-10">
       <PlayerProfileContent data={data} variant="admin" />
     </div>
   );

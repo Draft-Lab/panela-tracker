@@ -1,4 +1,6 @@
 import { LandingSectionSkeleton } from "@/components/landing/skeletons/landing-section-skeleton";
+import { glassOuter } from "@/lib/glass-styles";
+import { cn } from "@/lib/utils";
 
 export default function DashboardLoading() {
   return (
@@ -21,7 +23,7 @@ export default function DashboardLoading() {
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className="h-24 rounded-xl border border-border/40 bg-muted/30"
+              className={cn(glassOuter, "h-24 bg-muted/20 p-1.5")}
             />
           ))}
         </div>
