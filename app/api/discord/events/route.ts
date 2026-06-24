@@ -1,4 +1,6 @@
 // app/api/discord/events/route.ts
+import { handlePlayerJoined } from "../../../../lib/discord/handle-player-joined";
+import { countActivePlayers } from "../../../../lib/discord/jogatina-metrics";
 import { createServiceRoleClient } from "../../../../lib/supabase/service-role";
 import { NextResponse } from "next/server";
 import type { JogatinaEvent } from "../../../../lib/types";
@@ -20,19 +22,6 @@ function verifyAuth(request: Request) {
   }
   const token = authHeader.substring(7);
   return token === DISCORD_BOT_API_KEY;
-}
-
-async function countActivePlayers(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  jogatinaId: string,
-) {
-  const { data } = await supabase
-    .from("jogatina_players")
-    .select("id")
-    .eq("jogatina_id", jogatinaId)
-    .eq("is_active", true);
-
-  return data?.length || 0;
 }
 
 async function syncPlayerFromDiscord(
@@ -60,45 +49,6 @@ async function syncPlayerFromDiscord(
       `[Discord Events] Erro ao sincronizar perfil do jogador ${playerId}:`,
       error
     );
-  }
-}
-
-// NOVA FUNÇÃO: Associar jogatina à temporada ativa
-async function associateToActiveSeason(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  jogatinaId: string,
-  gameId: string
-) {
-  try {
-    const now = new Date().toISOString();
-
-    // Buscar temporada ativa para este jogo
-    const { data: activeSeason } = await supabase
-      .from("seasons")
-      .select("id")
-      .eq("game_id", gameId)
-      .eq("is_active", true)
-      .lte("started_at", now)
-      .or(`ended_at.is.null,ended_at.gte.${now}`)
-      .single();
-
-    if (activeSeason) {
-      // Associar jogatina à temporada
-      await supabase
-        .from("jogatinas")
-        .update({ season_id: activeSeason.id })
-        .eq("id", jogatinaId);
-
-      console.log(
-        `[Discord Events] Jogatina ${jogatinaId} associada à temporada ${activeSeason.id}`
-      );
-      return activeSeason.id;
-    }
-
-    return null;
-  } catch (error) {
-    console.error("[Discord Events] Erro ao associar temporada:", error);
-    return null;
   }
 }
 
@@ -185,13 +135,19 @@ export async function POST(request: Request) {
     const timestamp = new Date().toISOString();
 
     if (event_type === "player_joined") {
-      return await handlePlayerJoined(
+      const result = await handlePlayerJoined(
         supabase,
         player.id,
         game.id,
         game_title,
-        timestamp
+        timestamp,
       );
+
+      if (!result.success) {
+        return NextResponse.json({ error: result.error }, { status: result.status });
+      }
+
+      return NextResponse.json(result);
     } else {
       return await handlePlayerLeft(supabase, player.id, game.id, game_title, timestamp);
     }
@@ -199,157 +155,6 @@ export async function POST(request: Request) {
     console.error("[Discord Events API] Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-}
-
-async function handlePlayerJoined(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  playerId: string,
-  gameId: string,
-  gameTitle: string,
-  timestamp: string
-) {
-  // Buscar jogatina ativa para este jogo
-  const { data: activeJogatina } = await supabase
-    .from("jogatinas")
-    .select("*")
-    .eq("game_id", gameId)
-    .eq("is_current", true)
-    .eq("source", "discord_bot")
-    .single();
-
-  let jogatina = activeJogatina;
-
-  // Se não existe jogatina ativa, criar uma nova
-  if (!jogatina) {
-    const { data: newJogatina, error } = await supabase
-      .from("jogatinas")
-      .insert({
-        game_id: gameId,
-        date: timestamp,
-        is_current: true,
-        source: "discord_bot",
-        session_type: "solo",
-        active_players: 0,
-        first_event_at: timestamp,
-        notes: `Sessão iniciada automaticamente via Discord Bot`,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json(
-        { error: `Failed to create jogatina: ${error.message}` },
-        { status: 500 }
-      );
-    }
-    jogatina = newJogatina;
-
-    // NOVA LÓGICA: Associar à temporada ativa (se existir)
-    await associateToActiveSeason(supabase, jogatina.id, gameId);
-  }
-
-  // Verificar se o jogador já está na jogatina
-  const { data: existingPlayer } = await supabase
-    .from("jogatina_players")
-    .select("id, is_active")
-    .eq("jogatina_id", jogatina.id)
-    .eq("player_id", playerId)
-    .single();
-
-  if (existingPlayer?.is_active) {
-    const activeCount = await countActivePlayers(supabase, jogatina.id);
-    const sessionType = activeCount > 1 ? "group" : "solo";
-
-    await supabase
-      .from("jogatinas")
-      .update({
-        active_players: activeCount,
-        session_type: sessionType,
-        last_event_at: timestamp,
-      })
-      .eq("id", jogatina.id);
-
-    return NextResponse.json({
-      success: true,
-      message: "Player already active in jogatina",
-      jogatina_id: jogatina.id,
-      game_title: gameTitle,
-      active_players: activeCount,
-      session_type: sessionType,
-      season_id: jogatina.season_id || null,
-    });
-  }
-
-  if (!existingPlayer) {
-    const { error: playerError } = await supabase.from("jogatina_players").insert({
-      jogatina_id: jogatina.id,
-      player_id: playerId,
-      status: "Jogatina",
-      is_active: true,
-    });
-
-    if (playerError) {
-      return NextResponse.json(
-        { error: `Failed to add player to jogatina: ${playerError.message}` },
-        { status: 500 }
-      );
-    }
-  } else {
-    const { error: activateError } = await supabase
-      .from("jogatina_players")
-      .update({ is_active: true })
-      .eq("id", existingPlayer.id);
-
-    if (activateError) {
-      return NextResponse.json(
-        { error: `Failed to reactivate player: ${activateError.message}` },
-        { status: 500 }
-      );
-    }
-  }
-
-  const { error: eventError } = await supabase.from("jogatina_events").insert({
-    jogatina_id: jogatina.id,
-    player_id: playerId,
-    event_type: "player_joined",
-    timestamp: timestamp,
-  });
-
-  if (eventError) {
-    return NextResponse.json(
-      { error: `Failed to register event: ${eventError.message}` },
-      { status: 500 }
-    );
-  }
-
-  const activeCount = await countActivePlayers(supabase, jogatina.id);
-  const sessionType = activeCount > 1 ? "group" : "solo";
-
-  const { error: updateError } = await supabase
-    .from("jogatinas")
-    .update({
-      active_players: activeCount,
-      session_type: sessionType,
-      last_event_at: timestamp,
-    })
-    .eq("id", jogatina.id);
-
-  if (updateError) {
-    return NextResponse.json(
-      { error: `Failed to update jogatina: ${updateError.message}` },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({
-    success: true,
-    message: "Player joined event registered",
-    jogatina_id: jogatina.id,
-    game_title: gameTitle,
-    active_players: activeCount,
-    session_type: sessionType,
-    season_id: jogatina.season_id || null,
-  });
 }
 
 async function handlePlayerLeft(
