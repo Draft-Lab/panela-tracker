@@ -1,8 +1,10 @@
+import { unstable_cache } from "next/cache";
 import type { createClient } from "@/lib/supabase/server";
-import { normalizeSupabaseRelation } from "@/lib/supabase-relation-helpers";
-type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
+import { createPublicClient } from "@/lib/supabase/public";
 
-const PAGE_SIZE = 1000;
+type SupabaseClient =
+  | Awaited<ReturnType<typeof createClient>>
+  | ReturnType<typeof createPublicClient>;
 
 export interface PlaytimeDurationTotals {
   gameMinutes: number;
@@ -13,6 +15,12 @@ export interface PlaytimeDurationTotals {
 export type PlaytimeJogatinaRow = {
   total_duration_minutes: number | null;
   game: { is_app: boolean } | null;
+};
+
+type PlaytimeTotalsRpcRow = {
+  game_minutes: number;
+  app_minutes: number;
+  session_count: number;
 };
 
 export function accumulateFinishedPlaytimeRow(
@@ -56,58 +64,43 @@ export function playtimeTotalsMatch(
   );
 }
 
+function parseRpcTotals(
+  row: PlaytimeTotalsRpcRow | undefined,
+): PlaytimeDurationTotals {
+  return {
+    gameMinutes: Number(row?.game_minutes ?? 0),
+    appMinutes: Number(row?.app_minutes ?? 0),
+    sessionCount: Number(row?.session_count ?? 0),
+  };
+}
+
+async function fetchPlaytimeDurationTotalsFromRpc(
+  supabase: SupabaseClient,
+): Promise<PlaytimeDurationTotals> {
+  const { data, error } = await supabase.rpc("get_finished_playtime_totals");
+
+  if (error) {
+    throw error;
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  return parseRpcTotals(row as PlaytimeTotalsRpcRow | undefined);
+}
+
 export async function fetchPlaytimeDurationTotals(
   supabase: SupabaseClient,
 ): Promise<PlaytimeDurationTotals> {
-  const totals: PlaytimeDurationTotals = {
-    gameMinutes: 0,
-    appMinutes: 0,
-    sessionCount: 0,
-  };
-
-  const seenIds = new Set<string>();
-  let from = 0;
-
-  while (true) {
-    const { data, error } = await supabase
-      .from("jogatinas")
-      .select("id, total_duration_minutes, game:games!inner(is_app)")
-      .eq("is_current", false)
-      .order("id", { ascending: true })
-      .range(from, from + PAGE_SIZE - 1);
-
-    if (error) {
-      throw error;
-    }
-
-    const rows = data ?? [];
-    if (!rows.length) {
-      break;
-    }
-
-    for (const row of rows) {
-      if (seenIds.has(row.id)) {
-        continue;
-      }
-
-      seenIds.add(row.id);
-
-      const game = normalizeSupabaseRelation(row.game);
-      accumulateFinishedPlaytimeRow(totals, {
-        total_duration_minutes: row.total_duration_minutes,
-        game,
-      });
-    }
-
-    if (rows.length < PAGE_SIZE) {
-      break;
-    }
-
-    from += PAGE_SIZE;
-  }
-
-  return totals;
+  return fetchPlaytimeDurationTotalsFromRpc(supabase);
 }
+
+export const getCachedPlaytimeDurationTotals = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    return fetchPlaytimeDurationTotalsFromRpc(supabase);
+  },
+  ["landing-playtime-duration-totals"],
+  { revalidate: 300 },
+);
 
 export function playtimeTotalsToHours(totals: PlaytimeDurationTotals): {
   gameHours: number;

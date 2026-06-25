@@ -2,7 +2,7 @@ import type { createClient } from "@/lib/supabase/server";
 import type { PlayerAggregateStats } from "@/lib/fetch-all-jogatina-players";
 import { buildLandingPlayerCardStatsFromSummary } from "@/lib/player-profile-helpers";
 import {
-  fetchPlaytimeDurationTotals,
+  getCachedPlaytimeDurationTotals,
   playtimeTotalsToHours,
 } from "@/lib/landing-playtime-totals";
 import type {
@@ -79,6 +79,32 @@ async function paginate<T>(
   return all;
 }
 
+async function fetchPlayersCount(supabase: SupabaseClient): Promise<number> {
+  const { count, error } = await supabase
+    .from("players")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return count ?? 0;
+}
+
+async function fetchCurrentGamesCount(supabase: SupabaseClient): Promise<number> {
+  const { count, error } = await supabase
+    .from("jogatinas")
+    .select("id, game:games!inner(is_app)", { count: "exact", head: true })
+    .eq("is_current", true)
+    .eq("game.is_app", false);
+
+  if (error) {
+    throw error;
+  }
+
+  return count ?? 0;
+}
+
 export async function fetchLandingPlayers(
   supabase: SupabaseClient,
 ): Promise<Player[]> {
@@ -126,18 +152,19 @@ export async function fetchLandingHeroData(
   weekAgo.setDate(weekAgo.getDate() - 7);
   const weekAgoIso = weekAgo.toISOString();
 
-  const [players, currentGames, weekJogatinas, durationTotals] = await Promise.all([
-    fetchLandingPlayers(supabase),
-    fetchCurrentJogatinas(supabase),
-    supabase
-      .from("jogatinas")
-      .select("total_duration_minutes, date, game:games(id, title, is_app)")
-      .gte("date", weekAgoIso)
-      .then(({ data }) =>
-        (data ?? []).filter((j) => j.game && !j.game.is_app),
-      ),
-    fetchPlaytimeDurationTotals(supabase),
-  ]);
+  const [playersCount, currentGamesCount, weekJogatinas, durationTotals] =
+    await Promise.all([
+      fetchPlayersCount(supabase),
+      fetchCurrentGamesCount(supabase),
+      supabase
+        .from("jogatinas")
+        .select("total_duration_minutes, date, game:games(id, title, is_app)")
+        .gte("date", weekAgoIso)
+        .then(({ data }) =>
+          (data ?? []).filter((j) => j.game && !j.game.is_app),
+        ),
+      getCachedPlaytimeDurationTotals(),
+    ]);
 
   const gameMinutes = weekJogatinas.reduce(
     (acc, jogatina) => {
@@ -165,8 +192,8 @@ export async function fetchLandingHeroData(
   const totalHours = playtimeHours.gameHours + playtimeHours.appHours;
 
   return {
-    playersCount: players.length,
-    currentGamesCount: currentGames.length,
+    playersCount,
+    currentGamesCount,
     totalHours,
     appHours: playtimeHours.appHours,
     mostPlayedThisWeek,
