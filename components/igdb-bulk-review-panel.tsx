@@ -168,6 +168,7 @@ function ReviewItemRow({
         matches={matches}
         onSelect={(match) => void applyMatch(match)}
         isApplying={isApplying}
+        referenceTitle={item.title}
         title={`Escolher jogo para "${item.title}"`}
         description="Selecione a correspondência correta no IGDB ou feche e ajuste o termo de busca."
       />

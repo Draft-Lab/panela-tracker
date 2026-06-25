@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Loader2, RotateCcw, Search } from "lucide-react";
 import { toast } from "sonner";
+import { IgdbSearchMatchList } from "@/components/igdb-search-match-list";
 
 interface IgdbEnrichSearchDialogProps {
   open: boolean;
@@ -100,8 +101,8 @@ export function IgdbEnrichSearchDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col gap-4">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[85vh] w-full max-w-2xl flex-col gap-4 overflow-hidden sm:max-w-2xl">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Buscar no IGDB</DialogTitle>
           <DialogDescription>
             Enriquecer <span className="font-medium text-foreground">{gameTitle}</span>{" "}
@@ -109,7 +110,7 @@ export function IgdbEnrichSearchDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-2">
+        <div className="shrink-0 space-y-2">
           <label htmlFor="igdb-search-query" className="text-sm font-medium">
             Termo de busca
           </label>
@@ -154,7 +155,7 @@ export function IgdbEnrichSearchDialog({
           )}
         </div>
 
-        <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {isSearching && (
             <div className="flex flex-col items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -174,63 +175,14 @@ export function IgdbEnrichSearchDialog({
           )}
 
           {showResults && (
-            <div className="space-y-3 pr-1">
-              <p className="text-sm text-muted-foreground">
-                {matches.length === 1
-                  ? "1 resultado encontrado — confirme se é o jogo correto:"
-                  : `${matches.length} resultados — escolha o jogo correto:`}
-              </p>
-              {matches.map((match) => (
-                <div
-                  key={match.igdbId}
-                  className="flex gap-3 rounded-lg border p-3 items-start"
-                >
-                  <div className="w-14 h-[4.5rem] bg-muted rounded overflow-hidden shrink-0">
-                    {match.coverUrl ? (
-                      <img
-                        src={match.coverUrl}
-                        alt={match.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground text-center px-1">
-                        Sem capa
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-medium truncate">{match.name}</p>
-                        {match.year && (
-                          <p className="text-sm text-muted-foreground">
-                            {match.year}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        size="sm"
-                        className="shrink-0"
-                        disabled={isBusy}
-                        onClick={() => void applyMatch(match)}
-                      >
-                        {isApplying ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          "Usar este"
-                        )}
-                      </Button>
-                    </div>
-                    {match.summary && (
-                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                        {match.summary}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <IgdbSearchMatchList
+              matches={matches}
+              onSelect={(match) => void applyMatch(match)}
+              isApplying={isApplying}
+              referenceTitle={gameTitle}
+              emptyMessage="Nenhum resultado encontrado."
+              filteredEmptyMessage="Nenhum resultado com os filtros atuais."
+            />
           )}
         </div>
       </DialogContent>

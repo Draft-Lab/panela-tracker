@@ -11,18 +11,11 @@ function getYearFromTimestamp(timestamp?: number): number | undefined {
   return new Date(timestamp * 1000).getFullYear();
 }
 
-export async function searchIgdbGames(title: string): Promise<IgdbSearchMatch[]> {
-  const escapedTitle = escapeSearchTerm(title.trim());
-  const body = [
-    "fields id,name,summary,first_release_date,cover.image_id;",
-    `search "${escapedTitle}";`,
-    "where version_parent = null;",
-    "limit 10;",
-  ].join(" ");
+const IGDB_SEARCH_PAGE_SIZE = 500;
+const IGDB_SEARCH_MAX_RESULTS = 5000;
 
-  const results = await igdbPost<IgdbSearchResult>("games", body);
-
-  return results.map((game) => ({
+function mapSearchResult(game: IgdbSearchResult): IgdbSearchMatch {
+  return {
     igdbId: game.id,
     name: game.name ?? "Sem nome",
     year: getYearFromTimestamp(game.first_release_date),
@@ -30,5 +23,36 @@ export async function searchIgdbGames(title: string): Promise<IgdbSearchMatch[]>
       ? buildIgdbImageUrl(game.cover.image_id, "cover_small")
       : undefined,
     summary: game.summary,
-  }));
+  };
+}
+
+async function fetchSearchPage(
+  escapedTitle: string,
+  offset: number,
+): Promise<IgdbSearchResult[]> {
+  const body = [
+    "fields id,name,summary,first_release_date,cover.image_id;",
+    `search "${escapedTitle}";`,
+    "where version_parent = null;",
+    `limit ${IGDB_SEARCH_PAGE_SIZE};`,
+    `offset ${offset};`,
+  ].join(" ");
+
+  return igdbPost<IgdbSearchResult>("games", body);
+}
+
+export async function searchIgdbGames(title: string): Promise<IgdbSearchMatch[]> {
+  const escapedTitle = escapeSearchTerm(title.trim());
+  const results: IgdbSearchResult[] = [];
+  let offset = 0;
+
+  while (results.length < IGDB_SEARCH_MAX_RESULTS) {
+    const page = await fetchSearchPage(escapedTitle, offset);
+    results.push(...page);
+
+    if (page.length < IGDB_SEARCH_PAGE_SIZE) break;
+    offset += IGDB_SEARCH_PAGE_SIZE;
+  }
+
+  return results.map(mapSearchResult);
 }
