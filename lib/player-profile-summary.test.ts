@@ -19,6 +19,7 @@ function makeJogatinaPlayer(
     jogatina_id: overrides.jogatina_id ?? "jog-1",
     player_id: overrides.player_id ?? "player-1",
     status: overrides.status ?? "Em andamento",
+    is_active: false,
     total_duration_minutes: overrides.minutes ?? 60,
     solo_duration_minutes: 0,
     group_duration_minutes: 0,
@@ -43,7 +44,7 @@ function makeJogatinaPlayer(
         created_at: "2025-01-01T00:00:00.000Z",
       },
     },
-  } as JogatinaPlayerWithDetails;
+  } as unknown as JogatinaPlayerWithDetails;
 }
 
 function makeSeasonParticipant(
@@ -81,7 +82,7 @@ function makeSeasonParticipant(
         created_at: "2025-01-01T00:00:00.000Z",
       },
     },
-  } as SeasonParticipantWithDetails;
+  } as unknown as SeasonParticipantWithDetails;
 }
 
 test("buildPlayerProfileSummary uses jogatinas only for totals", () => {

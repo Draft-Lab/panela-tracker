@@ -71,7 +71,9 @@ export function StatusDistributionChart({
             ))}
           </Pie>
           <Tooltip
-            content={(props) => <ChartTooltip {...props} total={total} />}
+            content={(props: TooltipProps<number, string>) => (
+              <ChartTooltip {...props} total={total} />
+            )}
           />
         </PieChart>
       </ResponsiveContainer>

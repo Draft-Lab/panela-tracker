@@ -36,6 +36,17 @@ interface PlayerStatus {
   notes: string
 }
 
+interface LoadedJogatinaPlayer {
+  id: string
+  player: {
+    id: string
+    name: string
+    avatar_url: string | null
+  }
+  status: PlayerStatus["status"]
+  notes: string | null
+}
+
 export function FinishCurrentGameDialog({ jogatinaId, gameTitle, open, onOpenChange }: FinishCurrentGameDialogProps) {
   const [playerStatuses, setPlayerStatuses] = useState<PlayerStatus[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -58,7 +69,7 @@ export function FinishCurrentGameDialog({ jogatinaId, gameTitle, open, onOpenCha
       console.error("[v0] Error loading player statuses:", error)
     } else {
       setPlayerStatuses(
-        (data || []).map((jp) => ({
+        (data || []).map((jp: LoadedJogatinaPlayer) => ({
           id: jp.id,
           player: jp.player,
           status: jp.status,

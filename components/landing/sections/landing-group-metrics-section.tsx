@@ -1,8 +1,9 @@
+import type { ReactElement } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { fetchJogatinaPlayerSlimRows } from "@/lib/fetch-landing-data";
 import { LandingGroupMetrics } from "@/components/landing-group-metrics/index";
 
-export async function LandingGroupMetricsSection() {
+export async function LandingGroupMetricsSection(): Promise<ReactElement> {
   const supabase = await createClient();
   const slimRows = await fetchJogatinaPlayerSlimRows(supabase);
 

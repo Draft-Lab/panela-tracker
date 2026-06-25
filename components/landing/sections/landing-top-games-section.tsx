@@ -1,8 +1,9 @@
+import type { ReactElement } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { fetchJogatinasForRanking } from "@/lib/fetch-landing-data";
 import { LandingTopGames } from "@/components/landing-top-games";
 
-export async function LandingTopGamesSection() {
+export async function LandingTopGamesSection(): Promise<ReactElement> {
   const supabase = await createClient();
   const jogatinas = await fetchJogatinasForRanking(supabase);
 

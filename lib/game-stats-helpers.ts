@@ -1,5 +1,7 @@
 import type { Jogatina, Game, JogatinaPlayer } from "@/lib/types";
 
+export type JogatinaPlayerRef = Pick<JogatinaPlayer, "jogatina_id" | "player_id">;
+
 const MIN_PLAYERS_FOR_GROUP_SESSION = 2;
 
 export interface GameRankingStat {
@@ -15,8 +17,8 @@ export type JogatinaWithPlayers = Jogatina & {
 
 export function getPlayersForJogatina(
   jogatina: JogatinaWithPlayers,
-  jogatinaPlayers: JogatinaPlayer[],
-): JogatinaPlayer[] {
+  jogatinaPlayers: JogatinaPlayerRef[],
+): JogatinaPlayerRef[] {
   const nested = jogatina.jogatina_players ?? [];
   if (nested.length > 0) {
     return nested;
@@ -27,7 +29,7 @@ export function getPlayersForJogatina(
 
 export function getUniquePlayerCount(
   jogatina: JogatinaWithPlayers,
-  jogatinaPlayers: JogatinaPlayer[],
+  jogatinaPlayers: JogatinaPlayerRef[],
 ): number {
   const players = getPlayersForJogatina(jogatina, jogatinaPlayers);
   return new Set(players.map((jp) => jp.player_id)).size;
@@ -35,7 +37,7 @@ export function getUniquePlayerCount(
 
 export function calculateTopGames(
   jogatinas: JogatinaWithPlayers[],
-  jogatinaPlayers: JogatinaPlayer[],
+  jogatinaPlayers: JogatinaPlayerRef[],
   limit = 5,
 ): GameRankingStat[] {
   const gameStats = jogatinas.reduce(

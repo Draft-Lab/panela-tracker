@@ -87,7 +87,7 @@ export function EditSeasonDialog({
         .eq("season_id", season.id);
 
       const currentPlayerIds =
-        currentParticipants?.map((p) => p.player_id) || [];
+        currentParticipants?.map((p: { player_id: string }) => p.player_id) || [];
 
       // 3. Adicionar novos participantes
       const playersToAdd = selectedPlayers.filter(
@@ -105,7 +105,7 @@ export function EditSeasonDialog({
 
       // 4. Remover participantes desmarcados
       const playersToRemove = currentPlayerIds.filter(
-        (id) => !selectedPlayers.includes(id),
+        (id: string) => !selectedPlayers.includes(id),
       );
       if (playersToRemove.length > 0) {
         await supabase

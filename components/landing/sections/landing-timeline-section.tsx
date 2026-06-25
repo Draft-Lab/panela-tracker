@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { createClient } from "@/lib/supabase/server";
 import {
   fetchJogatinaPlayerSlimRows,
@@ -5,7 +6,7 @@ import {
 } from "@/lib/fetch-landing-data";
 import { LandingTimelineSection } from "@/components/landing-timeline-section";
 
-export async function LandingTimelineSectionAsync() {
+export async function LandingTimelineSectionAsync(): Promise<ReactElement> {
   const supabase = await createClient();
 
   const [recentJogatinas, slimRows] = await Promise.all([

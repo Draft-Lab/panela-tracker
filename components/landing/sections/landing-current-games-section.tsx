@@ -1,8 +1,9 @@
+import type { ReactElement } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { fetchCurrentJogatinas } from "@/lib/fetch-landing-data";
 import { LandingCurrentGamesSection } from "@/components/landing-current-games-section";
 
-export async function LandingCurrentGamesSectionAsync() {
+export async function LandingCurrentGamesSectionAsync(): Promise<ReactElement> {
   const supabase = await createClient();
   const currentGames = await fetchCurrentJogatinas(supabase);
 

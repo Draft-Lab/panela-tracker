@@ -5,6 +5,7 @@ import {
   getCachedPlaytimeDurationTotals,
   playtimeTotalsToHours,
 } from "@/lib/landing-playtime-totals";
+import { normalizeSupabaseRelation } from "@/lib/supabase-relation-helpers";
 import type {
   Game,
   Jogatina,
@@ -17,6 +18,16 @@ import type {
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
 const PAGE_SIZE = 1000;
+
+function normalizeGameRelation<T extends Pick<Game, "is_app">>(
+  game: T | T[] | null | undefined,
+): T | null {
+  return normalizeSupabaseRelation(game);
+}
+
+function isNonAppGame(game: Pick<Game, "is_app"> | null | undefined): boolean {
+  return Boolean(game && !game.is_app);
+}
 
 export type LandingCurrentJogatina = Jogatina & {
   game: Game;
@@ -140,9 +151,43 @@ export async function fetchCurrentJogatinas(
     throw error;
   }
 
-  return (data ?? []).filter(
-    (j) => j.game && !j.game.is_app,
-  ) as LandingCurrentJogatina[];
+  return (data ?? [])
+    .map((j) => ({
+      ...j,
+      game: normalizeGameRelation(j.game as Game | Game[] | null),
+    }))
+    .filter((j) => isNonAppGame(j.game)) as LandingCurrentJogatina[];
+}
+
+type HeroWeekJogatina = {
+  total_duration_minutes: number | null;
+  date: string;
+  game: Pick<Game, "id" | "title" | "is_app">;
+};
+
+async function fetchHeroWeekJogatinas(
+  supabase: SupabaseClient,
+  weekAgoIso: string,
+): Promise<HeroWeekJogatina[]> {
+  const { data, error } = await supabase
+    .from("jogatinas")
+    .select("total_duration_minutes, date, game:games(id, title, is_app)")
+    .gte("date", weekAgoIso);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? [])
+    .map((j) => ({
+      ...j,
+      game: normalizeGameRelation(
+        j.game as Pick<Game, "id" | "title" | "is_app"> | Pick<Game, "id" | "title" | "is_app">[] | null,
+      ),
+    }))
+    .filter(
+      (j): j is HeroWeekJogatina => isNonAppGame(j.game) && j.game !== null,
+    );
 }
 
 export async function fetchLandingHeroData(
@@ -156,13 +201,7 @@ export async function fetchLandingHeroData(
     await Promise.all([
       fetchPlayersCount(supabase),
       fetchCurrentGamesCount(supabase),
-      supabase
-        .from("jogatinas")
-        .select("total_duration_minutes, date, game:games(id, title, is_app)")
-        .gte("date", weekAgoIso)
-        .then(({ data }) =>
-          (data ?? []).filter((j) => j.game && !j.game.is_app),
-        ),
+      fetchHeroWeekJogatinas(supabase, weekAgoIso),
       getCachedPlaytimeDurationTotals(),
     ]);
 
@@ -221,9 +260,12 @@ export async function fetchRecentJogatinas(
     throw error;
   }
 
-  return (data ?? []).filter(
-    (j) => j.game && !j.game.is_app,
-  ) as LandingCurrentJogatina[];
+  return (data ?? [])
+    .map((j) => ({
+      ...j,
+      game: normalizeGameRelation(j.game as Game | Game[] | null),
+    }))
+    .filter((j) => isNonAppGame(j.game)) as LandingCurrentJogatina[];
 }
 
 export async function fetchJogatinasForHeatmap(
@@ -254,9 +296,14 @@ export async function fetchJogatinasForHeatmap(
     throw error;
   }
 
-  return (data ?? []).filter(
-    (j) => j.game && !j.game.is_app,
-  ) as LandingHeatmapJogatina[];
+  return (data ?? [])
+    .map((j) => ({
+      ...j,
+      game: normalizeGameRelation(
+        j.game as Pick<Game, "id" | "is_app"> | Pick<Game, "id" | "is_app">[] | null,
+      ),
+    }))
+    .filter((j) => isNonAppGame(j.game)) as unknown as LandingHeatmapJogatina[];
 }
 
 export async function fetchJogatinaPlayerSlimRows(
@@ -286,9 +333,29 @@ export async function fetchJogatinaPlayerSlimRows(
     return data ?? [];
   });
 
-  return rows.filter(
-    (row) => row.jogatina?.game && !row.jogatina.game.is_app,
-  ) as LandingSlimJogatinaPlayer[];
+  return rows
+    .map((row) => {
+      const jogatina = normalizeSupabaseRelation(row.jogatina);
+      const game = jogatina
+        ? normalizeGameRelation(
+            jogatina.game as Pick<Game, "id" | "is_app"> | Pick<Game, "id" | "is_app">[] | null,
+          )
+        : null;
+      const player = normalizeSupabaseRelation(row.player as Player | Player[] | null);
+
+      return {
+        ...row,
+        player: player ?? undefined,
+        jogatina: jogatina
+          ? {
+              season_id: jogatina.season_id,
+              game_id: jogatina.game_id,
+              game,
+            }
+          : undefined,
+      };
+    })
+    .filter((row) => isNonAppGame(row.jogatina?.game ?? null)) as LandingSlimJogatinaPlayer[];
 }
 
 export async function fetchJogatinasForRanking(
@@ -326,9 +393,12 @@ export async function fetchJogatinasForRanking(
     return data ?? [];
   });
 
-  return rows.filter(
-    (j) => j.game && !j.game.is_app,
-  ) as LandingRankingJogatina[];
+  return rows
+    .map((j) => ({
+      ...j,
+      game: normalizeGameRelation(j.game as Game | Game[] | null),
+    }))
+    .filter((j) => isNonAppGame(j.game)) as LandingRankingJogatina[];
 }
 
 export async function fetchSeasonParticipantsSlim(

@@ -144,12 +144,14 @@ class QueryBuilder {
 
   async single(): Promise<{ data: Row | null; error: { message: string } | null }> {
     const result = await this.execute();
-    if (result.error) return result;
+    if (result.error) {
+      return { data: null, error: result.error };
+    }
 
     const rows = Array.isArray(result.data)
-      ? (result.data as Row[])
+      ? result.data
       : result.data
-        ? [result.data as Row]
+        ? [result.data]
         : [];
 
     if (rows.length === 0) {

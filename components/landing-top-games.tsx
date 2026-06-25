@@ -1,7 +1,7 @@
 import { Users } from "lucide-react"
-import { calculateTopGames, type GameRankingStat } from "@/lib/game-stats-helpers"
+import { calculateTopGames, type GameRankingStat, type JogatinaPlayerRef } from "@/lib/game-stats-helpers"
 import { cn } from "@/lib/utils"
-import type { Jogatina, Game, JogatinaPlayer } from "@/lib/types"
+import type { Jogatina, Game } from "@/lib/types"
 import { GameIgdbMetaInline } from "@/components/game-igdb-meta-inline"
 import { LandingTopGamesExtended } from "@/components/landing-top-games-extended"
 import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
@@ -12,7 +12,7 @@ const TOP_GAMES_LIMIT = 20
 
 interface LandingTopGamesProps {
   jogatinas: (Jogatina & { game: Game })[]
-  jogatinaPlayers: JogatinaPlayer[]
+  jogatinaPlayers: JogatinaPlayerRef[]
   showExtended?: boolean
 }
 

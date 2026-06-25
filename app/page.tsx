@@ -14,6 +14,17 @@ import { LandingTimelineSectionAsync } from "@/components/landing/sections/landi
 import { LandingGroupMetricsSection } from "@/components/landing/sections/landing-group-metrics-section"
 import { LandingPlayerProfilesSection } from "@/components/landing/sections/landing-player-profiles-section"
 import { LandingHighlightsSection } from "@/components/landing/sections/landing-highlights-section"
+import { rsc } from "@/lib/rsc"
+
+const HeroSection = rsc(LandingHeroSection)
+const CurrentGamesSection = rsc(LandingCurrentGamesSectionAsync)
+const TopGamesSection = rsc(LandingTopGamesSection)
+const ActivitySection = rsc(LandingActivitySection)
+const HallOfShameSection = rsc(LandingHallOfShameSection)
+const TimelineSection = rsc(LandingTimelineSectionAsync)
+const GroupMetricsSection = rsc(LandingGroupMetricsSection)
+const PlayerProfilesSection = rsc(LandingPlayerProfilesSection)
+const HighlightsSection = rsc(LandingHighlightsSection)
 
 export default function LandingPage() {
   return (
@@ -23,7 +34,7 @@ export default function LandingPage() {
       <main className="mx-auto max-w-6xl px-4 pt-28 pb-8 lg:px-8 lg:pt-32">
         <section id="overview" className="scroll-mt-28 pb-6 lg:pb-10">
           <Suspense fallback={<LandingHeroSkeleton />}>
-            <LandingHeroSection />
+            <HeroSection />
           </Suspense>
         </section>
 
@@ -34,7 +45,7 @@ export default function LandingPage() {
           description="Sessões em andamento e quem está online agora."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
-            <LandingCurrentGamesSectionAsync />
+            <CurrentGamesSection />
           </Suspense>
         </LandingSection>
 
@@ -45,7 +56,7 @@ export default function LandingPage() {
           description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
-            <LandingTopGamesSection />
+            <TopGamesSection />
           </Suspense>
         </LandingSection>
 
@@ -56,7 +67,7 @@ export default function LandingPage() {
           description="Heatmap dos últimos 12 meses e resumo de frequência."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="heatmap" />}>
-            <LandingActivitySection />
+            <ActivitySection />
           </Suspense>
         </LandingSection>
 
@@ -67,7 +78,7 @@ export default function LandingPage() {
           description="Os três maiores dropadores do grupo."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
-            <LandingHallOfShameSection />
+            <HallOfShameSection />
           </Suspense>
         </LandingSection>
 
@@ -78,7 +89,7 @@ export default function LandingPage() {
           description="Últimos eventos registrados pelo grupo."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
-            <LandingTimelineSectionAsync />
+            <TimelineSection />
           </Suspense>
         </LandingSection>
 
@@ -89,7 +100,7 @@ export default function LandingPage() {
           description="Distribuição de status e duração média das sessões."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="metrics" />}>
-            <LandingGroupMetricsSection />
+            <GroupMetricsSection />
           </Suspense>
         </LandingSection>
 
@@ -100,7 +111,7 @@ export default function LandingPage() {
           description="Tempo total, sessões e comportamento de cada membro."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="profiles" />}>
-            <LandingPlayerProfilesSection />
+            <PlayerProfilesSection />
           </Suspense>
         </LandingSection>
 
@@ -111,7 +122,7 @@ export default function LandingPage() {
           description="Quem voltou, quem lotou a sessão e quem zerou de verdade."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
-            <LandingHighlightsSection />
+            <HighlightsSection />
           </Suspense>
         </LandingSection>
       </main>

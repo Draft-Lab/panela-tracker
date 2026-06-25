@@ -1,4 +1,5 @@
 import type { createClient } from "@/lib/supabase/server";
+import { normalizeSupabaseRelation } from "@/lib/supabase-relation-helpers";
 import type { JogatinaPlayerWithDetails } from "@/lib/player-profile-helpers";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -76,7 +77,10 @@ export async function fetchPlayerAggregateStatsMap(
     }
 
     for (const row of data) {
-      const game = row.jogatina?.game;
+      const jogatina = normalizeSupabaseRelation(row.jogatina);
+      const game = jogatina
+        ? normalizeSupabaseRelation(jogatina.game)
+        : null;
       if (game?.is_app) {
         continue;
       }

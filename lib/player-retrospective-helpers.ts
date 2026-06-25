@@ -138,11 +138,11 @@ function buildMonthlyCovers(
     });
 
     let top: { game: Game; minutes: number; sessions: number } | null = null;
-    gameStats.forEach((stats) => {
+    for (const stats of gameStats.values()) {
       if (!top || stats.minutes > top.minutes) {
         top = stats;
       }
-    });
+    }
 
     if (!top) continue;
 

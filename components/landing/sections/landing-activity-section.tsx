@@ -1,3 +1,4 @@
+import type { ReactElement } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { fetchJogatinasForHeatmap } from "@/lib/fetch-landing-data"
 import { ActivityHeatmap } from "@/components/activity-heatmap"
@@ -5,7 +6,7 @@ import { ActivitySummaryCards } from "@/components/activity-summary-cards"
 import { LandingGlassCell } from "@/components/landing/landing-glass-cell"
 import type { Game, Jogatina } from "@/lib/types"
 
-export async function LandingActivitySection() {
+export async function LandingActivitySection(): Promise<ReactElement> {
   const supabase = await createClient()
   const jogatinas = await fetchJogatinasForHeatmap(supabase)
 

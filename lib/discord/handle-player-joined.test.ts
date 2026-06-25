@@ -1,5 +1,6 @@
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert/strict";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { handlePlayerJoined } from "./handle-player-joined";
 import {
   createEmptyJoinTestStore,
@@ -13,8 +14,7 @@ const GAME_TITLE = "Minecraft";
 const TIMESTAMP = "2026-06-24T12:00:00.000Z";
 
 function countJoinEvents(store: ReturnType<typeof createEmptyJoinTestStore>) {
-  return store.jogatina_events.filter((e) => e.event_type === "player_joined")
-    .length;
+  return store.jogatina_events.filter((e) => e.event_type === "player_joined").length;
 }
 
 describe("handlePlayerJoined", () => {
@@ -27,11 +27,11 @@ describe("handlePlayerJoined", () => {
     const supabase = createJoinTestSupabase(store);
 
     const result = await handlePlayerJoined(
-      supabase,
+      supabase as unknown as SupabaseClient,
       PLAYER_ID,
       GAME_ID,
       GAME_TITLE,
-      TIMESTAMP,
+      TIMESTAMP
     );
 
     assert.equal(result.success, true);
@@ -59,18 +59,18 @@ describe("handlePlayerJoined", () => {
     const supabase = createJoinTestSupabase(store);
 
     const first = await handlePlayerJoined(
-      supabase,
+      supabase as unknown as SupabaseClient,
       PLAYER_ID,
       GAME_ID,
       GAME_TITLE,
-      TIMESTAMP,
+      TIMESTAMP
     );
     const second = await handlePlayerJoined(
-      supabase,
+      supabase as unknown as SupabaseClient,
       PLAYER_ID,
       GAME_ID,
       GAME_TITLE,
-      "2026-06-24T12:05:00.000Z",
+      "2026-06-24T12:05:00.000Z"
     );
 
     assert.equal(first.success, true);
@@ -91,11 +91,11 @@ describe("handlePlayerJoined", () => {
     const supabase = createJoinTestSupabase(store);
 
     const first = await handlePlayerJoined(
-      supabase,
+      supabase as unknown as SupabaseClient,
       PLAYER_ID,
       GAME_ID,
       GAME_TITLE,
-      TIMESTAMP,
+      TIMESTAMP
     );
     assert.equal(first.success, true);
     if (!first.success) return;
@@ -104,11 +104,11 @@ describe("handlePlayerJoined", () => {
     jogatinaPlayer.is_active = false;
 
     const second = await handlePlayerJoined(
-      supabase,
+      supabase as unknown as SupabaseClient,
       PLAYER_ID,
       GAME_ID,
       GAME_TITLE,
-      "2026-06-24T13:00:00.000Z",
+      "2026-06-24T13:00:00.000Z"
     );
 
     assert.equal(second.success, true);

@@ -16,7 +16,12 @@ export function HallOfShame({
   jogatinaPlayers,
   seasonParticipants = [],
 }: HallOfShameProps) {
-  const rankedDroppers = calculatePlayerStats(jogatinaPlayers, seasonParticipants)
+  const rankedDroppers = calculatePlayerStats(
+    jogatinaPlayers.filter(
+      (jp): jp is JogatinaPlayer & { player: Player } => Boolean(jp.player),
+    ),
+    seasonParticipants,
+  )
     .filter((player) => player.totalJogatinas > 0)
     .sort((a, b) => b.dropos - a.dropos)
 

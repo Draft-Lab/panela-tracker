@@ -280,7 +280,7 @@ export function buildYearSummary(
   });
 
   let busiestMonth: YearSummary["busiestMonth"] = null;
-  monthlyCounts.forEach((sessionCount, monthIndex) => {
+  for (const [monthIndex, sessionCount] of monthlyCounts.entries()) {
     if (!busiestMonth || sessionCount > busiestMonth.sessionCount) {
       busiestMonth = {
         monthIndex,
@@ -288,7 +288,7 @@ export function buildYearSummary(
         sessionCount,
       };
     }
-  });
+  }
 
   const spotlightBusiestMonth = busiestMonth
     ? pickTopGameInMonth(groupJogatinas, busiestMonth.monthIndex)
