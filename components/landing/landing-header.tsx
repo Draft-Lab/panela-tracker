@@ -21,10 +21,10 @@ interface LandingHeaderProps {
 
 export function LandingHeader({ wide = false }: LandingHeaderProps) {
   return (
-    <header className="pointer-events-none fixed inset-x-0 top-0 z-30 pt-4 md:pt-6">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-6 md:pt-6">
       <div
         className={cn(
-          "pointer-events-auto mx-auto flex h-14 w-[calc(100%-2rem)] items-center justify-between gap-3 px-4 md:px-5",
+          "pointer-events-auto mx-auto flex h-14 w-full max-w-full items-center justify-between gap-3 px-4 md:px-5",
           wide ? "max-w-7xl" : "max-w-6xl",
           "rounded-full border border-border/80 bg-background/80 shadow-[0_2px_16px_rgba(0,0,0,0.35)] backdrop-blur-md",
         )}

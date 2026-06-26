@@ -163,6 +163,11 @@
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+    overflow-x: clip;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -219,5 +224,9 @@
   .story-progress-fill {
     animation: story-progress-fill var(--story-duration, 6s) linear forwards;
     transform-origin: left center;
+  }
+
+  body.landing-mobile-nav-open {
+    overflow: hidden;
   }
 }
