@@ -131,3 +131,17 @@ export interface PlayerGameStats {
   total_minutes: number;
   session_count?: number;
 }
+
+export type PlayerPlatinumStatus = "platinado" | "platinando";
+
+export interface PlayerPlatinumGame {
+  id: string;
+  player_id: string;
+  game_id: string;
+  status: PlayerPlatinumStatus;
+  completed_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  game?: Pick<Game, "id" | "title" | "cover_url">;
+}

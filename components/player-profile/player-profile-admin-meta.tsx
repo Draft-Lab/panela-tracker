@@ -8,8 +8,8 @@ export function PlayerProfileAdminMeta({ discordId }: PlayerProfileAdminMetaProp
   }
 
   return (
-    <p className="mt-1 text-sm text-muted-foreground">
-      Discord: <span className="font-mono text-xs">{discordId}</span>
+    <p className="mt-1 text-xs text-muted-foreground">
+      Discord: <span className="font-mono text-[11px]">{discordId}</span>
     </p>
   );
 }

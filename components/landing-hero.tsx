@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LandingHeroBento } from "@/components/landing/landing-hero-bento"
 import { LandingScrollReveal } from "@/components/landing/landing-scroll-reveal"
+import type { LandingHeroMember } from "@/lib/fetch-landing-data"
 
 interface LandingHeroProps {
   playersCount: number
@@ -10,6 +11,7 @@ interface LandingHeroProps {
   totalHours: number
   appHours: number
   mostPlayedThisWeek: string
+  members: LandingHeroMember[]
 }
 
 export function LandingHero({
@@ -18,6 +20,7 @@ export function LandingHero({
   totalHours,
   appHours,
   mostPlayedThisWeek,
+  members,
 }: LandingHeroProps) {
   const liveLabel =
     currentGamesCount === 0
@@ -85,6 +88,8 @@ export function LandingHero({
           totalHours={totalHours}
           appHours={appHours}
           mostPlayedThisWeek={mostPlayedThisWeek}
+          members={members}
+          className="w-full"
         />
       </div>
     </div>

@@ -16,6 +16,7 @@ import {
   type JogatinaPlayerWithDetails,
   type SeasonParticipantWithDetails,
 } from "@/lib/player-profile-helpers";
+import type { PlayerPlatinumGame } from "@/lib/types";
 
 export const loadPlayerProfile = cache(async (id: string) => {
   const supabase = await createClient();
@@ -64,6 +65,14 @@ export const loadPlayerProfile = cache(async (id: string) => {
     gameSeasonParticipants,
   );
 
+  const { data: platinumGamesRaw } = await supabase
+    .from("player_platinum_games")
+    .select("*, game:games(id, title, cover_url)")
+    .eq("player_id", id)
+    .order("created_at", { ascending: false });
+
+  const platinumGames = (platinumGamesRaw ?? []) as PlayerPlatinumGame[];
+
   return {
     player,
     summary,
@@ -75,5 +84,6 @@ export const loadPlayerProfile = cache(async (id: string) => {
     activeSeasons: getActiveSeasonsForPlayer(gameSeasonParticipants),
     bannerCoverUrl: getTopGameCover(library),
     currentlyPlaying: getPlayerCurrentlyPlaying(gameJogatinaPlayers),
+    platinumGames,
   };
 });

@@ -61,12 +61,20 @@ export type LandingSeasonParticipant = SeasonParticipant & {
   season?: { game_id: string; game: Game | null };
 };
 
+export interface LandingHeroMember {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  isPlayingNow: boolean;
+}
+
 export interface LandingHeroData {
   playersCount: number;
   currentGamesCount: number;
   totalHours: number;
   appHours: number;
   mostPlayedThisWeek: string;
+  members: LandingHeroMember[];
 }
 
 async function paginate<T>(
@@ -197,13 +205,20 @@ export async function fetchLandingHeroData(
   weekAgo.setDate(weekAgo.getDate() - 7);
   const weekAgoIso = weekAgo.toISOString();
 
-  const [playersCount, currentGamesCount, weekJogatinas, durationTotals] =
+  const [playersCount, currentGamesCount, weekJogatinas, durationTotals, membersRaw, playingPlayerIds] =
     await Promise.all([
       fetchPlayersCount(supabase),
       fetchCurrentGamesCount(supabase),
       fetchHeroWeekJogatinas(supabase, weekAgoIso),
       getCachedPlaytimeDurationTotals(),
+      fetchHeroMembers(supabase),
+      fetchActivePlayingPlayerIds(supabase),
     ]);
+
+  const members = membersRaw.map((member) => ({
+    ...member,
+    isPlayingNow: playingPlayerIds.has(member.id),
+  }));
 
   const gameMinutes = weekJogatinas.reduce(
     (acc, jogatina) => {
@@ -236,7 +251,42 @@ export async function fetchLandingHeroData(
     totalHours,
     appHours: playtimeHours.appHours,
     mostPlayedThisWeek,
+    members,
   };
+}
+
+async function fetchHeroMembers(
+  supabase: SupabaseClient,
+): Promise<Omit<LandingHeroMember, "isPlayingNow">[]> {
+  const { data, error } = await supabase
+    .from("players")
+    .select("id, name, avatar_url")
+    .order("name", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+async function fetchActivePlayingPlayerIds(
+  supabase: SupabaseClient,
+): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from("jogatina_players")
+    .select(
+      "player_id, jogatina:jogatinas!inner(is_current, game:games!inner(is_app))",
+    )
+    .eq("is_active", true)
+    .eq("jogatina.is_current", true)
+    .eq("jogatina.game.is_app", false);
+
+  if (error) {
+    throw error;
+  }
+
+  return new Set((data ?? []).map((row) => row.player_id));
 }
 
 export async function fetchRecentJogatinas(

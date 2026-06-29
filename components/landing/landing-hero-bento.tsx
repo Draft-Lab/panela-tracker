@@ -1,5 +1,8 @@
 import { LandingGlassCell, LandingMetric } from "@/components/landing/landing-glass-cell"
+import { LandingHeroMemberAvatars } from "@/components/landing/landing-hero-member-avatars"
 import { LandingScrollReveal } from "@/components/landing/landing-scroll-reveal"
+import type { LandingHeroMember } from "@/lib/fetch-landing-data"
+import { cn } from "@/lib/utils"
 
 interface LandingHeroBentoProps {
   playersCount: number
@@ -7,6 +10,8 @@ interface LandingHeroBentoProps {
   totalHours: number
   appHours: number
   mostPlayedThisWeek: string
+  members?: LandingHeroMember[]
+  className?: string
 }
 
 const METRIC_VALUE_CLASS = "text-[clamp(1.5rem,10cqi,2.25rem)] leading-none"
@@ -18,12 +23,14 @@ export function LandingHeroBento({
   totalHours,
   appHours,
   mostPlayedThisWeek,
+  members = [],
+  className,
 }: LandingHeroBentoProps) {
   const tempoMeta =
     appHours > 0 ? `${appHours}h em apps` : "Desde o primeiro registro"
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn("flex flex-col gap-2.5", className)}>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <LandingScrollReveal variant="hero" delay={120} className="sm:col-span-2 lg:col-span-1">
           <LandingGlassCell className="h-full">
@@ -69,6 +76,15 @@ export function LandingHeroBento({
           />
         </LandingGlassCell>
       </LandingScrollReveal>
+
+      {members.length > 0 && (
+        <LandingScrollReveal variant="hero" delay={400}>
+          <LandingHeroMemberAvatars
+            members={members}
+            className="hidden lg:ml-auto lg:flex"
+          />
+        </LandingScrollReveal>
+      )}
     </div>
   )
 }

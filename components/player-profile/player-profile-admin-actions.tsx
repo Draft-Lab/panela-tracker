@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EditPlayerDialog } from "@/components/edit-player-dialog";
+import { EditPlayerSheet } from "@/components/edit-player/edit-player-sheet";
 import type { Player } from "@/lib/types";
 
 interface PlayerProfileAdminActionsProps {
@@ -29,7 +29,7 @@ export function PlayerProfileAdminActions({ player }: PlayerProfileAdminActionsP
         </Button>
       </div>
 
-      <EditPlayerDialog player={player} open={editOpen} onOpenChange={setEditOpen} />
+      <EditPlayerSheet player={player} open={editOpen} onOpenChange={setEditOpen} />
     </>
   );
 }

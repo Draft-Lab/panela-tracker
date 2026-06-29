@@ -4,7 +4,7 @@ import type { Player } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { EditPlayerDialog } from "@/components/edit-player-dialog";
+import { EditPlayerSheet } from "@/components/edit-player/edit-player-sheet";
 import { PlayerListCard } from "@/components/player-list-card";
 
 interface PlayerListProps {
@@ -54,7 +54,7 @@ export function PlayerList({ players }: PlayerListProps) {
       </div>
 
       {editingPlayer && (
-        <EditPlayerDialog
+        <EditPlayerSheet
           player={editingPlayer}
           open={!!editingPlayer}
           onOpenChange={(open) => !open && setEditingPlayer(null)}
