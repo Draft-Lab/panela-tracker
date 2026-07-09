@@ -23,6 +23,11 @@ interface LandingHighlightsProps {
   })[]
 }
 
+type HighlightItem = {
+  key: string
+  node: (variant: "featured" | "compact") => ReactNode
+}
+
 export function LandingHighlights({
   jogatinas,
   jogatinaPlayers,
@@ -35,31 +40,33 @@ export function LandingHighlights({
   const cards = [
     comeback && {
       key: "comeback",
-      node: (
+      node: (variant: "featured" | "compact") => (
         <HighlightCard
           game={comeback.game}
           label="Resurgiu das cinzas"
           icon={History}
           badge={formatGapDays(comeback.gapDays)}
           meta={`Voltou em ${formatHighlightDate(comeback.returnDate)}`}
+          variant={variant}
         />
       ),
     },
     biggestGroup && {
       key: "biggest-group",
-      node: (
+      node: (variant: "featured" | "compact") => (
         <HighlightCard
           game={biggestGroup.game}
           label="A galera toda"
           icon={Users}
           badge={`${biggestGroup.playerCount} jogadores`}
           meta={formatHighlightDate(biggestGroup.date)}
+          variant={variant}
         />
       ),
     },
     champion && {
       key: "champion",
-      node: (
+      node: (variant: "featured" | "compact") => (
         <HighlightCard
           game={champion.game}
           label="We are the champions"
@@ -71,10 +78,11 @@ export function LandingHighlights({
           ]
             .filter(Boolean)
             .join(" · ")}
+          variant={variant}
         />
       ),
     },
-  ].filter(Boolean) as Array<{ key: string; node: ReactNode }>
+  ].filter(Boolean) as HighlightItem[]
 
   if (cards.length === 0) {
     return (
@@ -84,11 +92,26 @@ export function LandingHighlights({
     )
   }
 
+  if (cards.length === 1) {
+    return <div>{cards[0].node("featured")}</div>
+  }
+
+  const [featured, ...rest] = cards
+
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-      {cards.map((card) => (
-        <div key={card.key}>{card.node}</div>
-      ))}
+    <div className="space-y-3">
+      {featured.node("featured")}
+      <div
+        className={
+          rest.length === 1
+            ? "grid grid-cols-1"
+            : "grid grid-cols-1 gap-3 sm:grid-cols-2"
+        }
+      >
+        {rest.map((card) => (
+          <div key={card.key}>{card.node("compact")}</div>
+        ))}
+      </div>
     </div>
   )
 }

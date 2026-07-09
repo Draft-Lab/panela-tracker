@@ -51,7 +51,6 @@ export default function LandingPage() {
 
         <LandingSection
           id="jogos"
-          eyebrow="Ranking"
           title="Jogos do grupo"
           description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
         >
@@ -62,7 +61,6 @@ export default function LandingPage() {
 
         <LandingSection
           id="atividade"
-          eyebrow="Histórico"
           title="Atividade ao longo do tempo"
           description="Heatmap dos últimos 12 meses e resumo de frequência."
         >
@@ -73,7 +71,6 @@ export default function LandingPage() {
 
         <LandingSection
           id="vergonha"
-          eyebrow="Estatísticas"
           title="Hall da vergonha"
           description="Os três maiores dropadores do grupo."
         >
@@ -95,7 +92,6 @@ export default function LandingPage() {
 
         <LandingSection
           id="metricas"
-          eyebrow="Padrões"
           title="Como a gente joga"
           description="Distribuição de status e duração média das sessões."
         >
@@ -106,7 +102,6 @@ export default function LandingPage() {
 
         <LandingSection
           id="perfis"
-          eyebrow="Membros"
           title="Perfis do grupo"
           description="Tempo total, sessões e comportamento de cada membro."
         >
