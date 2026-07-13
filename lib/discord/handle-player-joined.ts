@@ -1,8 +1,5 @@
 import { countActivePlayers } from "./jogatina-metrics";
-
-type SupabaseClient = {
-  from: (table: string) => unknown;
-};
+import { getOrCreateActiveJogatina } from "./get-or-create-active-jogatina";
 
 export type HandlePlayerJoinedSuccess = {
   success: true;
@@ -24,38 +21,6 @@ export type HandlePlayerJoinedResult =
   | HandlePlayerJoinedSuccess
   | HandlePlayerJoinedError;
 
-async function associateToActiveSeason(
-  supabase: SupabaseClient,
-  jogatinaId: string,
-  gameId: string,
-) {
-  try {
-    const now = new Date().toISOString();
-
-    const { data: activeSeason } = await (supabase as JoinSupabaseClient)
-      .from("seasons")
-      .select("id")
-      .eq("game_id", gameId)
-      .eq("is_active", true)
-      .lte("started_at", now)
-      .or(`ended_at.is.null,ended_at.gte.${now}`)
-      .single();
-
-    if (activeSeason) {
-      await (supabase as JoinSupabaseClient)
-        .from("jogatinas")
-        .update({ season_id: activeSeason.id })
-        .eq("id", jogatinaId);
-
-      return activeSeason.id;
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 type JoinSupabaseClient = Parameters<typeof countActivePlayers>[0];
 
 export async function handlePlayerJoined(
@@ -65,50 +30,28 @@ export async function handlePlayerJoined(
   gameTitle: string,
   timestamp: string,
 ): Promise<HandlePlayerJoinedResult> {
-  const { data: activeJogatina } = await supabase
-    .from("jogatinas")
-    .select("*")
-    .eq("game_id", gameId)
-    .eq("is_current", true)
-    .eq("source", "discord_bot")
-    .single();
+  const created = await getOrCreateActiveJogatina(
+    supabase,
+    gameId,
+    timestamp,
+  );
 
-  let jogatina = activeJogatina;
-
-  if (!jogatina) {
-    const { data: newJogatina, error } = await supabase
-      .from("jogatinas")
-      .insert({
-        game_id: gameId,
-        date: timestamp,
-        is_current: true,
-        source: "discord_bot",
-        session_type: "solo",
-        active_players: 0,
-        first_event_at: timestamp,
-        notes: "Sessão iniciada automaticamente via Discord Bot",
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return {
-        success: false,
-        error: `Failed to create jogatina: ${error.message}`,
-        status: 500,
-      };
-    }
-    jogatina = newJogatina;
-
-    await associateToActiveSeason(supabase, jogatina.id, gameId);
+  if (!created.success) {
+    return {
+      success: false,
+      error: created.error,
+      status: 500,
+    };
   }
+
+  const jogatina = created.jogatina;
 
   const { data: existingPlayer } = await supabase
     .from("jogatina_players")
     .select("id, is_active")
     .eq("jogatina_id", jogatina.id)
     .eq("player_id", playerId)
-    .single();
+    .maybeSingle();
 
   if (existingPlayer?.is_active) {
     const activeCount = await countActivePlayers(supabase, jogatina.id);
@@ -130,7 +73,7 @@ export async function handlePlayerJoined(
       game_title: gameTitle,
       active_players: activeCount,
       session_type: sessionType,
-      season_id: jogatina.season_id || null,
+      season_id: (jogatina.season_id as string | null) || null,
     };
   }
 
@@ -206,6 +149,6 @@ export async function handlePlayerJoined(
     game_title: gameTitle,
     active_players: activeCount,
     session_type: sessionType,
-    season_id: jogatina.season_id || null,
+    season_id: (jogatina.season_id as string | null) || null,
   };
 }

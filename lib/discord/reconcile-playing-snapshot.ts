@@ -1,4 +1,6 @@
 import type { createClient } from "../supabase/server";
+import { getOrCreateActiveJogatina } from "./get-or-create-active-jogatina";
+import { mergeDuplicateActiveJogatinas } from "./merge-duplicate-jogatinas";
 import {
   countActivePlayers,
   finishJogatina,
@@ -148,64 +150,33 @@ async function findOrCreateGame(supabase: SupabaseClient, gameTitle: string) {
   return game;
 }
 
-async function associateToActiveSeason(
-  supabase: SupabaseClient,
-  jogatinaId: string,
-  gameId: string,
-) {
-  const now = new Date().toISOString();
-
-  const { data: activeSeason } = await supabase
-    .from("seasons")
-    .select("id")
-    .eq("game_id", gameId)
-    .eq("is_active", true)
-    .lte("started_at", now)
-    .or(`ended_at.is.null,ended_at.gte.${now}`)
-    .single();
-
-  if (activeSeason) {
-    await supabase
-      .from("jogatinas")
-      .update({ season_id: activeSeason.id })
-      .eq("id", jogatinaId);
-  }
-}
-
-async function getOrCreateActiveJogatina(
+async function resolveActiveJogatina(
   supabase: SupabaseClient,
   gameId: string,
   timestamp: string,
   existing?: ActiveJogatinaRow | null,
-) {
+): Promise<ActiveJogatinaRow> {
   if (existing) return existing;
 
-  const { data: newJogatina, error } = await supabase
-    .from("jogatinas")
-    .insert({
-      game_id: gameId,
-      date: timestamp,
-      is_current: true,
-      source: "discord_bot",
-      session_type: "solo",
-      active_players: 0,
-      first_event_at: timestamp,
-      notes: "Sessão sincronizada via Discord Bot",
-    })
-    .select("id, game_id, first_event_at, season_id")
-    .single();
+  const created = await getOrCreateActiveJogatina(
+    supabase,
+    gameId,
+    timestamp,
+    "Sessão sincronizada via Discord Bot",
+  );
 
-  if (error || !newJogatina) {
-    throw new Error(`Failed to create jogatina: ${error?.message}`);
+  if (!created.success) {
+    throw new Error(created.error);
   }
 
-  await associateToActiveSeason(supabase, newJogatina.id, gameId);
-
   return {
-    ...newJogatina,
+    id: created.jogatina.id,
+    game_id: created.jogatina.game_id,
+    first_event_at: created.jogatina.first_event_at,
+    season_id: created.jogatina.season_id,
     game: null,
     jogatina_players: [],
-  } satisfies ActiveJogatinaRow;
+  };
 }
 
 async function markPlayerJoined(
@@ -337,7 +308,7 @@ async function reconcileGame(
   }
 
   const game = await findOrCreateGame(supabase, gameTitle);
-  const jogatina = await getOrCreateActiveJogatina(
+  const jogatina = await resolveActiveJogatina(
     supabase,
     game.id,
     timestamp,
@@ -416,9 +387,17 @@ export async function reconcilePlayingSnapshot(
     .eq("is_current", true)
     .eq("source", "discord_bot");
 
+  const normalizedActive = (activeJogatinas ?? []).map((row) =>
+    normalizeActiveJogatina(row as Record<string, unknown>),
+  );
+  const mergedActive = await mergeDuplicateActiveJogatinas(
+    supabase,
+    normalizedActive,
+    timestamp,
+  );
+
   const jogatinaByGameTitle = new Map<string, ActiveJogatinaRow>();
-  for (const row of activeJogatinas ?? []) {
-    const normalized = normalizeActiveJogatina(row as Record<string, unknown>);
+  for (const normalized of mergedActive) {
     const title = normalized.game?.title;
     if (title) jogatinaByGameTitle.set(title, normalized);
   }

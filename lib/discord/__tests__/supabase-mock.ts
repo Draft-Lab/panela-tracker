@@ -38,6 +38,7 @@ class QueryBuilder {
   private insertPayload: Row | Row[] | null = null;
   private updatePayload: Row | null = null;
   private orderBy: { column: string; ascending: boolean } | null = null;
+  private limitCount: number | null = null;
   private mode: "select" | "insert" | "update" = "select";
 
   constructor(store: JoinTestStore, table: keyof JoinTestStore) {
@@ -67,6 +68,11 @@ class QueryBuilder {
 
   order(column: string, options?: { ascending?: boolean }) {
     this.orderBy = { column, ascending: options?.ascending ?? true };
+    return this;
+  }
+
+  limit(count: number) {
+    this.limitCount = count;
     return this;
   }
 
@@ -124,6 +130,10 @@ class QueryBuilder {
       });
     }
 
+    if (this.limitCount != null) {
+      result = result.slice(0, this.limitCount);
+    }
+
     return result;
   }
 
@@ -142,7 +152,27 @@ class QueryBuilder {
     return picked;
   }
 
-  async single(): Promise<{ data: Row | null; error: { message: string } | null }> {
+  private assertUniqueActiveJogatina(payload: Row): { message: string; code: string } | null {
+    if (this.table !== "jogatinas") return null;
+    if (payload.is_current !== true || payload.source !== "discord_bot") return null;
+
+    const conflict = this.store.jogatinas.find(
+      (row) =>
+        row.game_id === payload.game_id &&
+        row.is_current === true &&
+        row.source === "discord_bot",
+    );
+
+    if (!conflict) return null;
+
+    return {
+      code: "23505",
+      message:
+        'duplicate key value violates unique constraint "idx_one_active_jogatina_per_game"',
+    };
+  }
+
+  async single(): Promise<{ data: Row | null; error: { message: string; code?: string } | null }> {
     const result = await this.execute();
     if (result.error) {
       return { data: null, error: result.error };
@@ -163,13 +193,47 @@ class QueryBuilder {
     return { data: rows[0], error: null };
   }
 
-  async execute(): Promise<{ data: Row | Row[] | null; error: { message: string } | null }> {
+  async maybeSingle(): Promise<{
+    data: Row | null;
+    error: { message: string; code?: string } | null;
+  }> {
+    const result = await this.execute();
+    if (result.error) {
+      return { data: null, error: result.error };
+    }
+
+    const rows = Array.isArray(result.data)
+      ? result.data
+      : result.data
+        ? [result.data]
+        : [];
+
+    if (rows.length === 0) {
+      return { data: null, error: null };
+    }
+    if (rows.length > 1) {
+      return { data: null, error: { message: "Multiple rows found" } };
+    }
+    return { data: rows[0], error: null };
+  }
+
+  async execute(): Promise<{
+    data: Row | Row[] | null;
+    error: { message: string; code?: string } | null;
+  }> {
     const tableRows = this.store[this.table] as Row[];
 
     if (this.mode === "insert") {
       const payloads = Array.isArray(this.insertPayload)
         ? this.insertPayload
         : [this.insertPayload as Row];
+
+      for (const payload of payloads) {
+        const conflict = this.assertUniqueActiveJogatina(payload);
+        if (conflict) {
+          return { data: null, error: conflict };
+        }
+      }
 
       const inserted = payloads.map((payload) => {
         const row: Row = {
@@ -199,9 +263,9 @@ class QueryBuilder {
     return { data: projected, error: null };
   }
 
-  then<TResult1 = { data: Row | Row[] | null; error: { message: string } | null }, TResult2 = never>(
+  then<TResult1 = { data: Row | Row[] | null; error: { message: string; code?: string } | null }, TResult2 = never>(
     onfulfilled?: (
-      value: { data: Row | Row[] | null; error: { message: string } | null },
+      value: { data: Row | Row[] | null; error: { message: string; code?: string } | null },
     ) => TResult1 | PromiseLike<TResult1>,
     onrejected?: (reason: unknown) => TResult2 | PromiseLike<TResult2>,
   ): Promise<TResult1 | TResult2> {
