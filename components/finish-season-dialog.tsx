@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Clock, Users } from "lucide-react";
 import { SeasonWithDetails } from "@/lib/types";
+import { upsertZeradoIfEligible } from "@/lib/player-zerado-mutations";
 
 interface FinishSeasonDialogProps {
   season: SeasonWithDetails;
@@ -98,6 +99,20 @@ export function FinishSeasonDialog({
           ended_at: new Date().toISOString(),
         })
         .eq("id", season.id);
+
+      // 3. Participantes Zero -> zerado no perfil (se nao estiver em platinum)
+      const gameId = season.game_id;
+      if (gameId) {
+        for (const ps of participantStatuses) {
+          if (ps.status !== "Zero") continue;
+          const participant = season.season_participants?.find(
+            (sp) => sp.id === ps.id,
+          );
+          const playerId = participant?.player_id;
+          if (!playerId) continue;
+          await upsertZeradoIfEligible(playerId, gameId);
+        }
+      }
 
       onOpenChange(false);
       router.refresh();

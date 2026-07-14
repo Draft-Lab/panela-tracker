@@ -145,3 +145,14 @@ export interface PlayerPlatinumGame {
   updated_at: string;
   game?: Pick<Game, "id" | "title" | "cover_url">;
 }
+
+export interface PlayerZeradoGame {
+  id: string;
+  player_id: string;
+  game_id: string;
+  completed_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  game?: Pick<Game, "id" | "title" | "cover_url">;
+}

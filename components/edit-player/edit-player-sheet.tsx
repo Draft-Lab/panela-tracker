@@ -16,13 +16,24 @@ import {
 import { EditPlayerBasicFields } from "@/components/edit-player/edit-player-basic-fields";
 import { EditPlayerPlatinandoSection } from "@/components/edit-player/edit-player-platinando-section";
 import { EditPlayerPlatinadosSection } from "@/components/edit-player/edit-player-platinados-section";
+import { EditPlayerZeradosSection } from "@/components/edit-player/edit-player-zerados-section";
 import {
   fetchGamesCatalog,
   fetchPlayerPlatinumGames,
 } from "@/lib/player-platinum-mutations";
+import { fetchPlayerZeradoGames } from "@/lib/player-zerado-mutations";
+import {
+  filterZeradosExcludingPlatinum,
+  sortZeradosByDate,
+} from "@/lib/player-zerado-helpers";
 import { splitPlatinumGames } from "@/lib/player-platinum-helpers";
 import { createClient } from "@/lib/supabase/client";
-import type { Game, Player, PlayerPlatinumGame } from "@/lib/types";
+import type {
+  Game,
+  Player,
+  PlayerPlatinumGame,
+  PlayerZeradoGame,
+} from "@/lib/types";
 
 interface EditPlayerSheetProps {
   player: Player;
@@ -41,19 +52,29 @@ export function EditPlayerSheet({
   const [isLoading, setIsLoading] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
   const [platinumGames, setPlatinumGames] = useState<PlayerPlatinumGame[]>([]);
+  const [zeradoGames, setZeradoGames] = useState<PlayerZeradoGame[]>([]);
   const router = useRouter();
 
   const loadPlatinumData = useCallback(async () => {
     try {
-      const [gamesData, platinumData] = await Promise.all([
+      const [gamesData, platinumData, zeradoData] = await Promise.all([
         fetchGamesCatalog(),
         fetchPlayerPlatinumGames(player.id),
+        fetchPlayerZeradoGames(player.id),
       ]);
       setGames(gamesData);
       setPlatinumGames(platinumData);
+      setZeradoGames(
+        sortZeradosByDate(
+          filterZeradosExcludingPlatinum(
+            zeradoData,
+            platinumData.map((entry) => entry.game_id),
+          ),
+        ),
+      );
     } catch (error) {
       console.error("[EditPlayerSheet] Error loading data:", error);
-      toast.error("Erro ao carregar dados de platinagem");
+      toast.error("Erro ao carregar dados de platinagem e zerados");
     }
   }, [player.id]);
 
@@ -135,7 +156,7 @@ export function EditPlayerSheet({
           <SheetHeader className="shrink-0 border-b border-white/[0.06] px-6 py-5">
             <SheetTitle>Editar jogador</SheetTitle>
             <SheetDescription>
-              Atualize os dados e a platinagem de {player.name}
+              Atualize os dados, platinagem e zerados de {player.name}
             </SheetDescription>
           </SheetHeader>
 
@@ -162,6 +183,14 @@ export function EditPlayerSheet({
               platinados={platinados}
               platinando={platinando}
               games={games}
+              onUpdated={handlePlatinumUpdated}
+            />
+
+            <EditPlayerZeradosSection
+              playerId={player.id}
+              zerados={zeradoGames}
+              games={games}
+              excludeGameIds={excludeGameIds}
               onUpdated={handlePlatinumUpdated}
             />
           </div>

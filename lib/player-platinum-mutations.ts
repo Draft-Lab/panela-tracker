@@ -44,6 +44,12 @@ export async function addPlatinando(
     if (deleteError) throw deleteError;
   }
 
+  await supabase
+    .from("player_zerado_games")
+    .delete()
+    .eq("player_id", playerId)
+    .eq("game_id", gameId);
+
   const { error } = await supabase.from("player_platinum_games").insert({
     player_id: playerId,
     game_id: gameId,
@@ -57,6 +63,20 @@ export async function addPlatinando(
 export async function markAsPlatinado(entryId: string): Promise<void> {
   const supabase = createClient();
   const now = new Date().toISOString();
+
+  const { data: entry, error: fetchError } = await supabase
+    .from("player_platinum_games")
+    .select("player_id, game_id")
+    .eq("id", entryId)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  await supabase
+    .from("player_zerado_games")
+    .delete()
+    .eq("player_id", entry.player_id)
+    .eq("game_id", entry.game_id);
 
   const { error } = await supabase
     .from("player_platinum_games")
@@ -76,6 +96,12 @@ export async function addPlatinado(
 ): Promise<void> {
   const supabase = createClient();
   const now = new Date().toISOString();
+
+  await supabase
+    .from("player_zerado_games")
+    .delete()
+    .eq("player_id", playerId)
+    .eq("game_id", gameId);
 
   const { error } = await supabase.from("player_platinum_games").insert({
     player_id: playerId,

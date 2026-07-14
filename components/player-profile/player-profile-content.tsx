@@ -28,6 +28,7 @@ export function PlayerProfileContent({
     bannerCoverUrl,
     currentlyPlaying,
     platinumGames,
+    zeradoGames,
   } = data;
 
   const { platinando, platinados } = splitPlatinumGames(platinumGames);
@@ -60,6 +61,7 @@ export function PlayerProfileContent({
         calendarJogatinas={calendarJogatinas}
         platinando={platinando}
         platinados={platinados}
+        zerados={zeradoGames}
       />
     </>
   );

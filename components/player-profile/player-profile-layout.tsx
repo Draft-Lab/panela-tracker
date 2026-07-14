@@ -16,7 +16,7 @@ import type {
   PlayerProfileGameEntry,
   PlayerProfileSummary,
 } from "@/lib/player-profile-helpers";
-import type { PlayerPlatinumGame } from "@/lib/types";
+import type { PlayerPlatinumGame, PlayerZeradoGame } from "@/lib/types";
 
 interface PlayerProfileLayoutProps {
   summary: PlayerProfileSummary;
@@ -27,6 +27,7 @@ interface PlayerProfileLayoutProps {
   calendarJogatinas: JogatinaWithGame[];
   platinando: PlayerPlatinumGame | null;
   platinados: PlayerPlatinumGame[];
+  zerados: PlayerZeradoGame[];
 }
 
 export function PlayerProfileLayout({
@@ -38,6 +39,7 @@ export function PlayerProfileLayout({
   calendarJogatinas,
   platinando,
   platinados,
+  zerados,
 }: PlayerProfileLayoutProps) {
   const [activeView, setActiveView] = useState<PlayerProfileView>("overview");
 
@@ -49,6 +51,7 @@ export function PlayerProfileLayout({
             <PlayerProfilePlatinumSection
               platinando={platinando}
               platinados={platinados}
+              zerados={zerados}
             />
             <PlayerProfileRecentGames games={recentGames} />
             <PlayerProfileActivitySection participationDays={participationDays} />

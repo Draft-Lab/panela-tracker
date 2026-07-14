@@ -16,7 +16,11 @@ import {
   type JogatinaPlayerWithDetails,
   type SeasonParticipantWithDetails,
 } from "@/lib/player-profile-helpers";
-import type { PlayerPlatinumGame } from "@/lib/types";
+import type { PlayerPlatinumGame, PlayerZeradoGame } from "@/lib/types";
+import {
+  filterZeradosExcludingPlatinum,
+  sortZeradosByDate,
+} from "@/lib/player-zerado-helpers";
 
 export const loadPlayerProfile = cache(async (id: string) => {
   const supabase = await createClient();
@@ -73,10 +77,30 @@ export const loadPlayerProfile = cache(async (id: string) => {
 
   const platinumGames = (platinumGamesRaw ?? []) as PlayerPlatinumGame[];
 
+  const { data: zeradoGamesRaw } = await supabase
+    .from("player_zerado_games")
+    .select("*, game:games(id, title, cover_url)")
+    .eq("player_id", id)
+    .order("created_at", { ascending: false });
+
+  const platinumGameIds = platinumGames.map((entry) => entry.game_id);
+  const zeradoGames = sortZeradosByDate(
+    filterZeradosExcludingPlatinum(
+      (zeradoGamesRaw ?? []) as PlayerZeradoGame[],
+      platinumGameIds,
+    ),
+  );
+
   return {
     player,
-    summary,
-    achievements: getPlayerAchievements(summary) ?? [],
+    summary: {
+      ...summary,
+      zeros: zeradoGames.length,
+    },
+    achievements: getPlayerAchievements({
+      ...summary,
+      zeros: zeradoGames.length,
+    }) ?? [],
     library,
     recentGames: getRecentGames(library, gameJogatinaPlayers),
     participationDays: getPlayerParticipationDays(gameJogatinaPlayers),
@@ -85,5 +109,6 @@ export const loadPlayerProfile = cache(async (id: string) => {
     bannerCoverUrl: getTopGameCover(library),
     currentlyPlaying: getPlayerCurrentlyPlaying(gameJogatinaPlayers),
     platinumGames,
+    zeradoGames,
   };
 });
