@@ -2,10 +2,12 @@ import { DashboardPanel } from "@/components/dashboard/dashboard-panel";
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { glassSubtle } from "@/lib/glass-styles";
 import { PlaytimeAuditDiagnostics } from "@/components/dashboard/playtime-audit/playtime-audit-diagnostics";
+import { PlaytimeAuditLegacyZerados } from "@/components/dashboard/playtime-audit/playtime-audit-legacy-zerados";
 import { PlaytimeAuditLiveState } from "@/components/dashboard/playtime-audit/playtime-audit-live-state";
 import { PlaytimeAuditMethods } from "@/components/dashboard/playtime-audit/playtime-audit-methods";
 import { PlaytimeAuditOutliers } from "@/components/dashboard/playtime-audit/playtime-audit-outliers";
 import { Badge } from "@/components/ui/badge";
+import type { LegacyZeradosAuditReport } from "@/lib/legacy-zerados-audit";
 import type { LiveStateAuditReport } from "@/lib/live-state-audit";
 import type { PlaytimeAuditReport } from "@/lib/playtime-audit";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
@@ -14,6 +16,7 @@ import { cn } from "@/lib/utils";
 interface PlaytimeAuditPanelProps {
   report: PlaytimeAuditReport;
   liveState: LiveStateAuditReport;
+  legacyZerados: LegacyZeradosAuditReport;
 }
 
 function formatGeneratedAt(value: string): string {
@@ -27,7 +30,11 @@ function formatGeneratedAt(value: string): string {
   });
 }
 
-export function PlaytimeAuditPanel({ report, liveState }: PlaytimeAuditPanelProps) {
+export function PlaytimeAuditPanel({
+  report,
+  liveState,
+  legacyZerados,
+}: PlaytimeAuditPanelProps) {
   const landing = report.methods.find((method) => method.id === "landing");
   const independent = report.methods.find(
     (method) => method.id === "independent",
@@ -99,6 +106,13 @@ export function PlaytimeAuditPanel({ report, liveState }: PlaytimeAuditPanelProp
         description="Lista jogatinas e jogadores ainda marcados como ativos no banco. Ajuda a achar sessão presa quando o bot caiu."
       >
         <PlaytimeAuditLiveState report={liveState} />
+      </DashboardSection>
+
+      <DashboardSection
+        title="Zeros do sistema antigo"
+        description="Jogos marcados como Zero em jogatinas ou temporadas. Serve para decidir o que migrar para a lista curada de zerados do perfil."
+      >
+        <PlaytimeAuditLegacyZerados report={legacyZerados} />
       </DashboardSection>
 
       <DashboardSection
