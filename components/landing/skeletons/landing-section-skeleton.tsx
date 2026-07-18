@@ -29,11 +29,11 @@ export function LandingSectionSkeleton({
 
 function CardsSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="h-40 rounded-xl border border-border/40 bg-muted/30"
+          className="h-36 rounded-[2rem] border border-border/40 bg-muted/30"
         />
       ))}
     </div>
