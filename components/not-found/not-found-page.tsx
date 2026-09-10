@@ -13,7 +13,7 @@ export function NotFoundPage() {
     <LandingShell>
       <LandingHeader />
 
-      <main className="relative flex min-h-[100dvh] flex-col items-center justify-center px-4 pb-16 pt-28 sm:px-6">
+      <main className="relative flex min-h-[100dvh] flex-col items-center justify-center px-4 pb-28 pt-8 sm:px-6 sm:pt-10 lg:pb-32 lg:pt-12">
         <NotFoundDecor />
 
         <div

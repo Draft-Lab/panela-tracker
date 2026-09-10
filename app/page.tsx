@@ -1,5 +1,6 @@
 import { Suspense } from "react"
-import { LandingHeader } from "@/components/landing/landing-header"
+import { LandingNavigation } from "@/components/landing/landing-navigation"
+import Rays from "@/components/motion/rays"
 import { LandingFooter } from "@/components/landing/landing-footer"
 import { LandingSection } from "@/components/landing/landing-section"
 import { LandingShell } from "@/components/landing/landing-shell"
@@ -29,10 +30,22 @@ const HighlightsSection = rsc(LandingHighlightsSection)
 export default function LandingPage() {
   return (
     <LandingShell>
-      <LandingHeader />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[min(42rem,78vw)] overflow-hidden opacity-35" aria-hidden>
+        <Rays
+          backgroundColor="transparent"
+          intensity={11}
+          rays={28}
+          reach={19}
+          position={38}
+          animation={{ animate: true, speed: 3 }}
+          raysColor={{ mode: "multi", color1: "#275DF5", color2: "#78B7FF" }}
+          style={{ zIndex: 0 }}
+        />
+      </div>
+      <LandingNavigation />
 
-      <main className="mx-auto max-w-6xl px-4 pt-28 pb-8 lg:px-8 lg:pt-32">
-        <section id="overview" className="scroll-mt-28 pb-6 lg:pb-10">
+      <main className="mx-auto max-w-6xl px-4 pt-2 pb-28 sm:pt-4 lg:px-8 lg:pt-5 lg:pb-32">
+        <section id="overview" className="scroll-mt-2 pb-6 lg:pb-10">
           <Suspense fallback={<LandingHeroSkeleton />}>
             <HeroSection />
           </Suspense>

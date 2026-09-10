@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LandingHeroBento } from "@/components/landing/landing-hero-bento"
 import { LandingScrollReveal } from "@/components/landing/landing-scroll-reveal"
+import { HighlightedText } from "@/components/motion/highlighted-text"
 import type { LandingHeroMember } from "@/lib/fetch-landing-data"
 
 interface LandingHeroProps {
@@ -58,9 +59,9 @@ export function LandingHero({
           </h1>
 
           <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground text-pretty">
-            {playersCount} pessoas, {totalHours} horas registradas e{" "}
-            <span className="text-foreground">{mostPlayedThisWeek}</span> na
-            frente desta semana.
+            <HighlightedText delay={0.1}>{playersCount} pessoas</HighlightedText>,{" "}
+            <HighlightedText delay={0.22}>{totalHours} horas registradas</HighlightedText> e{" "}
+            <HighlightedText delay={0.34}>{mostPlayedThisWeek}</HighlightedText> na frente desta semana.
           </p>
 
           <Link

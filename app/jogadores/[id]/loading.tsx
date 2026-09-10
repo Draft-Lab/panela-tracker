@@ -7,7 +7,7 @@ export default function PlayerProfileLoading() {
     <LandingShell>
       <LandingHeader wide />
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 pb-12 pt-24 lg:px-8 lg:pt-28">
+      <main className="mx-auto max-w-7xl space-y-6 px-4 pb-28 pt-8 sm:pt-10 lg:px-8 lg:pb-32 lg:pt-12">
         <div className="animate-pulse overflow-hidden rounded-[2rem] ring-1 ring-white/10">
           <div className="h-44 bg-muted/40 sm:h-52" />
           <div className="space-y-4 p-4 sm:p-6">

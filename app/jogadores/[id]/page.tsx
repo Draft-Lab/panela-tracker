@@ -65,7 +65,7 @@ export default async function PlayerProfilePage({
     <LandingShell>
       <LandingHeader wide />
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 pb-12 pt-24 lg:px-8 lg:pt-28">
+      <main className="mx-auto max-w-7xl space-y-6 px-4 pb-28 pt-8 sm:pt-10 lg:px-8 lg:pb-32 lg:pt-12">
         <PlayerProfileContent data={data} variant="public" />
       </main>
     </LandingShell>

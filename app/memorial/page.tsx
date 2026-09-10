@@ -7,7 +7,7 @@ export default function MemorialPage() {
     <LandingShell>
       <LandingHeader />
 
-      <main className="mx-auto max-w-6xl px-4 pb-16 pt-24 lg:px-8 lg:pt-28">
+      <main className="mx-auto max-w-6xl px-4 pb-28 pt-8 sm:pt-10 lg:px-8 lg:pb-32 lg:pt-12">
         <SuperviveMemorial />
       </main>
     </LandingShell>
