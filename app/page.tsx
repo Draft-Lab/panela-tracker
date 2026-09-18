@@ -15,6 +15,7 @@ import { LandingTimelineSectionAsync } from "@/components/landing/sections/landi
 import { LandingGroupMetricsSection } from "@/components/landing/sections/landing-group-metrics-section"
 import { LandingPlayerProfilesSection } from "@/components/landing/sections/landing-player-profiles-section"
 import { LandingHighlightsSection } from "@/components/landing/sections/landing-highlights-section"
+import { LandingWeeklySummarySection } from "@/components/landing/sections/landing-weekly-summary-section"
 import { rsc } from "@/lib/rsc"
 
 const HeroSection = rsc(LandingHeroSection)
@@ -26,6 +27,7 @@ const TimelineSection = rsc(LandingTimelineSectionAsync)
 const GroupMetricsSection = rsc(LandingGroupMetricsSection)
 const PlayerProfilesSection = rsc(LandingPlayerProfilesSection)
 const HighlightsSection = rsc(LandingHighlightsSection)
+const WeeklySummarySection = rsc(LandingWeeklySummarySection)
 
 export default function LandingPage() {
   return (
@@ -63,22 +65,33 @@ export default function LandingPage() {
         </LandingSection>
 
         <LandingSection
-          id="jogos"
-          title="Jogos do grupo"
-          description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
-        >
-          <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
-            <TopGamesSection />
-          </Suspense>
-        </LandingSection>
-
-        <LandingSection
           id="atividade"
           title="Atividade ao longo do tempo"
           description="Heatmap dos últimos 12 meses e resumo de frequência."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="heatmap" />}>
             <ActivitySection />
+          </Suspense>
+        </LandingSection>
+
+        <LandingSection
+          id="semana"
+          eyebrow="Agora"
+          title="Resumo da semana"
+          description="O ritmo do grupo nos últimos 7 dias, comparado à semana anterior."
+        >
+          <Suspense fallback={<LandingSectionSkeleton variant="metrics" />}>
+            <WeeklySummarySection />
+          </Suspense>
+        </LandingSection>
+
+        <LandingSection
+          id="jogos"
+          title="Jogos do grupo"
+          description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
+        >
+          <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
+            <TopGamesSection />
           </Suspense>
         </LandingSection>
 

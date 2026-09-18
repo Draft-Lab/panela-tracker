@@ -23,16 +23,22 @@ const SECTION_ITEMS: PreviewRailItem[] = [
     href: "/#agora",
   },
   {
-    id: "jogos",
-    label: "Jogos",
-    description: "Os jogos que mais juntaram o grupo.",
-    href: "/#jogos",
-  },
-  {
     id: "atividade",
     label: "Atividade",
     description: "O ritmo de jogo ao longo do ano.",
     href: "/#atividade",
+  },
+  {
+    id: "semana",
+    label: "Semana",
+    description: "Como foi o ritmo do grupo nos últimos dias.",
+    href: "/#semana",
+  },
+  {
+    id: "jogos",
+    label: "Jogos",
+    description: "Os jogos que mais juntaram o grupo.",
+    href: "/#jogos",
   },
   {
     id: "vergonha",

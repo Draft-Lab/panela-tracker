@@ -6,6 +6,7 @@ import {
   playtimeTotalsToHours,
 } from "@/lib/landing-playtime-totals";
 import { normalizeSupabaseRelation } from "@/lib/supabase-relation-helpers";
+import { buildWeeklySummary, type WeeklySummary } from "@/lib/landing-weekly-summary-helpers";
 import type {
   Game,
   Jogatina,
@@ -175,12 +176,12 @@ type HeroWeekJogatina = {
 
 async function fetchHeroWeekJogatinas(
   supabase: SupabaseClient,
-  weekAgoIso: string,
+  twoWeeksAgoIso: string,
 ): Promise<HeroWeekJogatina[]> {
   const { data, error } = await supabase
     .from("jogatinas")
     .select("total_duration_minutes, date, game:games(id, title, is_app)")
-    .gte("date", weekAgoIso);
+    .gte("date", twoWeeksAgoIso);
 
   if (error) {
     throw error;
@@ -198,18 +199,36 @@ async function fetchHeroWeekJogatinas(
     );
 }
 
+export async function fetchLandingWeeklySummary(
+  supabase: SupabaseClient,
+): Promise<WeeklySummary> {
+  const currentWeekStart = new Date();
+  currentWeekStart.setDate(currentWeekStart.getDate() - 6);
+  currentWeekStart.setHours(0, 0, 0, 0);
+
+  const previousWeekStart = new Date(currentWeekStart);
+  previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+
+  const jogatinas = await fetchHeroWeekJogatinas(
+    supabase,
+    previousWeekStart.toISOString(),
+  );
+
+  return buildWeeklySummary(jogatinas);
+}
+
 export async function fetchLandingHeroData(
   supabase: SupabaseClient,
 ): Promise<LandingHeroData> {
   const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekAgoIso = weekAgo.toISOString();
+  weekAgo.setDate(weekAgo.getDate() - 6);
+  weekAgo.setHours(0, 0, 0, 0);
 
   const [playersCount, currentGamesCount, weekJogatinas, durationTotals, membersRaw, playingPlayerIds] =
     await Promise.all([
       fetchPlayersCount(supabase),
       fetchCurrentGamesCount(supabase),
-      fetchHeroWeekJogatinas(supabase, weekAgoIso),
+      fetchHeroWeekJogatinas(supabase, weekAgo.toISOString()),
       getCachedPlaytimeDurationTotals(),
       fetchHeroMembers(supabase),
       fetchActivePlayingPlayerIds(supabase),
@@ -230,8 +249,8 @@ export async function fetchLandingHeroData(
         (acc[game.id] || 0) + (jogatina.total_duration_minutes || 0);
       return acc;
     },
-    {} as Record<string, number>,
-  );
+      {} as Record<string, number>,
+    );
 
   const mostPlayedGameId = Object.entries(gameMinutes)
     .filter(([, minutes]) => minutes > 0)
