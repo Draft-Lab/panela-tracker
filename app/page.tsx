@@ -142,7 +142,7 @@ export default function LandingPage() {
           title="Momentos marcantes"
           description="Quem voltou, quem lotou a sessão e quem zerou de verdade."
         >
-          <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
+          <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
             <HighlightsSection />
           </Suspense>
         </LandingSection>

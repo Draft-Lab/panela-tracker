@@ -1,5 +1,5 @@
 import { History, Trophy, Users } from "lucide-react"
-import { HighlightCard } from "@/components/landing-highlights/highlight-card"
+import { MomentsBoard, type MomentRecord } from "@/components/landing-highlights/moments-board"
 import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import {
   findBiggestGroupSession,
@@ -61,14 +61,7 @@ export function LandingHighlights({
         .filter(Boolean)
         .join(" · "),
     },
-  ].filter(Boolean) as Array<{
-    key: string
-    game: Game
-    label: string
-    icon: typeof History
-    badge: string
-    meta: string
-  }>
+  ].filter(Boolean) as MomentRecord[]
 
   if (cards.length === 0) {
     return (
@@ -78,26 +71,5 @@ export function LandingHighlights({
     )
   }
 
-  return (
-    <div
-      className={
-        cards.length === 1
-          ? "grid grid-cols-1"
-          : cards.length === 2
-            ? "grid grid-cols-1 gap-3 sm:grid-cols-2"
-            : "grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
-      }
-    >
-      {cards.map((card) => (
-        <HighlightCard
-          key={card.key}
-          game={card.game}
-          label={card.label}
-          icon={card.icon}
-          badge={card.badge}
-          meta={card.meta}
-        />
-      ))}
-    </div>
-  )
+  return <MomentsBoard moments={cards} />
 }

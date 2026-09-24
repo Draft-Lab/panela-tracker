@@ -32,10 +32,11 @@ export function LandingPlayerProfiles({
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {sortedStats.map((stat) => (
+      {sortedStats.map((stat, index) => (
         <LandingPlayerProfileCard
           key={stat.player.id}
           player={stat.player}
+          position={index + 1}
           totalSessions={stat.totalSessions}
           totalMinutes={stat.totalMinutes}
           dropCount={stat.dropCount}

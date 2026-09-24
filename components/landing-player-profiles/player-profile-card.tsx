@@ -1,15 +1,18 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
-import { ArrowUpRight, Calendar, Clock, Gamepad2, TrendingDown } from "lucide-react"
+import { ArrowUpRight, Clock3 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { PlayerProfileStat } from "@/components/landing-player-profiles/player-profile-stat"
+import { CardFolder } from "@/components/motion/card-folder"
+import { DigitSwap } from "@/components/motion/digit-swap"
 import type { PlayerAchievement } from "@/lib/player-achievements"
 import { formatPlayerDuration } from "@/lib/player-profile-helpers"
-import { cn } from "@/lib/utils"
 import type { Player } from "@/lib/types"
-import { LandingGlassCell } from "@/components/landing/landing-glass-cell"
 
 interface LandingPlayerProfileCardProps {
   player: Player
+  position: number
   totalSessions: number
   totalMinutes: number
   dropCount: number
@@ -18,29 +21,34 @@ interface LandingPlayerProfileCardProps {
   achievements?: PlayerAchievement[]
 }
 
-function AchievementPill({
-  achievement,
-  className,
+function FolderStat({
+  label,
+  value,
+  animationKey,
+  accent = false,
 }: {
-  achievement: PlayerAchievement
-  className?: string
+  label: string
+  value: number
+  animationKey: string
+  accent?: boolean
 }) {
   return (
-    <span
-      title={achievement.description}
-      className={cn(
-        "inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em]",
-        achievement.style,
-        className,
-      )}
-    >
-      {achievement.label}
+    <span className="flex min-w-0 flex-col items-center gap-0.5 px-1 text-center">
+      <span className="text-[9px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        {label}
+      </span>
+      <DigitSwap
+        value={value.toLocaleString("pt-BR")}
+        animationKey={animationKey}
+        className={`font-mono text-lg font-semibold tabular-nums tracking-tight sm:text-xl ${accent ? "text-rose-300" : "text-foreground"}`}
+      />
     </span>
   )
 }
 
 export function LandingPlayerProfileCard({
   player,
+  position,
   totalSessions,
   totalMinutes,
   dropCount,
@@ -48,120 +56,79 @@ export function LandingPlayerProfileCard({
   dropRate,
   achievements = [],
 }: LandingPlayerProfileCardProps) {
-  const initials = player.name.slice(0, 2).toUpperCase()
-  const avatarUrl = player.avatar_url || ""
+  const [open, setOpen] = useState(false)
   const primaryAchievement = achievements[0]
-  const secondaryAchievements = achievements.slice(1)
+  const duration = formatPlayerDuration(totalMinutes)
 
   return (
-    <Link href={`/jogadores/${player.id}`} className="group block h-full">
-      <LandingGlassCell
-        className="h-full transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.99]"
-        innerClassName="flex h-full flex-col gap-4 p-4 sm:p-5"
-      >
-        <div className="flex items-start gap-4">
-          <div className="relative shrink-0">
-            <div
-              className="absolute -inset-1 rounded-full bg-primary/20 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
-              aria-hidden
-            />
-            <Avatar className="relative h-14 w-14 ring-2 ring-white/15 transition-transform duration-300 group-hover:scale-[1.03] sm:h-16 sm:w-16">
-              <AvatarImage src={avatarUrl} alt={player.name} />
-              <AvatarFallback className="text-sm font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-
-          <div className="min-w-0 flex-1 pt-0.5">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="line-clamp-2 text-base font-semibold tracking-tight text-foreground transition-colors duration-200 group-hover:text-primary sm:text-lg">
-                {player.name}
-              </h3>
-              <ArrowUpRight
-                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:opacity-100"
-                strokeWidth={1.75}
-              />
+    <article className="group mx-auto w-full max-w-[27rem]">
+      <h3 className="sr-only">{player.name}</h3>
+      <CardFolder
+        title={player.name}
+        open={open}
+        onOpenChange={setOpen}
+        ariaLabel={`${open ? "Fechar" : "Abrir"} ficha de ${player.name}. ${duration} jogadas, ${totalSessions} sessões, ${uniqueGames} jogos e ${dropCount} drops.`}
+        className="w-full"
+        frontShape="flat"
+        cardClassName="border-white/[0.14] bg-[radial-gradient(circle_at_12%_0%,rgba(39,93,245,0.17),transparent_55%)] bg-card"
+        frontClassName="[&_svg_path:first-child]:fill-card"
+        card={
+          <div className="flex h-full flex-col p-3 sm:p-4">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <Avatar className="size-10 shrink-0 ring-1 ring-white/20 sm:size-11">
+                <AvatarImage src={player.avatar_url || ""} alt="" />
+                <AvatarFallback className="text-xs font-semibold">
+                  {player.name.slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-base font-semibold tracking-tight text-foreground sm:text-lg">
+                  {player.name}
+                </span>
+                <span className="block truncate text-[11px] text-muted-foreground">
+                  {primaryAchievement?.label ?? "Membro da Panela"}
+                </span>
+              </span>
+              <span className="self-start font-mono text-[11px] tabular-nums text-primary/80">
+                {String(position).padStart(2, "0")}
+              </span>
             </div>
 
-            {primaryAchievement ? (
-              <div className="mt-2">
-                <AchievementPill achievement={primaryAchievement} />
-              </div>
-            ) : null}
-          </div>
-        </div>
+            <div className="mt-1.5 min-w-0 sm:mt-2">
+              <span className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.13em] text-muted-foreground">
+                <Clock3 className="size-3 text-primary" aria-hidden="true" />
+                Tempo no grupo
+              </span>
+              <span className="mt-0.5 block truncate text-base font-semibold tabular-nums tracking-tight text-foreground sm:text-lg">
+                {duration}
+              </span>
+            </div>
 
-        <div className="rounded-[1.25rem] border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-          <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-            Tempo no grupo
-          </p>
-          <div className="mt-1.5 flex items-center gap-2">
-            <Clock className="h-4 w-4 shrink-0 text-primary/80" strokeWidth={1.75} />
-            <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
-              {formatPlayerDuration(totalMinutes)}
-            </p>
+            <div className="mt-auto flex min-w-0 items-end justify-between gap-2 border-t border-white/[0.08] pt-2">
+              <span className="truncate text-[10px] text-muted-foreground">
+                {achievements.slice(1).map((achievement) => achievement.label).join(" · ") || "Da nossa panela"}
+              </span>
+              <span className="shrink-0 text-right text-[10px] text-muted-foreground">
+                {dropCount === 0 ? "Sem drops" : `${Math.round(dropRate)}% de drops`}
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div className="rounded-[1.25rem] bg-white/[0.03] p-1 ring-1 ring-white/[0.06]">
-          <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[calc(1.25rem-0.25rem)] bg-white/[0.04]">
-            <PlayerProfileStat
-              label="Sessões"
-              value={totalSessions.toLocaleString("pt-BR")}
-              icon={Calendar}
-            />
-            <PlayerProfileStat
-              label="Drops"
-              value={dropCount.toLocaleString("pt-BR")}
-              hint={
-                dropCount > 0 && totalSessions > 0
-                  ? `${dropRate.toFixed(0)}% das sessões`
-                  : dropCount === 0
-                    ? "Firme demais"
-                    : undefined
-              }
-              icon={TrendingDown}
-              valueClassName={dropCount > 0 ? "text-destructive" : undefined}
-            />
-            <PlayerProfileStat
-              label="Jogos"
-              value={uniqueGames.toLocaleString("pt-BR")}
-              hint="títulos diferentes"
-              icon={Gamepad2}
-            />
-          </div>
-        </div>
-
-        {secondaryAchievements.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
-            {secondaryAchievements.map((achievement) => (
-              <AchievementPill key={achievement.id} achievement={achievement} />
-            ))}
-          </div>
-        ) : null}
-
-        <div className="mt-auto pt-1">
-          <span
-            className={cn(
-              "flex w-full items-center justify-between rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm text-muted-foreground",
-              "transition-[background-color,color,border-color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-              "group-hover:border-white/[0.12] group-hover:bg-white/[0.05] group-hover:text-foreground",
-            )}
-          >
-            Ver perfil
-            <span
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full bg-white/[0.06]",
-                "transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
-                "group-hover:translate-x-0.5 group-hover:-translate-y-px group-hover:bg-white/[0.1]",
-              )}
-            >
-              <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
-            </span>
+        }
+        front={
+          <span className="grid h-full grid-cols-3 items-center divide-x divide-white/[0.08] px-1.5">
+            <FolderStat label="Sessões" value={totalSessions} animationKey={`${player.id}-${open}`} />
+            <FolderStat label="Jogos" value={uniqueGames} animationKey={`${player.id}-${open}`} />
+            <FolderStat label="Drops" value={dropCount} animationKey={`${player.id}-${open}`} accent={dropCount > 0} />
           </span>
-        </div>
-      </LandingGlassCell>
-    </Link>
+        }
+      />
+      <Link
+        href={`/jogadores/${player.id}`}
+        className="mt-2 flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        Ver perfil de {player.name}
+        <ArrowUpRight className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+      </Link>
+    </article>
   )
 }

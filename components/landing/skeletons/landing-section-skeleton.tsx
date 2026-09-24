@@ -68,11 +68,11 @@ function ListSkeleton() {
 
 function ProfilesSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, index) => (
         <div
           key={index}
-          className="h-52 rounded-xl border border-border/40 bg-muted/30"
+          className="aspect-[1029/680] rounded-2xl border border-border/40 bg-muted/30"
         />
       ))}
     </div>
