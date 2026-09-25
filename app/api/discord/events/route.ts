@@ -1,9 +1,12 @@
 // app/api/discord/events/route.ts
 import { handlePlayerJoined } from "../../../../lib/discord/handle-player-joined";
-import { countActivePlayers } from "../../../../lib/discord/jogatina-metrics";
+import {
+  calculatePlayerDurations,
+  countActivePlayers,
+  finishJogatina,
+} from "../../../../lib/discord/jogatina-metrics";
 import { createServiceRoleClient } from "../../../../lib/supabase/service-role";
 import { NextResponse } from "next/server";
-import type { JogatinaEvent } from "../../../../lib/types";
 
 const DISCORD_BOT_API_KEY = process.env.DISCORD_BOT_API_KEY;
 
@@ -245,40 +248,16 @@ async function handlePlayerLeft(
       `[Discord Events] Nenhum jogador ativo! Finalizando jogatina ${activeJogatina.id} automaticamente...`
     );
 
-    // Calcular estatísticas de duração para cada jogador
-    await calculatePlayerDurations(supabase, activeJogatina.id);
-
-    // Calcular duração total
-    const firstEvent = new Date(activeJogatina.first_event_at);
-    const lastEvent = new Date(timestamp);
-    const durationMinutes = Math.floor(
-      (lastEvent.getTime() - firstEvent.getTime()) / 60000
-    );
-
-    const { error: updateError } = await supabase
-      .from("jogatinas")
-      .update({
-        is_current: false,
-        active_players: 0,
-        last_event_at: timestamp,
-        date: timestamp,
-        total_duration_minutes: durationMinutes,
-      })
-      .eq("id", activeJogatina.id);
-
-    if (updateError) {
-      console.error(
-        `[Discord Events] Erro ao finalizar jogatina: ${updateError.message}`
-      );
+    let durationMinutes: number;
+    try {
+      durationMinutes = await finishJogatina(supabase, activeJogatina, timestamp);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to finish jogatina";
+      console.error(`[Discord Events] Erro ao finalizar jogatina: ${message}`);
       return NextResponse.json(
-        { error: `Failed to finish jogatina: ${updateError.message}` },
+        { error: message },
         { status: 500 }
       );
-    }
-
-    // Atualizar métricas da temporada (se associada)
-    if (activeJogatina.season_id) {
-      await updateSeasonMetrics(supabase, activeJogatina.season_id, activeJogatina.id);
     }
 
     return NextResponse.json({
@@ -321,163 +300,5 @@ async function handlePlayerLeft(
       session_finished: false,
       season_id: activeJogatina.season_id || null,
     });
-  }
-}
-
-// NOVA FUNÇÃO: Atualizar métricas consolidadas da temporada
-async function updateSeasonMetrics(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  seasonId: string,
-  jogatinaId: string
-) {
-  try {
-    // Buscar todos os participantes da jogatina finalizada
-    const { data: jogatinaPlayers } = await supabase
-      .from("jogatina_players")
-      .select(
-        "player_id, total_duration_minutes, solo_duration_minutes, group_duration_minutes"
-      )
-      .eq("jogatina_id", jogatinaId);
-
-    if (!jogatinaPlayers || jogatinaPlayers.length === 0) return;
-
-    // Atualizar cada participante da temporada
-    for (const jp of jogatinaPlayers) {
-      // Buscar participante atual da temporada
-      const { data: participant } = await supabase
-        .from("season_participants")
-        .select("*")
-        .eq("season_id", seasonId)
-        .eq("player_id", jp.player_id)
-        .single();
-
-      if (participant) {
-        // Atualizar métricas acumuladas
-        await supabase
-          .from("season_participants")
-          .update({
-            total_sessions: participant.total_sessions + 1,
-            total_duration_minutes:
-              participant.total_duration_minutes + (jp.total_duration_minutes || 0),
-            solo_duration_minutes:
-              participant.solo_duration_minutes + (jp.solo_duration_minutes || 0),
-            group_duration_minutes:
-              participant.group_duration_minutes + (jp.group_duration_minutes || 0),
-          })
-          .eq("id", participant.id);
-      } else {
-        // Criar participante se ainda não existe (caso jogador não foi adicionado manualmente)
-        await supabase.from("season_participants").insert({
-          season_id: seasonId,
-          player_id: jp.player_id,
-          status: "Em andamento",
-          total_sessions: 1,
-          total_duration_minutes: jp.total_duration_minutes || 0,
-          solo_duration_minutes: jp.solo_duration_minutes || 0,
-          group_duration_minutes: jp.group_duration_minutes || 0,
-        });
-      }
-    }
-
-    console.log(`[Discord Events] Métricas da temporada ${seasonId} atualizadas`);
-  } catch (error) {
-    console.error("[Discord Events] Erro ao atualizar métricas da temporada:", error);
-  }
-}
-
-async function calculatePlayerDurations(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  jogatinaId: string
-) {
-  // [Código existente permanece o mesmo]
-  const { data: events, error: eventsError } = await supabase
-    .from("jogatina_events")
-    .select("*")
-    .eq("jogatina_id", jogatinaId)
-    .order("timestamp", { ascending: true });
-
-  if (eventsError || !events || events.length === 0) {
-    console.error("[calculatePlayerDurations] Error fetching events:", eventsError);
-    return;
-  }
-
-  const { data: jogatinaPlayers, error: playersError } = await supabase
-    .from("jogatina_players")
-    .select("id, player_id")
-    .eq("jogatina_id", jogatinaId);
-
-  if (playersError || !jogatinaPlayers) {
-    console.error("[calculatePlayerDurations] Error fetching players:", playersError);
-    return;
-  }
-
-  for (const jp of jogatinaPlayers) {
-    const playerId = jp.player_id;
-    const playerEvents = events.filter((e: JogatinaEvent) => e.player_id === playerId);
-
-    if (playerEvents.length === 0) continue;
-
-    let totalTime = 0;
-    let soloTime = 0;
-    let groupTime = 0;
-
-    for (let i = 0; i < playerEvents.length; i++) {
-      const event = playerEvents[i];
-
-      if (event.event_type === "player_joined") {
-        const joinTime = new Date(event.timestamp);
-        const nextLeaveEvent = playerEvents
-          .slice(i + 1)
-          .find((e: JogatinaEvent) => e.event_type === "player_left");
-
-        if (nextLeaveEvent) {
-          const leaveTime = new Date(nextLeaveEvent.timestamp);
-          const sessionDuration = (leaveTime.getTime() - joinTime.getTime()) / 60000;
-
-          totalTime += sessionDuration;
-
-          const otherActivePlayers = events.filter((e: JogatinaEvent) => {
-            if (e.player_id === playerId) return false;
-
-            const eventTime = new Date(e.timestamp);
-
-            if (e.event_type === "player_joined" && eventTime <= leaveTime) {
-              const otherLeaveEvent = events.find(
-                (le: JogatinaEvent) =>
-                  le.player_id === e.player_id &&
-                  le.event_type === "player_left" &&
-                  new Date(le.timestamp) >= joinTime
-              );
-
-              return !otherLeaveEvent || new Date(otherLeaveEvent.timestamp) > joinTime;
-            }
-
-            return false;
-          });
-
-          if (otherActivePlayers.length > 0) {
-            groupTime += sessionDuration;
-          } else {
-            soloTime += sessionDuration;
-          }
-        }
-      }
-    }
-
-    const { error: updateError } = await supabase
-      .from("jogatina_players")
-      .update({
-        solo_duration_minutes: Math.round(soloTime),
-        group_duration_minutes: Math.round(groupTime),
-        total_duration_minutes: Math.round(totalTime),
-      })
-      .eq("id", jp.id);
-
-    if (updateError) {
-      console.error(
-        `[calculatePlayerDurations] Error updating player ${playerId}:`,
-        updateError
-      );
-    }
   }
 }

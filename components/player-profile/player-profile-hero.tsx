@@ -16,6 +16,7 @@ interface PlayerProfileHeroProps {
   totalMinutes: number
   totalSessions: number
   uniqueGames: number
+  pointsBalance: number
   bannerCoverUrl: string | null
   metaExtra?: ReactNode
   actions?: ReactNode
@@ -44,6 +45,7 @@ export function PlayerProfileHero({
   totalMinutes,
   totalSessions,
   uniqueGames,
+  pointsBalance,
   bannerCoverUrl,
   metaExtra,
   actions,
@@ -142,6 +144,7 @@ export function PlayerProfileHero({
                   />
                   <HeroStat label="Sessões" value={String(totalSessions)} />
                   <HeroStat label="Jogos" value={String(uniqueGames)} />
+                  <HeroStat label="Pontos" value={pointsBalance.toLocaleString("pt-BR")} />
                 </div>
                 {actions}
               </div>

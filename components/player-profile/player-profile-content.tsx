@@ -42,6 +42,7 @@ export function PlayerProfileContent({
         totalMinutes={summary.totalMinutes}
         totalSessions={summary.totalSessions}
         uniqueGames={summary.uniqueGames}
+        pointsBalance={player.points_balance ?? 0}
         bannerCoverUrl={bannerCoverUrl}
         metaExtra={
           isAdmin ? <PlayerProfileAdminMeta discordId={player.discord_id} /> : undefined

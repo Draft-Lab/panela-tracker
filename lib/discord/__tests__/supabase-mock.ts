@@ -274,11 +274,21 @@ class QueryBuilder {
 }
 
 export function createJoinTestSupabase(store: JoinTestStore) {
+  const rpcCalls: string[] = [];
+
   return {
     from(table: keyof JoinTestStore) {
       return new QueryBuilder(store, table);
     },
+    rpc(functionName: string) {
+      rpcCalls.push(functionName);
+      if (functionName === "award_jogatina_points") {
+        return Promise.resolve({ data: 0, error: null });
+      }
+      return Promise.resolve({ data: null, error: { message: `Unknown RPC: ${functionName}` } });
+    },
     _store: store,
+    _rpcCalls: rpcCalls,
   };
 }
 

@@ -198,6 +198,16 @@ export async function finishJogatina(
 ) {
   await calculatePlayerDurations(supabase, jogatina.id);
 
+  // Credita antes de fechar a sessão. Se o crédito falhar, ela continua ativa e
+  // pode ser processada novamente; a tabela de lançamentos impede duplicidade.
+  const { error: pointsError } = await supabase.rpc("award_jogatina_points", {
+    p_jogatina_id: jogatina.id,
+  });
+
+  if (pointsError) {
+    throw new Error(`Erro ao conceder pontos: ${pointsError.message}`);
+  }
+
   const firstEvent = jogatina.first_event_at
     ? new Date(jogatina.first_event_at)
     : new Date(timestamp);
@@ -206,7 +216,7 @@ export async function finishJogatina(
     (lastEvent.getTime() - firstEvent.getTime()) / 60000,
   );
 
-  await supabase
+  const { error: finishError } = await supabase
     .from("jogatinas")
     .update({
       is_current: false,
@@ -216,6 +226,10 @@ export async function finishJogatina(
       total_duration_minutes: durationMinutes,
     })
     .eq("id", jogatina.id);
+
+  if (finishError) {
+    throw new Error(`Erro ao finalizar jogatina: ${finishError.message}`);
+  }
 
   if (jogatina.season_id) {
     await updateSeasonMetrics(supabase, jogatina.season_id, jogatina.id);

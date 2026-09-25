@@ -88,29 +88,14 @@ export function FinishCurrentGameDialog({ jogatinaId, gameTitle, open, onOpenCha
     setIsLoading(true)
     const supabase = createClient()
 
-    // Update all player statuses
-    const updatePromises = playerStatuses.map((ps) =>
-      supabase
-        .from("jogatina_players")
-        .update({
-          status: ps.status,
-          notes: ps.notes.trim() || null,
-        })
-        .eq("id", ps.id),
-    )
-
-    const results = await Promise.all(updatePromises)
-    const hasError = results.some((r) => r.error)
-
-    if (hasError) {
-      console.error("[v0] Error updating player statuses")
-      alert("Erro ao atualizar status dos jogadores")
-      setIsLoading(false)
-      return
-    }
-
-    // Mark jogatina as not current
-    const { error: jogatinaError } = await supabase.from("jogatinas").update({ is_current: false }).eq("id", jogatinaId)
+    const { error: jogatinaError } = await supabase.rpc("finish_manual_jogatina", {
+      p_jogatina_id: jogatinaId,
+      p_player_updates: playerStatuses.map((ps) => ({
+        id: ps.id,
+        status: ps.status,
+        notes: ps.notes.trim(),
+      })),
+    })
 
     if (jogatinaError) {
       console.error("[v0] Error finishing jogatina:", jogatinaError)

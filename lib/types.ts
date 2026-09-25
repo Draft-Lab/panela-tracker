@@ -5,6 +5,7 @@ export interface Player {
   discord_id: string | null;
   created_at: string;
   total_played_minutes?: number;
+  points_balance?: number;
 }
 
 export interface Game {

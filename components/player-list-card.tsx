@@ -7,6 +7,7 @@ import {
   BarChart3,
   Calendar,
   Clock,
+  Coins,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -97,6 +98,15 @@ export function PlayerListCard({
           </div>
           <p className="mt-0.5 text-xl font-bold tabular-nums">
             {totalMinutes > 0 ? formatPlayerDuration(totalMinutes) : "—"}
+          </p>
+        </div>
+        <div className="mt-2 rounded-lg border border-border/40 bg-background/30 px-3 py-2.5">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Coins className="h-3.5 w-3.5" />
+            Pontos
+          </div>
+          <p className="mt-0.5 text-xl font-bold tabular-nums">
+            {(player.points_balance ?? 0).toLocaleString("pt-BR")}
           </p>
         </div>
 

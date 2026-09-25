@@ -336,5 +336,6 @@ describe("mergeDuplicateActiveJogatinas", () => {
     assert.equal(dupePlayer?.is_active, false);
 
     assert.equal(store.jogatinas.find((j) => j.id === "jogatina-b")?.is_current, false);
+    assert.deepEqual(supabase._rpcCalls, ["award_jogatina_points"]);
   });
 });
