@@ -67,7 +67,7 @@ export function LandingPlayerProfileCard({
         title={player.name}
         open={open}
         onOpenChange={setOpen}
-        ariaLabel={`${open ? "Fechar" : "Abrir"} ficha de ${player.name}. ${duration} jogadas, ${totalSessions} sessões, ${uniqueGames} jogos e ${dropCount} drops.`}
+        ariaLabel={`${open ? "Fechar" : "Abrir"} ficha de ${player.name}. ${duration} jogadas, ${player.points_balance ?? 0} pontos, ${totalSessions} sessões, ${uniqueGames} jogos e ${dropCount} drops.`}
         className="w-full"
         frontShape="flat"
         cardClassName="border-white/[0.14] bg-[radial-gradient(circle_at_12%_0%,rgba(39,93,245,0.17),transparent_55%)] bg-card"
@@ -115,9 +115,10 @@ export function LandingPlayerProfileCard({
           </div>
         }
         front={
-          <span className="grid h-full grid-cols-3 items-center divide-x divide-white/[0.08] px-1.5">
+          <span className="grid h-full grid-cols-4 items-center divide-x divide-white/[0.08] px-1.5">
             <FolderStat label="Sessões" value={totalSessions} animationKey={`${player.id}-${open}`} />
             <FolderStat label="Jogos" value={uniqueGames} animationKey={`${player.id}-${open}`} />
+            <FolderStat label="Pontos" value={player.points_balance ?? 0} animationKey={`${player.id}-${open}`} />
             <FolderStat label="Drops" value={dropCount} animationKey={`${player.id}-${open}`} accent={dropCount > 0} />
           </span>
         }
