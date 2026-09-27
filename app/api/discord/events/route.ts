@@ -6,6 +6,7 @@ import {
   finishJogatina,
 } from "../../../../lib/discord/jogatina-metrics";
 import { createServiceRoleClient } from "../../../../lib/supabase/service-role";
+import { autoEnrichGameFromIgdb } from "../../../../lib/igdb/auto-enrich-game";
 import { NextResponse } from "next/server";
 
 const DISCORD_BOT_API_KEY = process.env.DISCORD_BOT_API_KEY;
@@ -132,6 +133,7 @@ export async function POST(request: Request) {
         );
       }
       game = newGame;
+      await autoEnrichGameFromIgdb(supabase, game.id, game_title);
     }
 
     // 3. Processar evento baseado no tipo

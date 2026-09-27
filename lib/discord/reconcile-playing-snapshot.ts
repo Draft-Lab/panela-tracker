@@ -1,5 +1,6 @@
 import type { createClient } from "../supabase/server";
 import { getOrCreateActiveJogatina } from "./get-or-create-active-jogatina";
+import { autoEnrichGameFromIgdb } from "../igdb/auto-enrich-game";
 import { mergeDuplicateActiveJogatinas } from "./merge-duplicate-jogatinas";
 import {
   countActivePlayers,
@@ -145,6 +146,7 @@ async function findOrCreateGame(supabase: SupabaseClient, gameTitle: string) {
       throw new Error(`Failed to create game: ${error?.message}`);
     }
     game = newGame;
+    await autoEnrichGameFromIgdb(supabase, game.id, gameTitle);
   }
 
   return game;
