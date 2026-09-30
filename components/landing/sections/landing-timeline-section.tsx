@@ -14,7 +14,9 @@ export async function LandingTimelineSectionAsync(): Promise<ReactElement> {
     fetchJogatinaPlayerSlimRows(supabase),
   ]);
 
-  const jogatinaPlayers = slimRows.map((row) => ({
+  const recentIds = new Set(recentJogatinas.map((jogatina) => jogatina.id));
+  // The client renders recent events only, so older participation rows add no UI value.
+  const jogatinaPlayers = slimRows.filter((row) => recentIds.has(row.jogatina_id)).map((row) => ({
     id: row.id,
     jogatina_id: row.jogatina_id,
     player_id: row.player_id,

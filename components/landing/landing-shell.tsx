@@ -2,11 +2,12 @@ import type { ReactNode } from "react"
 
 interface LandingShellProps {
   children: ReactNode
+  className?: string
 }
 
-export function LandingShell({ children }: LandingShellProps) {
+export function LandingShell({ children, className = "" }: LandingShellProps) {
   return (
-    <div className="landing-theme relative min-h-[100dvh] scroll-smooth overflow-x-clip">
+    <div className={`landing-theme relative min-h-[100dvh] scroll-smooth overflow-x-clip ${className}`}>
       <a
         href="#overview"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"

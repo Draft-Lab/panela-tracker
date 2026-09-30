@@ -1,5 +1,3 @@
-"use client"
-
 import { Calendar, TrendingUp, Clock } from "lucide-react"
 import type { Jogatina, Game } from "@/lib/types"
 import { cn } from "@/lib/utils"

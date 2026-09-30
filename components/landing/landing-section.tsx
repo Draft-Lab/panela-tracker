@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { LandingScrollReveal } from "@/components/landing/landing-scroll-reveal"
+import { ChevronsDown } from "lucide-react"
 
 interface LandingSectionProps {
   id?: string
@@ -8,6 +9,7 @@ interface LandingSectionProps {
   description?: string
   eyebrow?: string
   children: ReactNode
+  stop?: string
   className?: string
 }
 
@@ -18,9 +20,12 @@ export function LandingSection({
   eyebrow,
   children,
   className,
+  stop,
 }: LandingSectionProps) {
   return (
-    <section id={id} className={cn("scroll-mt-28 py-14 lg:py-20", className)}>
+    <section id={id} className={cn("landing-section scroll-mt-28 py-14 lg:py-20", className)}>
+      {stop && <span className="homepage-waypoint" aria-hidden="true">{stop}</span>}
+      {stop && stop !== "09" && <ChevronsDown className="homepage-route-arrow" size={26} strokeWidth={3} aria-hidden="true" />}
       {(title || description) && (
         <LandingScrollReveal>
           <header className="mb-8 max-w-2xl lg:mb-10">

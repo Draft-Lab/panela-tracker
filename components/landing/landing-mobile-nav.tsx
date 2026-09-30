@@ -10,11 +10,14 @@ import {
 import { createPortal } from "react-dom"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
 
 const SECTION_LINKS = [
+  { href: "/#overview", label: "Início" },
   { href: "/#agora", label: "Agora" },
   { href: "/#jogos", label: "Jogos" },
   { href: "/#atividade", label: "Atividade" },
+  { href: "/#semana", label: "Semana" },
   { href: "/#vergonha", label: "Vergonha" },
   { href: "/#timeline", label: "Timeline" },
   { href: "/#metricas", label: "Métricas" },
@@ -81,7 +84,7 @@ function MobileNavTrigger() {
   )
 }
 
-function MobileNavOverlay() {
+function MobileNavOverlay({ menuClassName }: { menuClassName?: string }) {
   const { open, close } = useMobileNav()
   const [visible, setVisible] = useState(false)
 
@@ -112,6 +115,23 @@ function MobileNavOverlay() {
     }
   }, [open, close])
 
+  useEffect(() => {
+    if (!open || !visible) return
+    const menu = document.getElementById("landing-mobile-menu")
+    if (!menu) return
+    const previous = document.activeElement as HTMLElement | null
+    const controls = Array.from(menu.querySelectorAll<HTMLElement>("button, a"))
+    controls[0]?.focus()
+    const trapFocus = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return
+      const first = controls[0], last = controls[controls.length - 1]
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+    }
+    menu.addEventListener("keydown", trapFocus)
+    return () => { menu.removeEventListener("keydown", trapFocus); previous?.focus() }
+  }, [open, visible])
+
   if (!visible || typeof document === "undefined") {
     return null
   }
@@ -119,12 +139,17 @@ function MobileNavOverlay() {
   return createPortal(
     <div
       id="landing-mobile-menu"
+      role="dialog"
+      aria-label="Menu de navegação"
+      aria-modal={open || undefined}
+      inert={!open}
       className={cn(
         "fixed inset-0 z-40 bg-background/95 backdrop-blur-2xl xl:hidden",
         "transition-opacity duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)]",
         open
           ? "pointer-events-auto opacity-100"
           : "pointer-events-none opacity-0",
+        menuClassName,
       )}
       aria-hidden={!open}
       onClick={close}
@@ -136,13 +161,14 @@ function MobileNavOverlay() {
         setVisible(false)
       }}
     >
+      <button type="button" aria-label="Fechar menu" onClick={close} className="absolute right-6 top-6 grid h-11 w-11 place-items-center rounded-lg border border-border text-foreground"><X size={22} /></button>
       <nav
         aria-label="Seções da página"
-        className="flex min-h-[100dvh] flex-col items-center justify-center gap-2 px-6 pt-24 pb-16"
+        className="flex h-[100dvh] overflow-y-auto flex-col items-center justify-center gap-2 px-6 pt-20 pb-16"
         onClick={(event) => event.stopPropagation()}
       >
         {SECTION_LINKS.map((link, index) => (
-          <Link
+          <a
             key={link.href}
             href={link.href}
             onClick={close}
@@ -157,7 +183,7 @@ function MobileNavOverlay() {
             }
           >
             {link.label}
-          </Link>
+          </a>
         ))}
 
         <Link
@@ -179,7 +205,7 @@ function MobileNavOverlay() {
   )
 }
 
-export function LandingMobileNav() {
+export function LandingMobileNav({ menuClassName }: { menuClassName?: string } = {}) {
   const [open, setOpen] = useState(false)
   const toggle = useCallback(() => setOpen((value) => !value), [])
   const close = useCallback(() => setOpen(false), [])
@@ -187,7 +213,7 @@ export function LandingMobileNav() {
   return (
     <MobileNavContext.Provider value={{ open, toggle, close }}>
       <MobileNavTrigger />
-      <MobileNavOverlay />
+      <MobileNavOverlay menuClassName={menuClassName} />
     </MobileNavContext.Provider>
   )
 }

@@ -17,7 +17,7 @@ export function LandingGlassCell({
   return (
     <div
       className={cn(
-        "@container rounded-[2rem] bg-white/[0.04] p-1.5 ring-1 ring-white/10",
+        "landing-cell @container rounded-[2rem] bg-white/[0.04] p-1.5 ring-1 ring-white/10",
         "transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
         "hover:shadow-[0_8px_32px_rgba(0,0,0,0.35)]",
         className,
@@ -25,7 +25,7 @@ export function LandingGlassCell({
     >
       <div
         className={cn(
-          "h-full rounded-[calc(2rem-0.375rem)] bg-card/50 p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]",
+          "landing-cell-inner h-full rounded-[calc(2rem-0.375rem)] bg-card/50 p-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]",
           innerClassName,
         )}
       >

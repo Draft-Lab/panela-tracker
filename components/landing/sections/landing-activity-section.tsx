@@ -11,6 +11,9 @@ export async function LandingActivitySection(): Promise<ReactElement> {
   const jogatinas = await fetchJogatinasForHeatmap(supabase)
 
   const heatmapJogatinas = jogatinas as (Jogatina & { game: Game })[]
+  const heatmapSessions = jogatinas.map(({ date, first_event_at, last_event_at, total_duration_minutes }) => ({
+    date, first_event_at, last_event_at, total_duration_minutes,
+  }))
 
   return (
     <LandingGlassCell innerClassName="overflow-visible p-3 sm:p-4 lg:p-5">
@@ -18,16 +21,12 @@ export async function LandingActivitySection(): Promise<ReactElement> {
         <ActivitySummaryCards
           jogatinas={heatmapJogatinas}
           variant="inline"
-          className="lg:hidden"
+          className="homepage-activity-summary"
         />
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-6">
           <div className="min-w-0 flex-1">
-            <ActivityHeatmap jogatinas={heatmapJogatinas} />
-          </div>
-
-          <div className="hidden shrink-0 lg:block lg:w-52 lg:border-l lg:border-white/[0.06] lg:pl-6">
-            <ActivitySummaryCards jogatinas={heatmapJogatinas} />
+            <ActivityHeatmap jogatinas={heatmapSessions} />
           </div>
         </div>
       </div>

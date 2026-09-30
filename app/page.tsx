@@ -1,7 +1,10 @@
 import { Suspense } from "react"
+import { Bree_Serif } from "next/font/google"
 import { LandingNavigation } from "@/components/landing/landing-navigation"
-import Rays from "@/components/motion/rays"
-import { LandingFooter } from "@/components/landing/landing-footer"
+import { HomepageChapter } from "@/components/landing/homepage-chapter"
+import { HomepageJourney } from "@/components/landing/homepage-journey"
+import { HomepageHeroScene } from "@/components/landing/homepage-hero-scene"
+import { HomepageFooter } from "@/components/landing/homepage-footer"
 import { LandingSection } from "@/components/landing/landing-section"
 import { LandingShell } from "@/components/landing/landing-shell"
 import { LandingHeroSkeleton } from "@/components/landing/skeletons/landing-hero-skeleton"
@@ -17,6 +20,9 @@ import { LandingPlayerProfilesSection } from "@/components/landing/sections/land
 import { LandingHighlightsSection } from "@/components/landing/sections/landing-highlights-section"
 import { LandingWeeklySummarySection } from "@/components/landing/sections/landing-weekly-summary-section"
 import { rsc } from "@/lib/rsc"
+import "./homepage.css"
+
+const display = Bree_Serif({ subsets: ["latin"], weight: "400", variable: "--font-homepage-display", display: "swap" })
 
 const HeroSection = rsc(LandingHeroSection)
 const CurrentGamesSection = rsc(LandingCurrentGamesSectionAsync)
@@ -31,29 +37,19 @@ const WeeklySummarySection = rsc(LandingWeeklySummarySection)
 
 export default function LandingPage() {
   return (
-    <LandingShell>
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[min(42rem,78vw)] overflow-hidden opacity-35" aria-hidden>
-        <Rays
-          backgroundColor="transparent"
-          intensity={11}
-          rays={28}
-          reach={19}
-          position={38}
-          animation={{ animate: true, speed: 3 }}
-          raysColor={{ mode: "multi", color1: "#275DF5", color2: "#78B7FF" }}
-          style={{ zIndex: 0 }}
-        />
-      </div>
-      <LandingNavigation />
+    <LandingShell className={`homepage-rework ${display.variable}`}>
+      <LandingNavigation menuClassName={`homepage-rework ${display.variable}`} />
 
-      <main className="mx-auto max-w-6xl px-4 pt-2 pb-28 sm:pt-4 lg:px-8 lg:pt-5 lg:pb-32">
-        <section id="overview" className="scroll-mt-2 pb-6 lg:pb-10">
+      <main className="homepage-main">
+        <section id="overview" className="homepage-overview">
+          <HomepageHeroScene />
           <Suspense fallback={<LandingHeroSkeleton />}>
             <HeroSection />
           </Suspense>
         </section>
 
-        <LandingSection
+        <HomepageJourney>
+        <LandingSection stop="01"
           id="agora"
           eyebrow="Ao vivo"
           title="O que estamos jogando"
@@ -63,8 +59,7 @@ export default function LandingPage() {
             <CurrentGamesSection />
           </Suspense>
         </LandingSection>
-
-        <LandingSection
+        <LandingSection stop="02"
           id="atividade"
           title="Atividade ao longo do tempo"
           description="Heatmap dos últimos 12 meses e resumo de frequência."
@@ -74,9 +69,8 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <LandingSection stop="03"
           id="semana"
-          eyebrow="Agora"
           title="Resumo da semana"
           description="O ritmo do grupo nos últimos 7 dias, comparado à semana anterior."
         >
@@ -85,7 +79,8 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <HomepageChapter tone="green" number="II" label="O território da panela" note="Tem sempre um jogo que junta a gente." />
+        <LandingSection stop="04" className="homepage-zone-green"
           id="jogos"
           title="Jogos do grupo"
           description="Os três jogos com mais sessões em que 2 ou mais pessoas jogaram juntas."
@@ -95,7 +90,7 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <LandingSection stop="05" className="homepage-zone-green"
           id="vergonha"
           title="Hall da vergonha"
           description="Os três maiores dropadores do grupo."
@@ -105,9 +100,8 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <LandingSection stop="06" className="homepage-zone-green"
           id="timeline"
-          eyebrow="Eventos"
           title="Timeline global"
           description="Últimos eventos registrados pelo grupo."
         >
@@ -116,7 +110,8 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <HomepageChapter tone="gold" number="III" label="Quem faz a panela" note="Cada jogador, uma história." />
+        <LandingSection stop="07" className="homepage-zone-gold"
           id="metricas"
           title="Como a gente joga"
           description="Distribuição de status e duração média das sessões."
@@ -126,7 +121,7 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <LandingSection stop="08" className="homepage-zone-gold"
           id="perfis"
           title="Perfis do grupo"
           description="Tempo total, sessões e comportamento de cada membro."
@@ -136,7 +131,7 @@ export default function LandingPage() {
           </Suspense>
         </LandingSection>
 
-        <LandingSection
+        <LandingSection stop="09" className="homepage-zone-gold"
           id="destaques"
           eyebrow="Recordes"
           title="Momentos marcantes"
@@ -146,9 +141,10 @@ export default function LandingPage() {
             <HighlightsSection />
           </Suspense>
         </LandingSection>
+        </HomepageJourney>
       </main>
 
-      <LandingFooter />
+      <HomepageFooter />
     </LandingShell>
   )
 }

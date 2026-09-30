@@ -29,7 +29,7 @@ export function LandingHeroMemberAvatars({
           <Link
             key={member.id}
             href={`/jogadores/${member.id}`}
-            title={isPlaying ? `${member.name} — jogando agora` : member.name}
+            title={isPlaying ? `${member.name}, jogando agora` : member.name}
             className={cn(
               "shrink-0 rounded-full p-px",
               "transition-[transform,box-shadow,ring-color] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",

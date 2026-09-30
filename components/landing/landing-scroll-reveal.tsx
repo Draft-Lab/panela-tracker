@@ -17,11 +17,14 @@ export function LandingScrollReveal({
   variant = "default",
 }: LandingScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true)
 
   useEffect(() => {
     const element = ref.current
     if (!element) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    // Server output stays readable without JavaScript; only offscreen content is staged.
+    if (element.getBoundingClientRect().top > window.innerHeight) setVisible(false)
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -42,6 +45,7 @@ export function LandingScrollReveal({
       ref={ref}
       className={cn(
         "transition-[transform,opacity,filter]",
+        "motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:blur-none motion-reduce:transition-none",
         variant === "hero"
           ? "duration-[800ms] ease-[cubic-bezier(0.32,0.72,0,1)]"
           : "duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]",

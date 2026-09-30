@@ -9,6 +9,7 @@ export async function LandingTopGamesSection(): Promise<ReactElement> {
 
   return (
     <LandingTopGames
+      appearance="poster"
       jogatinas={jogatinas}
       jogatinaPlayers={jogatinas.flatMap(
         (j) =>

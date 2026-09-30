@@ -136,21 +136,22 @@ function DockLink({
   active?: boolean
   children: ReactNode
 }) {
+  const NavigationLink = href.includes("#") ? "a" : Link
   return (
     <DockItem active={active}>
-      <Link
+      <NavigationLink
         href={href}
         aria-label={label}
         title={label}
         className="relative z-10 flex h-full w-full items-center justify-center rounded-xl text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none"
       >
         {children}
-      </Link>
+      </NavigationLink>
     </DockItem>
   )
 }
 
-export function LandingNavigation() {
+export function LandingNavigation({ menuClassName }: { menuClassName?: string } = {}) {
   const pathname = usePathname()
   const isHome = pathname === "/"
   const isMemorial = pathname.startsWith("/memorial")
@@ -175,7 +176,7 @@ export function LandingNavigation() {
             <LockKeyhole className="h-4 w-4" strokeWidth={1.75} />
           </DockLink>
           <div className="flex h-11 w-9 items-center justify-center xl:hidden">
-            <LandingMobileNav />
+            <LandingMobileNav menuClassName={menuClassName} />
           </div>
         </Dock>
       </nav>

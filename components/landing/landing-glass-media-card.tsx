@@ -32,7 +32,7 @@ export function LandingGlassMediaCard({
             alt=""
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover object-center blur-md brightness-[0.42] saturate-110 scale-105"
+            className="landing-media-image object-cover object-center blur-md brightness-[0.42] saturate-110 scale-105"
           />
           <div className="absolute inset-0 bg-background/50" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-background/40" />

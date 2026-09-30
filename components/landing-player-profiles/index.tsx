@@ -31,7 +31,7 @@ export function LandingPlayerProfiles({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="homepage-player-roster grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {sortedStats.map((stat, index) => (
         <LandingPlayerProfileCard
           key={stat.player.id}

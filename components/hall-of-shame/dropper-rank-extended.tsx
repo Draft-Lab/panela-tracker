@@ -107,6 +107,7 @@ export function DropperRankExtended({
             : "grid-rows-[0fr] opacity-0",
         )}
         aria-hidden={!expanded}
+        inert={!expanded}
       >
         <div className="overflow-hidden">
           <LandingGlassCell innerClassName="divide-y divide-white/[0.06] p-0">

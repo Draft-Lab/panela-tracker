@@ -1,4 +1,5 @@
 import { Users } from "lucide-react"
+import Image from "next/image"
 import { calculateTopGames, type GameRankingStat, type JogatinaPlayerRef } from "@/lib/game-stats-helpers"
 import { cn } from "@/lib/utils"
 import type { Jogatina, Game } from "@/lib/types"
@@ -14,6 +15,7 @@ interface LandingTopGamesProps {
   jogatinas: (Jogatina & { game: Game })[]
   jogatinaPlayers: JogatinaPlayerRef[]
   showExtended?: boolean
+  appearance?: "default" | "poster"
 }
 
 interface GameRankCardProps {
@@ -88,7 +90,22 @@ function GameRankCard({ stat, rank, variant, className }: GameRankCardProps) {
   )
 }
 
-function TopGamesPodium({ topGames }: { topGames: GameRankingStat[] }) {
+function TopGamesPodium({ topGames, appearance }: { topGames: GameRankingStat[]; appearance: "default" | "poster" }) {
+  if (appearance === "poster") {
+    return <div className="homepage-game-posters">
+      {topGames.map((stat, index) => <article className="homepage-game-poster" key={stat.game.id}>
+        <div className={cn("homepage-game-cover", /\/(?:header|capsule_)/.test(stat.game.cover_url ?? "") && "homepage-game-cover-wide")}>
+          {stat.game.cover_url ? <Image src={stat.game.cover_url} alt={stat.game.title} fill sizes="(max-width: 767px) 100vw, 33vw" className="object-cover" /> : <span>{stat.game.title}</span>}
+        </div>
+        <div className="homepage-game-caption">
+          <span className="homepage-game-rank">{String(index + 1).padStart(2, "0")}</span>
+          <div><h3>{stat.game.title}</h3><GameIgdbMetaInline game={stat.game} variant="line" className="mt-2" />
+            <p><strong>{stat.sessions}</strong> sessões <span>{stat.participations} participações</span></p>
+          </div>
+        </div>
+      </article>)}
+    </div>
+  }
   const [first, second, third] = topGames
 
   if (topGames.length === 1) {
@@ -132,6 +149,7 @@ export function LandingTopGames({
   jogatinas,
   jogatinaPlayers,
   showExtended = true,
+  appearance = "default",
 }: LandingTopGamesProps) {
   const rankedGames = calculateTopGames(
     jogatinas,
@@ -151,7 +169,7 @@ export function LandingTopGames({
 
   return (
     <div className="space-y-3">
-      <TopGamesPodium topGames={topGames} />
+      <TopGamesPodium topGames={topGames} appearance={appearance} />
       {showExtended && extendedGames.length > 0 && (
         <LandingTopGamesExtended games={extendedGames} />
       )}
