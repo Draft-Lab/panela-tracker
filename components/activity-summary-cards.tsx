@@ -1,3 +1,4 @@
+import { buildActivityHeatmapWindow } from "@/lib/activity-heatmap-window"
 import { Calendar, TrendingUp, Clock } from "lucide-react"
 import type { Jogatina, Game } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -51,9 +52,7 @@ function buildSummaryStats(
   const endDate = new Date()
   endDate.setHours(23, 59, 59, 999)
 
-  const startDate = new Date()
-  startDate.setMonth(startDate.getMonth() - 12)
-  startDate.setHours(0, 0, 0, 0)
+  const { firstDate: startDate } = buildActivityHeatmapWindow(endDate)
 
   const filteredJogatinas = jogatinas.filter((j) => {
     const jogatinaDate = new Date(j.date)

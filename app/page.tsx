@@ -1,5 +1,9 @@
 import { Suspense } from "react"
-import { Bree_Serif } from "next/font/google"
+import { Bree_Serif, Pirata_One, Kalam } from "next/font/google"
+import { HomepageFieldNote } from "@/components/landing/homepage-field-note"
+import { HomepageDynamoNote } from "@/components/landing/homepage-dynamo-note"
+import { HomepageTacticalMark } from "@/components/landing/homepage-tactical-mark"
+import { HomepagePortal } from "@/components/landing/homepage-portal"
 import { LandingNavigation } from "@/components/landing/landing-navigation"
 import { HomepageChapter } from "@/components/landing/homepage-chapter"
 import { HomepageJourney } from "@/components/landing/homepage-journey"
@@ -23,6 +27,8 @@ import { rsc } from "@/lib/rsc"
 import "./homepage.css"
 
 const display = Bree_Serif({ subsets: ["latin"], weight: "400", variable: "--font-homepage-display", display: "swap" })
+const headline = Pirata_One({ subsets: ["latin"], weight: "400", variable: "--font-homepage-headline", display: "swap" })
+const handwriting = Kalam({ subsets: ["latin"], weight: "400", variable: "--font-homepage-handwriting", display: "swap" })
 
 const HeroSection = rsc(LandingHeroSection)
 const CurrentGamesSection = rsc(LandingCurrentGamesSectionAsync)
@@ -37,8 +43,8 @@ const WeeklySummarySection = rsc(LandingWeeklySummarySection)
 
 export default function LandingPage() {
   return (
-    <LandingShell className={`homepage-rework ${display.variable}`}>
-      <LandingNavigation menuClassName={`homepage-rework ${display.variable}`} />
+    <LandingShell className={`homepage-rework ${display.variable} ${headline.variable} ${handwriting.variable}`}>
+      <LandingNavigation menuClassName={`homepage-rework ${display.variable} ${headline.variable} ${handwriting.variable}`} />
 
       <main className="homepage-main">
         <section id="overview" className="homepage-overview">
@@ -62,11 +68,12 @@ export default function LandingPage() {
         <LandingSection stop="02"
           id="atividade"
           title="Atividade ao longo do tempo"
-          description="Heatmap dos últimos 12 meses e resumo de frequência."
+          description="Heatmap dos últimos 6 meses e resumo de frequência."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="heatmap" />}>
             <ActivitySection />
           </Suspense>
+          <HomepagePortal tone="blue" />
         </LandingSection>
 
         <LandingSection stop="03"
@@ -77,6 +84,8 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="metrics" />}>
             <WeeklySummarySection />
           </Suspense>
+          <p className="homepage-margin-note">“Mais uma e a gente sai.” <span>— a panela, toda noite</span></p>
+          <HomepageTacticalMark />
         </LandingSection>
 
         <HomepageChapter tone="green" number="II" label="O território da panela" note="Tem sempre um jogo que junta a gente." />
@@ -88,6 +97,7 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
             <TopGamesSection />
           </Suspense>
+          <HomepageFieldNote />
         </LandingSection>
 
         <LandingSection stop="05" className="homepage-zone-green"
@@ -108,6 +118,7 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
             <TimelineSection />
           </Suspense>
+          <HomepageTacticalMark variant="radio" />
         </LandingSection>
 
         <HomepageChapter tone="gold" number="III" label="Quem faz a panela" note="Cada jogador, uma história." />
@@ -119,6 +130,7 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="metrics" />}>
             <GroupMetricsSection />
           </Suspense>
+          <HomepageDynamoNote />
         </LandingSection>
 
         <LandingSection stop="08" className="homepage-zone-gold"
@@ -129,6 +141,8 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="profiles" />}>
             <PlayerProfilesSection />
           </Suspense>
+          <p className="homepage-margin-note homepage-margin-note-right">Cada ficha, uma história. <span>O lobby não seria o mesmo sem vocês.</span></p>
+          <HomepageTacticalMark variant="target" />
         </LandingSection>
 
         <LandingSection stop="09" className="homepage-zone-gold"
@@ -140,6 +154,7 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
             <HighlightsSection />
           </Suspense>
+          <HomepagePortal tone="gold" />
         </LandingSection>
         </HomepageJourney>
       </main>

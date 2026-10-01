@@ -1,7 +1,7 @@
 "use client"
 
 import { createPortal } from "react-dom"
-import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react"
+import { useMemo, useState, type SyntheticEvent } from "react"
 import { getDateKey } from "@/lib/calendar-helpers"
 import { getJogatinaActivityDays, splitMinutesAcrossActivityDays } from "@/lib/jogatina-date-helpers"
 import type { Jogatina } from "@/lib/types"
@@ -69,8 +69,6 @@ function HeatmapTooltip({ hovered }: { hovered: HoveredDay }) {
 
 export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
   const { weeks, months, maxValue, startDate, endDate } = useMemo(() => buildHeatmapData(jogatinas), [jogatinas])
-  const scrollRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { const element = scrollRef.current; if (element) element.scrollLeft = element.scrollWidth }, [weeks.length])
   const [hovered, setHovered] = useState<HoveredDay | null>(null)
   const totalSessions = useMemo(() => weeks.flat().reduce((sum, day) => sum + day.count, 0), [weeks])
   const activeDays = useMemo(() => weeks.flat().filter((day) => day.count > 0).length, [weeks])
@@ -86,18 +84,18 @@ export function ActivityHeatmap({ jogatinas }: ActivityHeatmapProps) {
           <p className="homepage-heatmap-title">O calendário da jogatina</p>
           <p className="mt-1 text-xs text-muted-foreground">{totalSessions} {totalSessions === 1 ? "jogatina" : "jogatinas"} em {activeDays} dias ativos</p>
         </div>
-        <button type="button" className="homepage-heatmap-today" onClick={() => scrollRef.current?.scrollTo({left:scrollRef.current.scrollWidth, behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"})}><CalendarDays size={14} /> Até {endDate.toLocaleDateString("pt-BR", {day:"numeric",month:"short",year:"numeric"})}</button>
+        <span className="homepage-heatmap-today"><CalendarDays size={14} aria-hidden="true" /> Até {endDate.toLocaleDateString("pt-BR", {day:"numeric",month:"short",year:"numeric"})}</span>
       </div>
 
-      <div className="homepage-heatmap-range"><span>{months[0]?.label} {months[0]?.year}</span><ArrowRight size={14} aria-hidden="true" /><span>{months.at(-1)?.label} {months.at(-1)?.year}</span><small>Deslize para explorar ↔</small></div>
-      <div ref={scrollRef} className="homepage-heatmap-scroll">
+      <div className="homepage-heatmap-range"><span>{months[0]?.label} {months[0]?.year}</span><ArrowRight size={14} aria-hidden="true" /><span>{months.at(-1)?.label} {months.at(-1)?.year}</span></div>
+      <div className="homepage-heatmap-scroll">
         <div className="homepage-heatmap-calendar">
-          <div className="homepage-heatmap-months" style={{gridTemplateColumns:`repeat(${weeks.length}, minmax(8px, 1fr))`}} aria-hidden="true">
+          <div className="homepage-heatmap-months" style={{gridTemplateColumns:`repeat(${weeks.length}, minmax(0, 1fr))`}} aria-hidden="true">
             {months.map((month,index) => <span key={`${month.year}-${month.label}`} className={index === months.length - 1 ? "is-current" : undefined} style={{gridColumn:`${month.column + 1} / span ${month.span}`}}>{month.label}</span>)}
           </div>
           <div className="homepage-heatmap-body">
             <div className="homepage-heatmap-weekdays" aria-hidden="true">{WEEKDAY_LABELS.map(label => <span key={label}>{label}</span>)}</div>
-            <div className="homepage-heatmap-weeks" style={{gridTemplateColumns:`repeat(${weeks.length}, minmax(8px, 1fr))`}} role="group" aria-label="Heatmap de atividade por dia">
+            <div className="homepage-heatmap-weeks" style={{gridTemplateColumns:`repeat(${weeks.length}, minmax(0, 1fr))`}} role="group" aria-label="Heatmap de atividade por dia">
               {weeks.map((week, weekIndex) => <div key={weekIndex} className="homepage-heatmap-week">
                 {week.map(day => {
                   const intensity = getIntensity(day, maxValue)

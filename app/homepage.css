@@ -189,13 +189,67 @@
 .homepage-chapter,.homepage-rework .homepage-journey > .landing-section { flex-shrink:0; }
 .homepage-chapter { width:100%; }
 
-/* The calendar keeps all twelve months aligned to their actual weeks. */
+/* Printed paper: the wear sits on the scenery, below readable content. */
+.homepage-rework,.homepage-zone-ground,.homepage-zone-skyline,.homepage-footer-wrap,.homepage-footer::before,.homepage-footer-divider { background-image:url('/panela-paper-wear.webp'); background-size:960px 960px; }
+.homepage-zone-skyline { background-position:120px 0; }
+.homepage-zone-gold .homepage-zone-ground { background-position:310px 90px; }
+.homepage-footer-divider::after { background-image:url('/panela-paper-wear.webp'); background-size:960px 960px; }
+.homepage-hero-rooftop { clip-path:polygon(10% 1%,21% 0,29% 1%,39% 0,48% 1%,60% 0,71% 1%,82% 0,92% 1%,100% 0,100% 93%,93% 92%,88% 94%,77% 93%,68% 95%,59% 94%,48% 97%,40% 95%,30% 98%,21% 97%,11% 100%,0 98%); }
+.homepage-chapter::before { content:""; position:absolute; top:-65px; left:50%; width:100vw; height:12px; transform:translateX(-50%); pointer-events:none; background:#e8dfbd; opacity:.07; clip-path:polygon(0 30%,6% 50%,11% 20%,18% 55%,27% 35%,34% 60%,45% 25%,52% 50%,64% 30%,72% 60%,83% 40%,91% 60%,100% 30%,100% 48%,92% 76%,83% 56%,72% 77%,64% 49%,52% 66%,45% 43%,34% 79%,27% 53%,18% 73%,11% 39%,6% 69%,0 48%); }
+.homepage-field-note.homepage-dynamo-note { margin-left:0; margin-right:auto; width:395px; min-height:185px; padding-top:35px; }
+.homepage-dynamo-note .homepage-field-note-paper { margin-left:135px; width:250px; background:#e3cfa7; transform:rotate(3deg); padding-left:22px; clip-path:polygon(0 2%,97% 0,100% 4%,99% 91%,96% 94%,98% 100%,1% 97%,0 89%); }
+.homepage-field-note.homepage-dynamo-note > img { left:0; right:auto; bottom:10px; width:145px; height:185px; transform:rotate(-7deg); animation:panela-bob 9s ease-in-out infinite; }
+@media(max-width:767px) {
+ .homepage-field-note.homepage-dynamo-note { width:100%; min-height:175px; }
+ .homepage-dynamo-note .homepage-field-note-paper { margin-left:100px; width:calc(100% - 100px); padding:16px 12px 16px 16px; }
+ .homepage-field-note.homepage-dynamo-note > img { width:108px; height:155px; left:-8px; }
+ .homepage-dynamo-note .homepage-note-source { font-size:7px; }
+ .homepage-hero-rooftop { clip-path:polygon(0 4%,8% 3%,18% 4%,29% 2%,39% 3%,49% 1%,59% 2%,69% 0,79% 1%,89% 0,100% 1%,100% 96%,92% 97%,84% 95%,73% 97%,64% 96%,54% 98%,43% 97%,32% 99%,22% 98%,10% 100%,0 99%); }
+}
+
+/* Inked display lettering and small handwritten field notes. */
+.homepage-hero-copy h1,.homepage-rework .landing-section h2,.homepage-chapter-sign > p,.homepage-footer-heading p { font-family:var(--font-homepage-headline),var(--font-homepage-display),serif; letter-spacing:.005em; }
+.homepage-hero-copy h1 { font-size:clamp(64px,7.3vw,98px); line-height:1.06; }
+.homepage-hero-copy h1 span { display:inline-block; background:var(--primary); color:#14292a; padding:0 12px 5px; margin-top:8px; transform:rotate(1deg); box-shadow:4px 5px 0 #0d222380; }
+.homepage-rework .landing-section h2 { font-size:clamp(32px,3.5vw,43px); line-height:1.15; }
+.homepage-chapter-sign > p { font-size:41px; }
+.homepage-chapter-note,.homepage-paper-label,.homepage-scroll-note,.homepage-margin-note { font-family:var(--font-homepage-handwriting),cursive; }
+.homepage-chapter-note { font-size:18px; }
+.homepage-paper-label { font-size:19px; line-height:1.35; }
+.homepage-margin-note { font-size:18px; color:var(--primary); margin:24px 0 0; transform:rotate(-2deg); line-height:1.6; }
+.homepage-margin-note > span { display:block; font-size:12px; color:var(--muted-foreground); }
+.homepage-margin-note-right { text-align:right; margin-top:36px; transform:rotate(2deg); }
+.homepage-field-note { position:relative; width:340px; max-width:100%; min-height:160px; margin:50px 8px 0 auto; padding-top:25px; }
+.homepage-field-note-paper { position:relative; z-index:1; width:250px; padding:18px 20px 15px; background:#d6e3d9; color:#243b37; transform:rotate(-4deg); box-shadow:4px 6px 0 #14241c; clip-path:polygon(1% 1%,99% 0,100% 95%,96% 100%,0 98%); }
+.homepage-field-note-paper::before { content:""; position:absolute; top:-2px; left:24%; width:60px; height:13px; background:#bba97cb3; transform:rotate(5deg); }
+.homepage-note-eyebrow { display:flex; align-items:center; gap:6px; font-size:9px; text-transform:uppercase; letter-spacing:.06em; font-weight:700; }
+.homepage-field-note-paper p { font-family:var(--font-homepage-handwriting),cursive; font-size:18px; line-height:1.45; margin:10px 0 6px; }
+.homepage-note-source { font-size:8px; opacity:.8; }
+.homepage-field-note > img { position:absolute; z-index:2; width:115px; height:165px; object-fit:contain; right:0; bottom:12px; transform:rotate(7deg); transform-origin:bottom center; animation:elluna-peek 8s ease-in-out infinite; pointer-events:none; }
+.homepage-note-sparkle { position:absolute; right:5px; top:8px; color:#badbdf; transform:rotate(15deg); }
+@keyframes elluna-peek { 0%,85%,100% { transform:rotate(7deg) translateY(0); } 92% { transform:rotate(3deg) translateY(-4px); } }
+@media(max-width:767px) {
+ .homepage-hero-copy h1 { font-size:68px; }
+ .homepage-hero-copy h1 span { padding:0 9px 4px; }
+ .homepage-rework .landing-section h2 { font-size:33px; }
+ .homepage-chapter-sign > p { font-size:27px; }
+ .homepage-chapter-note { font-size:14px; }
+ .homepage-field-note { width:290px; margin:35px 0 0; min-height:150px; }
+ .homepage-field-note-paper { width:calc(100% - 65px); padding:15px 12px; }
+ .homepage-field-note-paper p { font-size:16px; }
+ .homepage-field-note > img { width:95px; height:145px; right:-3px; bottom:10px; }
+ .homepage-margin-note { font-size:17px; }
+ .homepage-note-eyebrow { font-size:8px; }
+}
+
+/* The calendar keeps all six months aligned to their actual weeks. */
 .homepage-heatmap-title { font-family:var(--font-homepage-display),serif; font-size:22px; }
 .homepage-heatmap-today { display:flex; align-items:center; gap:6px; flex-shrink:0; color:var(--primary); font-size:11px; padding:7px 10px; border:1px dashed var(--border); border-radius:5px; }
 .homepage-heatmap-range { display:flex; align-items:center; gap:10px; font-size:11px; color:var(--muted-foreground); margin:0 0 16px 34px; }
 .homepage-heatmap-range small { display:none; margin-left:auto; }
 .homepage-heatmap-scroll { overflow-x:auto; padding-bottom:8px; }
-.homepage-heatmap-calendar { min-width:590px; }
+.homepage-heatmap { max-width:680px; margin-inline:auto; }
+.homepage-heatmap-calendar { min-width:0; width:100%; }
 .homepage-heatmap-months { display:grid; gap:3px; margin-left:34px; margin-bottom:12px; font-size:10px; color:var(--muted-foreground); }
 .homepage-heatmap-months .is-current { color:var(--primary); font-weight:700; }
 .homepage-heatmap-body { display:grid; grid-template-columns:28px 1fr; gap:6px; }
@@ -282,7 +336,7 @@ html:has(.homepage-rework)::-webkit-scrollbar-track,html:has(.homepage-rework) *
  .homepage-heatmap-range { margin-left:0; flex-wrap:wrap; }
  .homepage-heatmap-range small { display:block; font-size:9px; width:100%; margin-left:0; }
  .homepage-heatmap-today { font-size:10px; }
- .homepage-heatmap-calendar { min-width:650px; }
+ .homepage-heatmap-calendar { min-width:0; }
  .homepage-heatmap-legend { font-size:9px; gap:6px; }
  .homepage-metrics-board { grid-template-columns:1fr; gap:42px; }
  .homepage-metrics-ticket { padding:26px 16px; }
@@ -299,5 +353,30 @@ html:has(.homepage-rework)::-webkit-scrollbar-track,html:has(.homepage-rework) *
  .homepage-moments-cards { grid-template-columns:1fr; gap:38px; }
  .homepage-moment:nth-child(2),.homepage-moment:nth-child(3) { transform:rotate(2deg); }
  .homepage-footer-divider { height:145px; }
- .homepage-footer-divider::after { mask-size:auto 100%; }
+.homepage-footer-divider::after { mask-size:auto 100%; }
+}
+.homepage-footer-wrap,.homepage-footer-divider,.homepage-footer-divider::after { background-image:url('/panela-paper-wear.webp'); background-size:960px 960px; }
+.homepage-portal { --portal-light:#83d1db; position:absolute; right:8px; bottom:-95px; width:52px; height:78px; display:block; transform:rotate(5deg); transition:transform .25s,filter .25s; }
+.homepage-portal img { display:block; width:100%; height:100%; object-fit:contain; }
+.homepage-portal::before { content:""; position:absolute; z-index:-1; inset:20% 10% 8%; background:var(--portal-light); opacity:.12; filter:blur(12px); border-radius:50%; }
+.homepage-portal-gold { --portal-light:#f3cb67; transform:rotate(-5deg); }
+.homepage-portal:hover { transform:rotate(0) translateY(-3px); filter:brightness(1.2); }
+@media(max-width:767px) {
+ .homepage-heatmap-months { margin-left:26px; gap:2px; font-size:9px; }
+ .homepage-heatmap-body { grid-template-columns:22px 1fr; gap:4px; }
+ .homepage-heatmap-weeks { gap:2px; }
+ .homepage-portal { width:42px; height:65px; right:4px; bottom:-74px; }
+}
+.homepage-hero-crossover { position:absolute; right:-80px; top:-15px; width:76%; height:calc(100% + 30px); max-width:none; margin:0; animation:none; pointer-events:none; }
+.homepage-hero-crossover picture,.homepage-hero-crossover img { display:block; width:100%; height:100%; object-fit:contain; object-position:right center; }
+.homepage-tactical-mark { position:absolute; pointer-events:none; user-select:none; color:var(--primary); }
+.homepage-tactical-mark-tags { width:52px; height:52px; right:0; bottom:0; transform:rotate(12deg); opacity:.85; }
+.homepage-tactical-mark-tags img { width:100%; height:100%; object-fit:contain; }
+.homepage-tactical-mark-radio { left:2px; bottom:-42px; opacity:.4; transform:rotate(-8deg); }
+.homepage-tactical-mark-target { left:4px; bottom:2px; opacity:.25; transform:rotate(12deg); }
+@media(max-width:767px) { .homepage-tactical-mark-tags { width:42px; height:42px; right:-4px; bottom:0; } }
+@media(max-width:1279px) { .homepage-hero-crossover { right:-48px; width:74%; } }
+@media(max-width:767px) {
+ .homepage-hero-crossover { position:relative; right:auto; top:auto; height:280px; width:calc(100% + 40px); max-width:none; margin:20px -20px 22px; }
+ .homepage-hero-crossover picture,.homepage-hero-crossover img { object-position:center; }
 }

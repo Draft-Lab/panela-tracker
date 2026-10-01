@@ -1,8 +1,8 @@
-/** Twelve calendar months, including the current one, aligned to Sunday columns. */
+/** Six calendar months, including the current one, aligned to Sunday columns. */
 export function buildActivityHeatmapWindow(today: Date) {
   const endDate = new Date(today)
   endDate.setHours(0, 0, 0, 0)
-  const firstDate = new Date(endDate.getFullYear(), endDate.getMonth() - 11, 1)
+  const firstDate = new Date(endDate.getFullYear(), endDate.getMonth() - 5, 1)
   const gridStart = new Date(firstDate)
   gridStart.setDate(gridStart.getDate() - gridStart.getDay())
   const gridEnd = new Date(endDate)
