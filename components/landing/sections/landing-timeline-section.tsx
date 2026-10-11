@@ -34,6 +34,7 @@ export async function LandingTimelineSectionAsync(): Promise<ReactElement> {
     <LandingTimelineSection
       jogatinas={recentJogatinas}
       jogatinaPlayers={jogatinaPlayers}
+      appearance="cartoon"
     />
   );
 }

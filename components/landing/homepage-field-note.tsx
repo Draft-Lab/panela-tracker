@@ -7,6 +7,7 @@ export function HomepageFieldNote() {
       <span className="homepage-note-eyebrow"><Moon size={13} aria-hidden="true" /> Lembrete da Elluna</span>
       <p>Ninguém fica pra trás.<br />Até o próximo lobby!</p>
       <span className="homepage-note-source">uma lembrança de SUPERVIVE</span>
+      <details className="homepage-folded-note"><summary>Uma última coisa…</summary><p>Os cartazes acima mostram os jogos com mais sessões em que pelo menos duas pessoas jogaram juntas.</p></details>
     </div>
     <img src="/panela-elluna.webp" alt="Elluna, a coelhinha azul de SUPERVIVE, espiando sobre a anotação." width={400} height={600} loading="lazy" decoding="async" />
     <Sparkles className="homepage-note-sparkle" size={18} aria-hidden="true" />

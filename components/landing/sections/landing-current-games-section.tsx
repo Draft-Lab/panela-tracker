@@ -11,6 +11,7 @@ export async function LandingCurrentGamesSectionAsync(): Promise<ReactElement> {
     <LandingCurrentGamesSection
       currentGames={currentGames}
       isInteractive={false}
+      appearance="cartoon"
     />
   );
 }

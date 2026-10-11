@@ -10,6 +10,7 @@ import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import { useIsClient } from "@/hooks/use-is-client"
 import { groupByDateLabel } from "@/lib/local-date"
 import { cn } from "@/lib/utils"
+import { HomepageEventFeedItem } from "@/components/landing/homepage-event-feed-item"
 
 interface LandingTimelineSectionProps {
   jogatinas: (Jogatina & {
@@ -19,6 +20,7 @@ interface LandingTimelineSectionProps {
   jogatinaPlayers: (JogatinaPlayer & { player: Player })[]
   limit?: number
   compact?: boolean
+  appearance?: "default" | "cartoon"
 }
 
 function buildRecentEvents(
@@ -49,6 +51,7 @@ export function LandingTimelineSection({
   jogatinaPlayers,
   limit = 6,
   compact = false,
+  appearance = "default",
 }: LandingTimelineSectionProps) {
   const isClient = useIsClient()
 
@@ -70,12 +73,12 @@ export function LandingTimelineSection({
   }
 
   return (
-    <div className={cn("rounded-[1.5rem] border border-white/[0.08] bg-card/25 p-3 sm:p-4", compact && "p-2.5")}>
+    <div className={appearance === "cartoon" ? "homepage-event-feed" : cn("rounded-[1.5rem] border border-white/[0.08] bg-card/25 p-3 sm:p-4", compact && "p-2.5")}>
       <div className="space-y-3">
         {groupedEvents.map(([label, events]) => (
           <section key={label || "timeline-events"}>
             {label && (
-              <div className="mb-2 grid grid-cols-[0.875rem_minmax(0,1fr)] gap-x-3">
+              <div className={appearance === "cartoon" ? "homepage-event-date" : "mb-2 grid grid-cols-[0.875rem_minmax(0,1fr)] gap-x-3"}>
                 <div aria-hidden />
                 <h3 className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   {label}
@@ -83,8 +86,9 @@ export function LandingTimelineSection({
               </div>
             )}
 
-            <div>
+            <div className={appearance === "cartoon" ? "homepage-event-strips" : undefined}>
               {events.map((event, index) => (
+                appearance === "cartoon" ? <HomepageEventFeedItem key={event.jogatina.id} event={event} /> :
                 <TimelineEventItem
                   key={event.jogatina.id}
                   event={event}

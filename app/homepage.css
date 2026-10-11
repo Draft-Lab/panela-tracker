@@ -380,3 +380,109 @@ html:has(.homepage-rework)::-webkit-scrollbar-track,html:has(.homepage-rework) *
  .homepage-hero-crossover { position:relative; right:auto; top:auto; height:280px; width:calc(100% + 40px); max-width:none; margin:20px -20px 22px; }
  .homepage-hero-crossover picture,.homepage-hero-crossover img { object-position:center; }
 }
+
+/* The lobby and event feed share the home's illustrated paper language. */
+.homepage-wanted-board { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; padding:8px 4px 24px; }
+.homepage-wanted-poster { --muted:#b9b88e; display:flex; align-items:center; flex-direction:column; min-width:0; padding:20px 14px 14px; background:#dfcfa4 url('/panela-paper-wear.webp') center / 600px; color:#333b28; border:3px solid #263523; box-shadow:5px 6px 0 #192a18; transform:rotate(-3deg); transition:transform .25s; text-align:center; }
+.homepage-wanted-poster:nth-child(2) { transform:translateY(15px) rotate(2deg); background-color:#d2c69e; }
+.homepage-wanted-poster:nth-child(3) { transform:rotate(-1deg); }
+.homepage-wanted-poster:hover { transform:translateY(-4px) rotate(0); }
+.homepage-wanted-rank { font-size:9px; text-transform:uppercase; letter-spacing:.12em; }
+.homepage-wanted-poster h3 { margin-top:10px; font-family:var(--font-homepage-display),serif; font-size:clamp(22px,2.5vw,30px); text-transform:uppercase; }
+.homepage-wanted-reason { margin:4px 0 16px; font-size:10px; }
+.homepage-wanted-poster [data-slot='avatar'] { width:80px; height:88px; border-radius:0; border:4px solid #333b28; filter:sepia(.4); transform:rotate(-3deg); }
+.homepage-wanted-name { font-family:var(--font-homepage-display),serif; font-size:21px; margin:16px 0 10px; overflow-wrap:anywhere; max-width:100%; }
+.homepage-wanted-count { border-top:2px dashed #8c8866; border-bottom:2px dashed #8c8866; width:100%; padding:10px 0; }
+.homepage-wanted-count strong { display:block; font-family:var(--font-homepage-display),serif; font-size:42px; line-height:1.1; color:#98442e; }
+.homepage-wanted-count span { font-size:10px; }
+.homepage-wanted-rate { margin:12px 0 16px; font-size:10px; line-height:1.7; }
+.homepage-wanted-link { display:flex; align-items:center; gap:8px; margin-top:auto; font-size:11px; font-weight:700; }
+.homepage-rework #agora { display:block; }
+.homepage-lobby-host { position:absolute; right:-18px; top:-185px; width:145px; pointer-events:none; z-index:3; }
+.homepage-lobby-host img { width:100%; height:auto; transform:rotate(6deg); filter:drop-shadow(5px 7px 0 #0c1d1e66); }
+.homepage-lobby-host > span { display:block; position:relative; margin:-12px 0 0 10px; width:fit-content; padding:7px 10px; background:#e8dbb7; color:#263b35; font-family:var(--font-homepage-handwriting),cursive; font-size:12px; transform:rotate(-5deg); box-shadow:3px 4px 0 #0c1d1e; }
+.homepage-lobbies { gap:30px; }
+.homepage-lobby { --foreground:#23352f; --muted-foreground:#53634e; --border:#718166; position:relative; display:flex; flex-direction:column; min-width:0; background:#eadfbe url('/panela-paper-wear.webp') center / 700px; color:var(--foreground); border:4px solid #eadfbe; box-shadow:7px 8px 0 #0c1d1e; transform:rotate(-1deg); transition:transform .25s; }
+.homepage-lobby:hover { transform:rotate(0) translateY(-3px); }
+.homepage-lobby-scene { position:relative; height:235px; background:#203b39; border:2px solid #203b39; }
+.homepage-lobby-art { object-fit:cover; object-position:center 35%; filter:brightness(.82) saturate(.85); }
+.homepage-lobby-placeholder { position:absolute; inset:0; margin:auto; color:#8dd0ce; }
+.homepage-lobby-tag { position:absolute; left:-12px; top:15px; display:inline-flex; align-items:center; gap:9px; padding:9px 16px; background:#f49b58; color:#172c29; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; transform:rotate(-4deg); box-shadow:3px 4px 0 #0c1d1e; }
+.homepage-lobby-tag > span { width:7px; height:7px; background:#172c29; border-radius:50%; }
+.homepage-lobby-ticket-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:9px; }
+.homepage-lobby-mode { flex-shrink:0; background:#203b39; color:#eee1c1; padding:6px 11px; font-size:11px; font-weight:600; border:1px solid #eee1c155; transform:rotate(3deg); }
+.homepage-lobby-ticket { position:relative; width:calc(100% - 40px); margin:-35px auto 0; padding:18px 22px; background:#eadfbe url('/panela-paper-wear.webp') center / 700px; border:2px solid #23352f; transform:rotate(1deg); box-shadow:3px 4px 0 #23352f33; }
+.homepage-lobby-ticket h3 { min-width:0; margin:0; font-family:var(--font-homepage-display),serif; font-size:clamp(24px,3vw,36px); line-height:1.12; overflow-wrap:anywhere; }
+.homepage-lobby-genres { font-size:11px; }
+.homepage-lobby-clock { display:inline-block; margin-top:15px; padding:7px 10px; background:#c4d7a7; border:1px solid #748662; transform:rotate(-2deg); }
+.homepage-lobby-clock p { color:#263b2b; }
+.homepage-lobby-roster { margin-top:auto; padding:22px; }
+.homepage-lobby-roster > p { margin-bottom:12px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.12em; }
+.homepage-lobby-roster .participant-chip { padding:6px 8px 6px 5px; gap:7px; background:#d8d3ae; border:1px solid #9ba182; max-width:100%; margin-bottom:5px; }
+.homepage-lobby-roster .participant-chip [data-slot='avatar'] { width:30px; height:30px; border-radius:3px; border:2px solid #304436; transform:rotate(-5deg); }
+.homepage-lobby-roster .participant-separator { display:none; }
+.homepage-lobby-no-players { font-size:12px; color:#53634e; }
+.homepage-lobby-finish { display:flex; align-items:center; gap:6px; margin-top:12px; font-size:12px; text-decoration:underline; text-underline-offset:3px; }
+.homepage-lobby-compact .homepage-lobby-scene { height:190px; }
+.homepage-lobby-compact .homepage-lobby-ticket { width:calc(100% - 20px); padding:16px; }
+.homepage-lobby-compact .homepage-lobby-ticket h3 { font-size:25px; }
+.homepage-lobby-empty { position:relative; display:flex; align-items:center; gap:24px; padding:30px; background:#203b39 url('/panela-paper-wear.webp') center / 700px; border:3px dashed #6f8e7f; }
+.homepage-lobby-empty > img { width:100px; height:auto; flex-shrink:0; transform:rotate(-7deg); }
+.homepage-lobby-empty .homepage-lobby-tag { position:static; font-size:10px; margin-bottom:15px; }
+.homepage-lobby-empty h3 { font-family:var(--font-homepage-display),serif; font-size:30px; }
+.homepage-lobby-empty p { margin-top:10px; font-size:12px; line-height:1.8; color:var(--muted-foreground); }
+.homepage-event-feed { min-width:0; }
+.homepage-event-date { margin-bottom:12px; }
+.homepage-event-date > div { display:none; }
+.homepage-event-date h3 { font-family:var(--font-homepage-handwriting),cursive; font-size:14px; text-transform:none; letter-spacing:0; }
+.homepage-event-strips { display:grid; gap:16px; padding:0 4px 10px; }
+.homepage-event-strip { --foreground:#27382c; --muted-foreground:#526043; display:grid; grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr); position:relative; background:#e8ddbc url('/panela-paper-wear.webp') center / 700px; color:var(--foreground); border:2px solid #27382c; box-shadow:4px 5px 0 #192a18; transform:rotate(-1deg); transition:transform .25s; }
+.homepage-event-strip:nth-child(even) { transform:rotate(1deg); }
+.homepage-event-strip:hover { transform:rotate(0) translateX(3px); }
+.homepage-event-player,.homepage-event-game { display:flex; align-items:center; gap:9px; min-width:0; padding:10px; }
+.homepage-event-player [data-slot='avatar'] { width:36px; height:36px; border:2px solid #304436; border-radius:3px; flex-shrink:0; transform:rotate(-4deg); }
+.homepage-event-player > div:last-child { min-width:0; }
+.homepage-event-player strong,.homepage-event-game strong { display:block; font-family:var(--font-homepage-display),serif; font-size:17px; line-height:1.2; overflow-wrap:anywhere; }
+.homepage-event-player span:not([data-slot]) { font-size:11px; color:#536043; }
+.homepage-event-action { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; align-content:center; gap:4px; padding:8px 3px; background:#cf7653; color:#232f24; clip-path:polygon(10% 0,100% 0,90% 100%,0 100%); }
+.homepage-event-action span { font-size:9px; font-weight:700; }
+.homepage-event-action > svg:first-child { width:100%; }
+.homepage-event-game { justify-content:space-between; }
+.homepage-event-game-info { min-width:0; }
+.homepage-event-game-details { white-space:normal; overflow:visible; font-size:11px; line-height:1.5; margin-top:4px; }
+.homepage-event-cover { display:grid; place-items:center; position:relative; height:46px; width:34px; flex-shrink:0; border:1px solid #304436; overflow:hidden; background:#c3c9a2; }
+.homepage-event-meta { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:12px; align-items:center; padding:8px 10px; background:#d1d1a9; font-size:11px; border-top:1px dashed #8c9778; color:#3d5135; }
+.homepage-event-meta > span { display:inline-flex; align-items:center; gap:4px; }
+.homepage-event-meta time { margin-left:auto; }
+.homepage-event-live .homepage-event-action { background:#a8d875; }
+.homepage-event-status { font-weight:700; }
+.homepage-event-status.is-live { font-weight:800; text-transform:uppercase; color:#274e29; }
+.homepage-event-roster { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:7px; list-style:none; margin:0; padding:9px 10px; border-top:1px solid #a0ab86; }
+.homepage-event-roster li { display:flex; align-items:center; gap:6px; max-width:100%; padding:3px 7px 3px 3px; background:#d7d3af; border:1px solid #8c9778; font-size:11px; }
+.homepage-event-roster li > span:last-child { overflow-wrap:anywhere; }
+.homepage-event-roster [data-slot='avatar'] { width:24px; height:24px; flex-shrink:0; border:1px solid #304436; border-radius:2px; }
+@media(min-width:1024px) { .homepage-rework #timeline { grid-template-columns:.6fr 1.4fr; gap:26px; } }
+@media(max-width:767px) {
+ .homepage-wanted-board { grid-template-columns:1fr; gap:26px; }
+ .homepage-wanted-poster { padding:22px; }
+ .homepage-wanted-poster:nth-child(2) { transform:rotate(2deg); }
+ .homepage-wanted-poster h3 { font-size:32px; }
+ .homepage-lobby-host { width:85px; right:-8px; top:auto; bottom:-110px; }
+ .homepage-lobby-host > span { font-size:10px; padding:5px 7px; margin-left:0; }
+ .homepage-lobby-scene { height:190px; }
+ .homepage-lobby-ticket { width:calc(100% - 16px); padding:14px; margin-top:-23px; }
+ .homepage-lobby-ticket h3 { font-size:26px; }
+ .homepage-lobby-roster { padding:18px 12px; }
+ .homepage-lobby-roster .participant-chip { flex-wrap:wrap; }
+ .homepage-lobby-roster .participant-chip > span:last-child { overflow-wrap:anywhere; }
+ .homepage-lobby-empty { padding:18px 14px; gap:12px; }
+ .homepage-lobby-empty > img { width:60px; }
+ .homepage-lobby-empty h3 { font-size:24px; }
+ .homepage-event-strip { grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr); }
+ .homepage-event-player,.homepage-event-game { padding:8px 6px; gap:6px; }
+ .homepage-event-player [data-slot='avatar'] { width:28px; height:28px; }
+ .homepage-event-player strong,.homepage-event-game strong { font-size:15px; }
+ .homepage-event-game { flex-direction:column-reverse; align-items:flex-start; justify-content:center; }
+ .homepage-event-cover { display:grid; height:44px; width:33px; }
+ .homepage-event-meta { gap:8px; }
+}

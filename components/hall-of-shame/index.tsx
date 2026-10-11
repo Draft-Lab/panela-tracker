@@ -3,6 +3,7 @@ import { DropperRankExtended } from "@/components/hall-of-shame/dropper-rank-ext
 import { DropperRankPodium } from "@/components/hall-of-shame/dropper-rank-podium"
 import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import type { JogatinaPlayer, SeasonParticipant, Player } from "@/lib/types"
+import { HomepageWantedPosters } from "@/components/landing/homepage-wanted-posters"
 
 const TOP_PODIUM = 3
 const TOP_EXTENDED = 10
@@ -10,11 +11,13 @@ const TOP_EXTENDED = 10
 interface HallOfShameProps {
   jogatinaPlayers: (JogatinaPlayer & { player?: Player })[]
   seasonParticipants?: (SeasonParticipant & { player?: Player })[]
+  appearance?: "default" | "cartoon"
 }
 
 export function HallOfShame({
   jogatinaPlayers,
   seasonParticipants = [],
+  appearance = "default",
 }: HallOfShameProps) {
   const rankedDroppers = calculatePlayerStats(
     jogatinaPlayers.filter(
@@ -22,7 +25,7 @@ export function HallOfShame({
     ),
     seasonParticipants,
   )
-    .filter((player) => player.totalJogatinas > 0)
+    .filter((player) => player.totalJogatinas > 0 && (appearance !== "cartoon" || player.dropos > 0))
     .sort((a, b) => b.dropos - a.dropos)
 
   const topDroppers = rankedDroppers.slice(0, TOP_PODIUM)
@@ -33,6 +36,8 @@ export function HallOfShame({
       <LandingEmptyState>Ninguém dropou ainda. Milagre.</LandingEmptyState>
     )
   }
+
+  if (appearance === "cartoon") return <HomepageWantedPosters droppers={topDroppers} />
 
   return (
     <div className="space-y-3">

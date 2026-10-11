@@ -6,6 +6,7 @@ export function HomepageDynamoNote() {
       <span className="homepage-note-eyebrow"><Orbit size={13} aria-hidden="true" /> Teoria do Dynamo</span>
       <p>A próxima partida<br />é sempre a melhor.</p>
       <span className="homepage-note-source">anotado em algum lugar de Deadlock</span>
+      <details className="homepage-folded-note"><summary>Abrir a teoria</summary><p>O tempo médio considera as participações registradas. Uma sessão com três jogadores pode deixar três histórias no arquivo.</p></details>
     </div>
     <img src="/panela-dynamo.webp" alt="Dynamo, o professor robô de Deadlock, levantando um dedo como quem tem uma teoria." width={400} height={500} loading="lazy" decoding="async" />
   </aside>

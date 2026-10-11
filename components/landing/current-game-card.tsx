@@ -9,8 +9,9 @@ import { CurrentSessionParticipants } from "@/components/landing/current-session
 import { getLiveSessionStartedAt } from "@/lib/live-session-helpers"
 import { buildCurrentSessionParticipants } from "@/lib/current-session-player-helpers"
 import { cn } from "@/lib/utils"
+import { HomepageLobbyCard } from "@/components/landing/homepage-lobby-card"
 
-interface CurrentGameCardProps {
+export interface CurrentGameCardProps {
   jogatina: Jogatina & {
     game: Game
     jogatina_players?: (JogatinaPlayer & { player: Player })[]
@@ -20,6 +21,7 @@ interface CurrentGameCardProps {
   onFinish?: (jogatinaId: string, gameTitle: string) => void
   /** Cards lado a lado precisam de layout empilhado para não esmagar capa e participantes */
   compact?: boolean
+  appearance?: "default" | "cartoon"
 }
 
 export function CurrentGameCard({
@@ -27,7 +29,11 @@ export function CurrentGameCard({
   isInteractive = false,
   onFinish,
   compact = false,
+  appearance = "default",
 }: CurrentGameCardProps) {
+  if (appearance === "cartoon") {
+    return <HomepageLobbyCard jogatina={jogatina} compact={compact} isInteractive={isInteractive} onFinish={onFinish} />
+  }
   const sessionEvents = jogatina.jogatina_events ?? []
   const activeCount = buildCurrentSessionParticipants(
     jogatina.jogatina_players ?? [],

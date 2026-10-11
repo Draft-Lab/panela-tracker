@@ -19,6 +19,7 @@ export async function LandingHallOfShameSection(): Promise<ReactElement> {
     <HallOfShame
       jogatinaPlayers={slimRowsToJogatinaPlayers(slimRows)}
       seasonParticipants={seasonParticipants}
+      appearance="cartoon"
     />
   );
 }

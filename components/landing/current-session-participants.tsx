@@ -90,12 +90,12 @@ function ParticipantChip({
   return (
     <>
       {showSeparator && (
-        <span className="text-[10px] text-muted-foreground/35" aria-hidden>
+        <span className="participant-separator text-[10px] text-muted-foreground/35" aria-hidden>
           ·
         </span>
       )}
       <span
-        className="inline-flex min-w-0 items-center gap-1"
+        className="participant-chip inline-flex min-w-0 items-center gap-1"
         title={formatParticipantTooltip(participant)}
       >
         <Avatar

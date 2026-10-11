@@ -25,6 +25,7 @@ import { LandingHighlightsSection } from "@/components/landing/sections/landing-
 import { LandingWeeklySummarySection } from "@/components/landing/sections/landing-weekly-summary-section"
 import { rsc } from "@/lib/rsc"
 import "./homepage.css"
+import "./homepage-world.css"
 
 const display = Bree_Serif({ subsets: ["latin"], weight: "400", variable: "--font-homepage-display", display: "swap" })
 const headline = Pirata_One({ subsets: ["latin"], weight: "400", variable: "--font-homepage-headline", display: "swap" })
@@ -55,6 +56,7 @@ export default function LandingPage() {
         </section>
 
         <HomepageJourney>
+        <HomepageChapter tone="blue" number="I" label="A noite começa aqui" note="Ponto de encontro da panela" />
         <LandingSection stop="01"
           id="agora"
           eyebrow="Ao vivo"
@@ -105,6 +107,7 @@ export default function LandingPage() {
           title="Hall da vergonha"
           description="Os três maiores dropadores do grupo."
         >
+          <div className="homepage-neighborhood-board"><img src="/panela-neighborhood-board.webp" alt="Mural ilustrado com cartazes de procurados e uma lanterna." width={240} height={160} loading="lazy" decoding="async" /><details><summary>Recado do xerife</summary><p>Os procurados são os jogadores com mais drops registrados. A ficha de cada um está nos cartazes abaixo.</p></details></div>
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
             <HallOfShameSection />
           </Suspense>
@@ -112,8 +115,8 @@ export default function LandingPage() {
 
         <LandingSection stop="06" className="homepage-zone-green"
           id="timeline"
-          title="Timeline global"
-          description="Últimos eventos registrados pelo grupo."
+          title="Quem puxou a próxima?"
+          description="As últimas sessões da panela, direto do lobby."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
             <TimelineSection />
