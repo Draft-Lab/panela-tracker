@@ -15,22 +15,21 @@ export function EnrichGameFromIgdb({ game }: EnrichGameFromIgdbProps) {
   const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const isDisabled = game.is_app || Boolean(game.igdb_synced_at);
+  const actionLabel = game.is_app
+    ? "Apps não são enriquecidos via IGDB"
+    : game.igdb_synced_at
+      ? "Alterar informações do IGDB"
+      : "Buscar informações no IGDB";
 
   return (
     <>
       <Button
         variant="outline"
         size="sm"
-        disabled={isDisabled}
+        disabled={game.is_app}
         onClick={() => setDialogOpen(true)}
-        title={
-          game.is_app
-            ? "Apps não são enriquecidos via IGDB"
-            : game.igdb_synced_at
-              ? "Jogo já enriquecido via IGDB"
-              : "Buscar informações no IGDB"
-        }
+        title={actionLabel}
+        aria-label={actionLabel}
       >
         <Database className="h-4 w-4" />
       </Button>
