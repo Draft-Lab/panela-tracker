@@ -1,10 +1,7 @@
 // app/api/discord/events/route.ts
 import { handlePlayerJoined } from "../../../../lib/discord/handle-player-joined";
-import {
-  calculatePlayerDurations,
-  countActivePlayers,
-  finishJogatina,
-} from "../../../../lib/discord/jogatina-metrics";
+import { handlePlayerLeft } from "../../../../lib/discord/handle-player-left";
+import { findOrCreateGame } from "../../../../lib/discord/find-or-create-game";
 import { createServiceRoleClient } from "../../../../lib/supabase/service-role";
 import { autoEnrichGameFromIgdb } from "../../../../lib/igdb/auto-enrich-game";
 import { NextResponse } from "next/server";
@@ -88,7 +85,7 @@ export async function POST(request: Request) {
       .from("players")
       .select("id")
       .eq("discord_id", discord_id)
-      .single();
+      .maybeSingle();
 
     if (!player) {
       const { data: newPlayer, error } = await supabase
@@ -112,27 +109,16 @@ export async function POST(request: Request) {
 
     await syncPlayerFromDiscord(supabase, player.id, discord_name, discord_avatar);
 
-    // 2. Buscar ou criar jogo
-    let { data: game } = await supabase
-      .from("games")
-      .select("id")
-      .eq("title", game_title)
-      .single();
+    // 2. Buscar ou criar jogo (tolerante a duplicatas de título)
+    const gameResult = await findOrCreateGame(supabase, game_title);
 
-    if (!game) {
-      const { data: newGame, error } = await supabase
-        .from("games")
-        .insert({ title: game_title })
-        .select("id")
-        .single();
+    if (!gameResult.success) {
+      return NextResponse.json({ error: gameResult.error }, { status: 500 });
+    }
 
-      if (error) {
-        return NextResponse.json(
-          { error: `Failed to create game: ${error.message}` },
-          { status: 500 }
-        );
-      }
-      game = newGame;
+    const game = gameResult.game;
+
+    if (gameResult.created) {
       await autoEnrichGameFromIgdb(supabase, game.id, game_title);
     }
 
@@ -153,154 +139,23 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(result);
-    } else {
-      return await handlePlayerLeft(supabase, player.id, game.id, game_title, timestamp);
     }
+
+    const result = await handlePlayerLeft(
+      supabase,
+      player.id,
+      game.id,
+      game_title,
+      timestamp,
+    );
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("[Discord Events API] Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
-
-async function handlePlayerLeft(
-  supabase: ReturnType<typeof createServiceRoleClient>,
-  playerId: string,
-  gameId: string,
-  gameTitle: string,
-  timestamp: string
-) {
-  // Buscar jogatina ativa para este jogo
-  const { data: activeJogatina } = await supabase
-    .from("jogatinas")
-    .select("*")
-    .eq("game_id", gameId)
-    .eq("is_current", true)
-    .eq("source", "discord_bot")
-    .single();
-
-  if (!activeJogatina) {
-    return NextResponse.json(
-      { error: "No active jogatina found for this game" },
-      { status: 404 }
-    );
-  }
-
-  const { data: jogatinaPlayer } = await supabase
-    .from("jogatina_players")
-    .select("id, is_active")
-    .eq("jogatina_id", activeJogatina.id)
-    .eq("player_id", playerId)
-    .single();
-
-  if (!jogatinaPlayer) {
-    return NextResponse.json(
-      { error: "Player is not in this jogatina" },
-      { status: 400 }
-    );
-  }
-
-  if (!jogatinaPlayer.is_active) {
-    return NextResponse.json(
-      { error: "Player is not currently active in this jogatina" },
-      { status: 400 }
-    );
-  }
-
-  // Marcar jogador como inativo
-  const { error: deactivateError } = await supabase
-    .from("jogatina_players")
-    .update({ is_active: false })
-    .eq("id", jogatinaPlayer.id);
-
-  if (deactivateError) {
-    return NextResponse.json(
-      { error: `Failed to deactivate player: ${deactivateError.message}` },
-      { status: 500 }
-    );
-  }
-
-  // Registrar evento de saída
-  const { error: eventError } = await supabase.from("jogatina_events").insert({
-    jogatina_id: activeJogatina.id,
-    player_id: playerId,
-    event_type: "player_left",
-    timestamp: timestamp,
-  });
-
-  if (eventError) {
-    return NextResponse.json(
-      { error: `Failed to register event: ${eventError.message}` },
-      { status: 500 }
-    );
-  }
-
-  await calculatePlayerDurations(supabase, activeJogatina.id);
-
-  const activePlayerCount = await countActivePlayers(
-    supabase,
-    activeJogatina.id,
-  );
-
-  console.log(
-    `[Discord Events] Jogador ${playerId} saiu. Jogadores ativos: ${activePlayerCount}`
-  );
-
-  if (activePlayerCount === 0) {
-    console.log(
-      `[Discord Events] Nenhum jogador ativo! Finalizando jogatina ${activeJogatina.id} automaticamente...`
-    );
-
-    let durationMinutes: number;
-    try {
-      durationMinutes = await finishJogatina(supabase, activeJogatina, timestamp);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to finish jogatina";
-      console.error(`[Discord Events] Erro ao finalizar jogatina: ${message}`);
-      return NextResponse.json(
-        { error: message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Player left and jogatina finished automatically",
-      jogatina_id: activeJogatina.id,
-      game_title: gameTitle,
-      active_players: 0,
-      session_finished: true,
-      total_duration_minutes: durationMinutes,
-      season_id: activeJogatina.season_id || null,
-    });
-  } else {
-    // Se ainda há jogadores ativos, apenas atualizar o status
-    const newSessionType = activePlayerCount > 1 ? "group" : "solo";
-
-    const { error: updateError } = await supabase
-      .from("jogatinas")
-      .update({
-        active_players: activePlayerCount,
-        session_type: newSessionType,
-        last_event_at: timestamp,
-      })
-      .eq("id", activeJogatina.id);
-
-    if (updateError) {
-      return NextResponse.json(
-        { error: `Failed to update jogatina: ${updateError.message}` },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Player left event registered",
-      jogatina_id: activeJogatina.id,
-      game_title: gameTitle,
-      active_players: activePlayerCount,
-      session_type: newSessionType,
-      session_finished: false,
-      season_id: activeJogatina.season_id || null,
-    });
   }
 }

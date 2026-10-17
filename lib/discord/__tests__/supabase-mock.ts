@@ -1,6 +1,8 @@
 type Row = Record<string, unknown>;
 
 export interface JoinTestStore {
+  games: Row[];
+  players: Row[];
   jogatinas: Row[];
   jogatina_players: Row[];
   jogatina_events: Row[];
@@ -20,6 +22,8 @@ export function resetIdCounter() {
 
 export function createEmptyJoinTestStore(): JoinTestStore {
   return {
+    games: [],
+    players: [],
     jogatinas: [],
     jogatina_players: [],
     jogatina_events: [],

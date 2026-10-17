@@ -2,19 +2,11 @@ import { fetchIgdbGameDetails } from "./fetch-game-details";
 import { mapIgdbToGameUpdate } from "./map-to-game-update";
 import { searchIgdbGames } from "./search-games";
 import { createServiceRoleClient } from "../supabase/service-role";
+import { normalizeGameTitle } from "../discord/game-title";
 
 const AUTO_ENRICH_TIMEOUT_MS = 4_000;
 
 type ServiceRoleClient = ReturnType<typeof createServiceRoleClient>;
-
-function normalizeTitle(title: string): string {
-  return title
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("pt-BR")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
 
 async function withTimeout<T>(operation: Promise<T>): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -57,9 +49,9 @@ async function enrichGame(
   title: string,
 ): Promise<void> {
   const matches = await searchIgdbGames(title);
-  const normalizedTitle = normalizeTitle(title);
+  const normalizedTitle = normalizeGameTitle(title);
   const match = matches.find(
-    (candidate) => normalizeTitle(candidate.name) === normalizedTitle,
+    (candidate) => normalizeGameTitle(candidate.name) === normalizedTitle,
   );
 
   if (!match) {
