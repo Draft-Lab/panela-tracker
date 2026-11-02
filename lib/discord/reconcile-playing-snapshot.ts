@@ -1,5 +1,6 @@
 import type { createClient } from "../supabase/server";
 import { getOrCreateActiveJogatina } from "./get-or-create-active-jogatina";
+import { findOrCreateGame } from "./find-or-create-game";
 import { autoEnrichGameFromIgdb } from "../igdb/auto-enrich-game";
 import { mergeDuplicateActiveJogatinas } from "./merge-duplicate-jogatinas";
 import {
@@ -126,30 +127,6 @@ async function findOrCreatePlayer(
   );
 
   return player;
-}
-
-async function findOrCreateGame(supabase: SupabaseClient, gameTitle: string) {
-  let { data: game } = await supabase
-    .from("games")
-    .select("id")
-    .eq("title", gameTitle)
-    .single();
-
-  if (!game) {
-    const { data: newGame, error } = await supabase
-      .from("games")
-      .insert({ title: gameTitle })
-      .select("id")
-      .single();
-
-    if (error || !newGame) {
-      throw new Error(`Failed to create game: ${error?.message}`);
-    }
-    game = newGame;
-    await autoEnrichGameFromIgdb(supabase, game.id, gameTitle);
-  }
-
-  return game;
 }
 
 async function resolveActiveJogatina(
@@ -309,7 +286,16 @@ async function reconcileGame(
     return detail;
   }
 
-  const game = await findOrCreateGame(supabase, gameTitle);
+  const gameResult = await findOrCreateGame(supabase, gameTitle);
+  if (!gameResult.success) {
+    throw new Error(gameResult.error);
+  }
+
+  const game = gameResult.game;
+  if (gameResult.created) {
+    await autoEnrichGameFromIgdb(supabase, game.id, gameTitle);
+  }
+
   const jogatina = await resolveActiveJogatina(
     supabase,
     game.id,
