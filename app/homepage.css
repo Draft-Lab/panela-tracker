@@ -486,3 +486,5 @@ html:has(.homepage-rework)::-webkit-scrollbar-track,html:has(.homepage-rework) *
  .homepage-event-cover { display:grid; height:44px; width:33px; }
  .homepage-event-meta { gap:8px; }
 }
+
+.homepage-hero-stats strong { font-variant-numeric:tabular-nums; }

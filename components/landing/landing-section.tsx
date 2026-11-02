@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { LandingScrollReveal } from "@/components/landing/landing-scroll-reveal"
 import { ChevronsDown } from "lucide-react"
+import { ChristmasDecoration, type ChristmasDecorationKind } from "./christmas-decoration"
 
 interface LandingSectionProps {
   id?: string
@@ -11,6 +12,7 @@ interface LandingSectionProps {
   children: ReactNode
   stop?: string
   className?: string
+  decoration?: ChristmasDecorationKind
 }
 
 export function LandingSection({
@@ -21,6 +23,7 @@ export function LandingSection({
   children,
   className,
   stop,
+  decoration,
 }: LandingSectionProps) {
   return (
     <section id={id} className={cn("landing-section scroll-mt-28 py-14 lg:py-20", className)}>
@@ -48,6 +51,7 @@ export function LandingSection({
         </LandingScrollReveal>
       )}
       <LandingScrollReveal delay={100}>{children}</LandingScrollReveal>
+      {decoration && <ChristmasDecoration kind={decoration} />}
     </section>
   )
 }

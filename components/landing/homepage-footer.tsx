@@ -6,7 +6,6 @@ import { FOOTER_NAV_COLUMNS } from "./footer/landing-footer-links"
 export function HomepageFooter() {
   return (
     <div className="homepage-footer-wrap">
-    <div className="homepage-footer-divider" aria-hidden="true" />
     <footer className="homepage-footer">
       <div className="homepage-footer-heading">
         <p>A sessão acaba.<br /><span>A história fica.</span></p>

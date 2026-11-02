@@ -6,7 +6,6 @@ import { FinishCurrentGameDialog } from "@/components/finish-current-game-dialog
 import { CurrentGameCard } from "@/components/landing/current-game-card"
 import { LandingEmptyState } from "@/components/landing/landing-glass-cell"
 import { cn } from "@/lib/utils"
-import { HomepageLobbyReaction } from "@/components/landing/homepage-lobby-reaction"
 
 interface LandingCurrentGamesSectionProps {
   currentGames: (Jogatina & {
@@ -26,11 +25,6 @@ export function LandingCurrentGamesSection({
   const [finishDialogOpen, setFinishDialogOpen] = useState(false)
   const [selectedJogatinaId, setSelectedJogatinaId] = useState<string | null>(null)
   const [selectedGameTitle, setSelectedGameTitle] = useState<string>("")
-  const activePlayers = new Set(currentGames.flatMap(session =>
-    (session.jogatina_players ?? []).filter(participant => participant.is_active).map(participant => participant.player.id),
-  )).size
-  const hasGroup = currentGames.some(session => session.session_type === "group")
-
   const handleFinishClick = (jogatinaId: string, gameTitle: string) => {
     setSelectedJogatinaId(jogatinaId)
     setSelectedGameTitle(gameTitle)
@@ -39,11 +33,8 @@ export function LandingCurrentGamesSection({
 
   if (currentGames.length === 0) {
     if (appearance === "cartoon") return (
-      <div>
-      <HomepageLobbyReaction sessionCount={0} activePlayers={0} hasGroup={false} />
       <div className="homepage-lobby-empty">
         <div><span className="homepage-lobby-tag">Intervalo no lobby</span><h3>A panela já volta.</h3><p>Ninguém está jogando agora. A próxima partida merece uma história.</p></div>
-      </div>
       </div>
     )
     return <LandingEmptyState>Ninguém está jogando agora</LandingEmptyState>
@@ -51,7 +42,6 @@ export function LandingCurrentGamesSection({
 
   return (
     <>
-      {appearance === "cartoon" && <HomepageLobbyReaction sessionCount={currentGames.length} activePlayers={activePlayers} hasGroup={hasGroup} />}
       <div
         className={cn(
           "grid items-stretch gap-4",

@@ -1,8 +1,5 @@
 import { Suspense } from "react"
 import { Bree_Serif, Pirata_One, Kalam } from "next/font/google"
-import { HomepageFieldNote } from "@/components/landing/homepage-field-note"
-import { HomepageDynamoNote } from "@/components/landing/homepage-dynamo-note"
-import { HomepageTacticalMark } from "@/components/landing/homepage-tactical-mark"
 import { HomepagePortal } from "@/components/landing/homepage-portal"
 import { LandingNavigation } from "@/components/landing/landing-navigation"
 import { HomepageChapter } from "@/components/landing/homepage-chapter"
@@ -26,6 +23,7 @@ import { LandingWeeklySummarySection } from "@/components/landing/sections/landi
 import { rsc } from "@/lib/rsc"
 import "./homepage.css"
 import "./homepage-world.css"
+import "./homepage-christmas.css"
 
 const display = Bree_Serif({ subsets: ["latin"], weight: "400", variable: "--font-homepage-display", display: "swap" })
 const headline = Pirata_One({ subsets: ["latin"], weight: "400", variable: "--font-homepage-headline", display: "swap" })
@@ -59,6 +57,7 @@ export default function LandingPage() {
         <HomepageChapter tone="blue" number="I" label="A noite começa aqui" note="Ponto de encontro da panela" />
         <LandingSection stop="01"
           id="agora"
+          decoration="gifts"
           eyebrow="Ao vivo"
           title="O que estamos jogando"
           description="Sessões em andamento e quem está online agora."
@@ -86,8 +85,6 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="metrics" />}>
             <WeeklySummarySection />
           </Suspense>
-          <p className="homepage-margin-note">“Mais uma e a gente sai.” <span>— a panela, toda noite</span></p>
-          <HomepageTacticalMark />
         </LandingSection>
 
         <HomepageChapter tone="green" number="II" label="O território da panela" note="Tem sempre um jogo que junta a gente." />
@@ -99,7 +96,6 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
             <TopGamesSection />
           </Suspense>
-          <HomepageFieldNote />
         </LandingSection>
 
         <LandingSection stop="05" className="homepage-zone-green"
@@ -107,7 +103,6 @@ export default function LandingPage() {
           title="Hall da vergonha"
           description="Os três maiores dropadores do grupo."
         >
-          <div className="homepage-neighborhood-board"><img src="/panela-neighborhood-board.webp" alt="Mural ilustrado com cartazes de procurados e uma lanterna." width={240} height={160} loading="lazy" decoding="async" /><details><summary>Recado do xerife</summary><p>Os procurados são os jogadores com mais drops registrados. A ficha de cada um está nos cartazes abaixo.</p></details></div>
           <Suspense fallback={<LandingSectionSkeleton variant="cards" />}>
             <HallOfShameSection />
           </Suspense>
@@ -115,13 +110,13 @@ export default function LandingPage() {
 
         <LandingSection stop="06" className="homepage-zone-green"
           id="timeline"
+          decoration="tree"
           title="Quem puxou a próxima?"
           description="As últimas sessões da panela, direto do lobby."
         >
           <Suspense fallback={<LandingSectionSkeleton variant="list" />}>
             <TimelineSection />
           </Suspense>
-          <HomepageTacticalMark variant="radio" />
         </LandingSection>
 
         <HomepageChapter tone="gold" number="III" label="Quem faz a panela" note="Cada jogador, uma história." />
@@ -133,7 +128,6 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="metrics" />}>
             <GroupMetricsSection />
           </Suspense>
-          <HomepageDynamoNote />
         </LandingSection>
 
         <LandingSection stop="08" className="homepage-zone-gold"
@@ -144,8 +138,6 @@ export default function LandingPage() {
           <Suspense fallback={<LandingSectionSkeleton variant="profiles" />}>
             <PlayerProfilesSection />
           </Suspense>
-          <p className="homepage-margin-note homepage-margin-note-right">Cada ficha, uma história. <span>O lobby não seria o mesmo sem vocês.</span></p>
-          <HomepageTacticalMark variant="target" />
         </LandingSection>
 
         <LandingSection stop="09" className="homepage-zone-gold"

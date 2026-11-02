@@ -1,0 +1,262 @@
+/* A quiet winter layer over the existing field guide. */
+.homepage-rework {
+  --background: #102a2c;
+  --card: #1b3736;
+  --border: #49625a;
+  background-color: var(--background);
+  background-image: radial-gradient(circle at 12% 16%, #e7f0dc88 0 1px, transparent 1.7px), radial-gradient(circle at 75% 35%, #e7f0dc66 0 1px, transparent 1.8px), radial-gradient(circle at 45% 70%, #e7f0dc44 0 1.5px, transparent 2px);
+  background-size: 173px 193px, 239px 227px, 307px 277px;
+}
+/* Two independent layers make the snowfall feel deep without blocking clicks. */
+.homepage-rework::before,
+.homepage-rework::after {
+  content: "";
+  position: fixed;
+  z-index: 20;
+  inset: -350px -30px 0;
+  pointer-events: none;
+  background-repeat: repeat;
+  will-change: transform;
+  animation: homepage-snowfall 24s linear infinite;
+}
+.homepage-rework::before {
+  opacity: .48;
+  background-image: radial-gradient(circle at 15% 20%, #f5fbf4 0 1.4px, transparent 2px), radial-gradient(circle at 75% 65%, #dcefe9 0 1px, transparent 1.7px);
+  background-size: 167px 167px;
+  animation-name: homepage-snowfall-near;
+}
+.homepage-rework::after {
+  opacity: .3;
+  background-image: radial-gradient(circle at 20% 20%, #fff 0 2px, transparent 3px), radial-gradient(circle at 70% 70%, #effbf5 0 1.5px, transparent 2.5px);
+  background-size: 293px 293px;
+  animation-name: homepage-snowfall-far;
+  animation-duration: 36s;
+}
+@keyframes homepage-snowfall-near {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, 167px, 0); }
+}
+@keyframes homepage-snowfall-far {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, 293px, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .homepage-rework::before, .homepage-rework::after { animation: none; will-change: auto; }
+}
+.homepage-overview { position: relative; padding-top: 105px; }
+.homepage-overview::before,
+.homepage-overview::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 0;
+  width: clamp(180px, 27vw, 380px);
+  height: clamp(95px, 14vw, 190px);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.homepage-overview::before { left: calc(50% - 50vw); background-image: url('/panela-natal-canto-esquerdo.webp'); background-position: left top; }
+.homepage-overview::after { right: calc(50% - 50vw); background-image: url('/panela-natal-canto-direito.webp'); background-position: right top; }
+.homepage-hero-copy h1 span {
+  position: relative;
+  color: #fff1d8;
+  background: linear-gradient(165deg, #b6402d 0%, #8a241d 62%, #631912 100%);
+  box-shadow: inset 0 0 0 1px #e67e4d, inset 0 -6px 14px #41120f77, 4px 6px 0 #061b1b99;
+}
+.homepage-hero-copy h1 span::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  left: -3%; right: -3%; top: -15px; height: 24px;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 24px 33px 0;
+  border-image: url('/panela-neve-borda.png') 175 240 0 / 24px 33px 0 round;
+}
+.homepage-hero-copy h1 span::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  left: 5%;
+  right: 5%;
+  bottom: -17px;
+  height: 15px;
+  border-top: 1px solid #a87442;
+  border-radius: 0 0 50% 50%;
+  background: radial-gradient(circle, #fff1ae 0 2px, #f3a54e 3px, transparent 7px) center 3px / 42px 12px repeat-x;
+}
+.homepage-cta {
+  color: #4a2616;
+  background: linear-gradient(180deg, #ffdea0 0%, #ffbd70 58%, #ef9747 100%);
+  border: 2px solid #ffe0a7;
+  border-radius: 6px;
+  box-shadow: inset 0 1px #fff8d4, 0 4px 0 #9b552a, 0 8px 18px #e68c3b33;
+}
+.homepage-chapter-note { position: relative; background: #e8d7b4; color: #173331; }
+.homepage-chapter-sign { position: relative; border-color: #e8d7b4; }
+.homepage-lobby::before,
+.homepage-lobby-ticket::before,
+.homepage-event-strip::before,
+.homepage-moment::before,
+.homepage-zone-gold .homepage-player-card::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  left: -8px;
+  right: -8px;
+  top: -14px;
+  height: 24px;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 24px 33px 0;
+  border-image: url('/panela-neve-borda.png') 175 240 0 / 24px 33px 0 round;
+}
+.homepage-event-strip::before { top: -10px; height: 18px; border-width: 18px 25px 0; border-image-width: 18px 25px 0; }
+.homepage-moment::before, .homepage-zone-gold .homepage-player-card::before { top: -10px; height: 18px; border-width: 18px 25px 0; border-image-width: 18px 25px 0; }
+.homepage-lobby { border-radius: 12px; }
+.homepage-rework .homepage-lobby { transform: none; border-color: #e9cda6; background-color: #e8cda3; box-shadow: 0 4px 0 #081b1c, 0 8px 22px #071b1b66; }
+.homepage-rework .homepage-lobby:hover { transform: translateY(-2px); }
+.homepage-lobby-scene, .homepage-lobby-art { border-radius: 8px 8px 0 0; }
+.homepage-lobby-ticket { border-radius: 8px; transform: none; background-color: #efd5ae; }
+.homepage-lobby-mode { transform: none; background: #315934; border-color: #b8d0a0; border-radius: 5px; }
+.homepage-lobby-clock { transform: none; border-radius: 4px; }
+.homepage-lobby-tag { z-index: 3; color: #fff1dc; background: #a33328; border-radius: 4px; }
+.homepage-lobby-tag > span { background: #f7dfbc; }
+.homepage-event-strip { border-radius: 8px; transform: none; background-color: #efd5ae; }
+.homepage-event-strip:nth-child(even) { transform: none; }
+.homepage-event-strip:hover { transform: translateX(3px); }
+.homepage-event-meta { background: #d8d1a3; }
+.homepage-rework #agora header > p:first-child { display: inline-block; padding: 5px 10px; border-radius: 4px; background: #a33328; color: #fff1dc; font-weight: 700; }
+.homepage-chapter-sign > span { background: #a13a2f; color: #fff1dc; }
+.homepage-zone-green, .homepage-zone-gold {
+  --background: #102a2c;
+  --card: #1b3736;
+  --muted: #284543;
+  --muted-foreground: #bdcbc1;
+  --primary: #f5aa62;
+  --border: #49655e;
+  --ring: #f5aa62;
+  --accent: #284543;
+  --destructive: #db7660;
+}
+.homepage-zone-scenery { display: none; }
+.homepage-rework .homepage-chapter-sign {
+  background: linear-gradient(180deg, #223b39, #0a2020 60%, #071817);
+  border-color: #ffb166;
+  box-shadow: inset 0 2px 0 #f8f2d5aa, 0 3px 0 #7c3e21, 0 0 18px #f4a14b44, 4px 6px 0 #071918;
+}
+.homepage-rework .homepage-chapter-sign > span { background: #ff9e4c; color: #512a19; }
+.homepage-rework .homepage-chapter-sign > p { color: #fff1d4; text-shadow: 0 0 10px #ffc77b70; }
+.homepage-rework .homepage-chapter-note { color: #3f2b1d; background: #e8d4ae; }
+.homepage-rework #semana { background: #1c3938; border-color: #58766a; }
+.homepage-rework .homepage-event-action { background: #b8523c; color: #fff1dd; }
+.homepage-rework .homepage-event-live .homepage-event-action { background: #537e50; }
+.homepage-rework .homepage-footer { --background:#102a2c; --card:#1b3736; --muted-foreground:#bdcbc1; --primary:#f5aa62; --border:#49655e; }
+.homepage-zone-gold .homepage-player-card:nth-child(n), .homepage-moment:nth-child(n) { background-color: #ead9b6; }
+.christmas-frame {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  padding: 38px 48px 52px;
+  border-radius: 28px;
+  background: #102e2e;
+  box-shadow: inset 0 0 0 3px #8c5b34, inset 0 0 35px #041719aa, 0 10px 22px #06181870;
+}
+.christmas-frame::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -12px;
+  pointer-events: none;
+  border: 58px solid transparent;
+  border-image: url('/panela-natal-moldura.webp') 200 180 200 180 / 58px 58px 58px 58px stretch;
+}
+.christmas-frame-content { position: relative; z-index: 1; min-width: 0; }
+.homepage-activity-content { display: flex; flex-direction: column; gap: 32px; }
+.homepage-activity-summary {
+  --foreground: #242b21;
+  --muted-foreground: #4e5140;
+  --border: #b99c6d;
+  position: relative;
+  gap: 0;
+  padding: 14px 20px;
+  color: #242b21;
+  background: #ecd1a5 url('/panela-paper-wear.webp') center / 700px;
+  border: 2px solid #8d6843;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 2px #f6e1bc, 0 4px 0 #0a1e1c88;
+}
+.homepage-activity-summary > div { padding: 6px 18px; gap: 7px; }
+.homepage-activity-summary > div + div { border-left: 1px solid #bd9c70; }
+.homepage-activity-summary > div > div:first-child { color: #3f3b28; }
+.homepage-activity-summary p:first-child { font-size: 17px; line-height: 1.25; }
+.homepage-activity-summary p:last-child { font-size: 11px; }
+.homepage-activity-frame .homepage-heatmap { max-width: none; padding: 0 10px 10px; }
+.homepage-activity-frame .homepage-heatmap-title { font-family: var(--font-homepage-headline), serif; font-size: clamp(27px, 3vw, 36px); line-height: 1.1; }
+.homepage-activity-frame .homepage-heatmap-today { color: #ffc073; border-color: #bd8b52; }
+.homepage-activity-frame .homepage-heatmap-day { min-height: 16px; }
+.homepage-activity-frame .homepage-heatmap-weekdays, .homepage-activity-frame .homepage-heatmap-week { grid-template-rows: repeat(7, 16px); }
+.homepage-rework .landing-cell, .homepage-player-card { border-top-color: #d5dfcf; }
+.homepage-waypoint { background: #d9e8da; }
+.homepage-rework .landing-section:nth-of-type(even) .homepage-waypoint { background: #dfa068; }
+.christmas-decoration {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  object-fit: contain;
+  object-position: bottom;
+}
+.christmas-decoration-gifts { width: clamp(100px, 14vw, 175px); height: auto; right: -55px; bottom: -38px; }
+.christmas-decoration-tree { width: clamp(95px, 12vw, 150px); height: auto; left: -95px; bottom: -60px; }
+.homepage-footer-wrap { background: #102a2c; }
+.homepage-rework .homepage-footer { padding-top: 55px; }
+.homepage-district-intro {
+  position: relative;
+  align-items: flex-start;
+  min-height: 300px;
+  margin-bottom: 90px;
+  overflow: visible;
+}
+.homepage-district-intro .homepage-district-copy { width: 46%; }
+.homepage-district-intro .homepage-chapter-note { font-size: 15px; }
+.homepage-district-intro .homepage-chapter-sign {
+  background: linear-gradient(180deg, #223b39, #0a2020 60%, #071817);
+  border-color: #ffb166;
+  box-shadow: inset 0 2px 0 #f8f2d5aa, 0 3px 0 #7c3e21, 0 0 18px #f4a14b55, 4px 6px 0 #071918;
+}
+.homepage-district-intro .homepage-chapter-sign > span { background: #ff9e4c; color: #512a19; box-shadow: inset 0 1px #ffd693; }
+.homepage-district-intro .homepage-chapter-sign > p { color: #fff1d4; font-size: 25px; text-shadow: 0 0 10px #ffc77b70; }
+.homepage-christmas-scene {
+  position: absolute;
+  right: -7%;
+  bottom: -20px;
+  width: 65%;
+  max-height: 300px;
+  object-fit: contain;
+  object-position: right bottom;
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .homepage-overview { padding-top: 78px; }
+  .homepage-overview::before, .homepage-overview::after { width: 43vw; height: 105px; }
+  .christmas-decoration-gifts { width: 85px; right: -15px; bottom: -35px; }
+  .christmas-decoration-tree { width: 75px; left: -32px; bottom: -55px; }
+  .homepage-district-intro { min-height: 275px; justify-content: flex-start; padding-top: 20px; }
+  .homepage-district-intro .homepage-district-copy { width: 100%; }
+  .homepage-district-intro .homepage-chapter-sign > p { font-size: 19px; }
+  .homepage-christmas-scene { width: 85%; max-height: 165px; right: -8%; bottom: -5px; }
+  .christmas-frame { padding: 28px 24px 40px; border-radius: 18px; }
+  .christmas-frame::before { inset: -8px; border-width: 36px; border-image-width: 36px; }
+  .homepage-activity-content { gap: 24px; }
+  .homepage-activity-summary { grid-template-columns: 1fr; padding: 10px 15px; }
+  .homepage-activity-summary > div { flex-direction: row; align-items: center; padding: 9px 4px; gap: 10px; }
+  .homepage-activity-summary > div:first-child { grid-column: auto; border-bottom: 0; }
+  .homepage-activity-summary > div + div { border-left: 0; border-top: 1px solid #bd9c70; }
+  .homepage-activity-summary p:first-child { font-size: 14px; }
+  .homepage-activity-frame .homepage-heatmap { padding: 0 4px 8px; }
+  .homepage-activity-frame .homepage-heatmap-calendar { min-width: 550px; }
+  .homepage-activity-frame .homepage-heatmap-range::after { content: "Deslize para ver todos os meses →"; flex-basis: 100%; font-size: 10px; color: var(--muted-foreground); }
+}
