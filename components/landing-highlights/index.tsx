@@ -35,7 +35,7 @@ export function LandingHighlights({
     comeback && {
       key: "comeback",
       game: comeback.game,
-      label: "Resurgiu das cinzas",
+      label: "Maior retorno",
       icon: History,
       badge: formatGapDays(comeback.gapDays),
       meta: `Voltou em ${formatHighlightDate(comeback.returnDate)}`,
@@ -43,7 +43,7 @@ export function LandingHighlights({
     biggestGroup && {
       key: "biggest-group",
       game: biggestGroup.game,
-      label: "A galera toda",
+      label: "Maior sessão em grupo",
       icon: Users,
       badge: `${biggestGroup.playerCount} jogadores`,
       meta: formatHighlightDate(biggestGroup.date),
@@ -51,15 +51,10 @@ export function LandingHighlights({
     champion && {
       key: "champion",
       game: champion.game,
-      label: "We are the champions",
+      label: "Último jogo zerado",
       icon: Trophy,
-      badge: `${champion.totalZeros} ${champion.totalZeros === 1 ? "zero no grupo" : "zeros no grupo"}`,
-      meta: [
-        formatHighlightDate(champion.latestZeroDate),
-        champion.playerName ? `Zerado por ${champion.playerName}` : null,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+      badge: champion.playerName ? `Zerado por ${champion.playerName}` : "Jogo zerado",
+      meta: formatHighlightDate(champion.latestZeroDate),
     },
   ].filter(Boolean) as MomentRecord[]
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react"
-import { motion, useReducedMotion, useScroll } from "motion/react"
+import { motion, useMotionValue, useReducedMotion } from "motion/react"
 
 /** Keep the route aligned as streamed sections and rankings change height. */
 export function HomepageJourney({ children }: { children: ReactNode }) {
@@ -11,10 +11,21 @@ export function HomepageJourney({ children }: { children: ReactNode }) {
   const [route, setRoute] = useState({ path: "", width: 1, height: 1 })
   const [zones, setZones] = useState<{ tone: string; top: number; height: number }[]>([])
   const reducedMotion = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 75%", "end 75%"] })
+  const revealHeight = useMotionValue(0)
   useEffect(() => {
     const root = ref.current
     if (!root) return
+    let frame = 0
+    // Clip the route at a fixed point in the viewport, not at a fraction of
+    // its length: horizontal detours otherwise make it race ahead of the page.
+    const updateReveal = () => {
+      frame = 0
+      const bounds = root.getBoundingClientRect()
+      revealHeight.set(Math.max(0, Math.min(bounds.height, window.innerHeight * 0.6 - bounds.top)))
+    }
+    const scheduleReveal = () => {
+      if (!frame) frame = requestAnimationFrame(updateReveal)
+    }
     const measure = () => {
       const bounds = root.getBoundingClientRect()
       const points = Array.from(root.querySelectorAll<HTMLElement>(".homepage-waypoint")).map(marker => {
@@ -34,13 +45,21 @@ export function HomepageJourney({ children }: { children: ReactNode }) {
       const starts = chapters.map(chapter => ({ tone: chapter.dataset.homepageChapter!, top: chapter.getBoundingClientRect().top - bounds.top - 230 }))
       // Keep the preceding color behind the next skyline's transparent sky.
       setZones(starts.map((zone, index) => ({ ...zone, height: (starts[index + 1] ? starts[index + 1].top + 240 : bounds.height) - zone.top })))
+      scheduleReveal()
     }
     const observer = new ResizeObserver(measure)
     observer.observe(root)
     root.querySelectorAll("section").forEach(section => observer.observe(section))
+    window.addEventListener("scroll", scheduleReveal, { passive: true })
+    window.addEventListener("resize", scheduleReveal)
     measure()
-    return () => observer.disconnect()
-  }, [])
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("scroll", scheduleReveal)
+      window.removeEventListener("resize", scheduleReveal)
+      if (frame) cancelAnimationFrame(frame)
+    }
+  }, [revealHeight])
   return <div className="homepage-journey" ref={ref}>
     <div className="homepage-zone-scenery" aria-hidden="true">
       {zones.map(zone => <div key={zone.tone} className={`homepage-zone-scenery-layer homepage-zone-${zone.tone}`} style={{ top: zone.top, height: zone.height }}>
@@ -59,7 +78,7 @@ export function HomepageJourney({ children }: { children: ReactNode }) {
         <stop offset="1" stopColor="#f3cb67" />
       </linearGradient>
       <mask id={maskId} maskUnits="userSpaceOnUse" x="-64" y="0" width={route.width + 128} height={route.height}>
-        <motion.path d={route.path} stroke="white" strokeWidth="6" strokeLinejoin="round" style={{ pathLength: reducedMotion ? 1 : scrollYProgress }} />
+        <motion.rect x="-64" y="0" width={route.width + 128} height={reducedMotion ? route.height : revealHeight} fill="white" />
       </mask></defs>
       <path d={route.path} stroke="var(--border)" strokeWidth="3" strokeDasharray="8 12" strokeLinejoin="round" />
       <path d={route.path} stroke={`url(#${gradientId})`} strokeWidth="3" strokeDasharray="8 12" strokeLinejoin="round" mask={`url(#${maskId})`} />

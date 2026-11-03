@@ -28,7 +28,7 @@ export function LandingSection({
   return (
     <section id={id} className={cn("landing-section scroll-mt-28 py-14 lg:py-20", className)}>
       {stop && <span className="homepage-waypoint" aria-hidden="true">{stop}</span>}
-      {stop && stop !== "09" && <ChevronsDown className="homepage-route-arrow" size={26} strokeWidth={3} aria-hidden="true" />}
+      {stop && stop !== "08" && <ChevronsDown className="homepage-route-arrow" size={26} strokeWidth={3} aria-hidden="true" />}
       {(title || description) && (
         <LandingScrollReveal>
           <header className="mb-8 max-w-2xl lg:mb-10">

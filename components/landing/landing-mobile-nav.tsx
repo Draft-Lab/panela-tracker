@@ -17,7 +17,6 @@ const SECTION_LINKS = [
   { href: "/#agora", label: "Agora" },
   { href: "/#jogos", label: "Jogos" },
   { href: "/#atividade", label: "Atividade" },
-  { href: "/#semana", label: "Semana" },
   { href: "/#vergonha", label: "Vergonha" },
   { href: "/#timeline", label: "Timeline" },
   { href: "/#metricas", label: "Métricas" },

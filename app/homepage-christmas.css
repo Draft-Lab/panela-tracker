@@ -58,6 +58,7 @@
 }
 .homepage-overview::before { left: calc(50% - 50vw); background-image: url('/panela-natal-canto-esquerdo.webp'); background-position: left top; }
 .homepage-overview::after { right: calc(50% - 50vw); background-image: url('/panela-natal-canto-direito.webp'); background-position: right top; }
+.homepage-journey { margin-top: 55px; padding-top: 0; }
 .homepage-hero-copy h1 span {
   position: relative;
   color: #fff1d8;
@@ -199,6 +200,7 @@
 .homepage-activity-frame .homepage-heatmap-today { color: #ffc073; border-color: #bd8b52; }
 .homepage-activity-frame .homepage-heatmap-day { min-height: 16px; }
 .homepage-activity-frame .homepage-heatmap-weekdays, .homepage-activity-frame .homepage-heatmap-week { grid-template-rows: repeat(7, 16px); }
+.homepage-rework #atividade { margin-bottom: 85px; }
 .homepage-rework .landing-cell, .homepage-player-card { border-top-color: #d5dfcf; }
 .homepage-waypoint { background: #d9e8da; }
 .homepage-rework .landing-section:nth-of-type(even) .homepage-waypoint { background: #dfa068; }
@@ -221,6 +223,19 @@
   overflow: visible;
 }
 .homepage-district-intro .homepage-district-copy { width: 46%; }
+.homepage-district-compact {
+  display: flex;
+  align-items: flex-start;
+  min-height: 0;
+  margin: 10px 0 55px;
+  gap: 0;
+}
+.homepage-district-compact .homepage-district-door { margin-top: 12px; }
+.homepage-moments-board { padding-top: 6px; }
+.homepage-moments-cards { gap: 18px; list-style: none; margin: 0; padding: 0; }
+.homepage-moment:nth-child(n) { transform: none; border-radius: 8px; }
+.homepage-moment-tab { min-height: 45px; padding-top: 13px; }
+.homepage-moment-copy { padding-top: 15px; }
 .homepage-district-intro .homepage-chapter-note { font-size: 15px; }
 .homepage-district-intro .homepage-chapter-sign {
   background: linear-gradient(180deg, #223b39, #0a2020 60%, #071817);
@@ -241,10 +256,12 @@
 }
 @media (max-width: 767px) {
   .homepage-overview { padding-top: 78px; }
+  .homepage-journey { margin-top: 40px; }
   .homepage-overview::before, .homepage-overview::after { width: 43vw; height: 105px; }
   .christmas-decoration-gifts { width: 85px; right: -15px; bottom: -35px; }
   .christmas-decoration-tree { width: 75px; left: -32px; bottom: -55px; }
   .homepage-district-intro { min-height: 275px; justify-content: flex-start; padding-top: 20px; }
+  .homepage-district-compact { margin: 0 0 40px; }
   .homepage-district-intro .homepage-district-copy { width: 100%; }
   .homepage-district-intro .homepage-chapter-sign > p { font-size: 19px; }
   .homepage-christmas-scene { width: 85%; max-height: 165px; right: -8%; bottom: -5px; }
@@ -259,4 +276,5 @@
   .homepage-activity-frame .homepage-heatmap { padding: 0 4px 8px; }
   .homepage-activity-frame .homepage-heatmap-calendar { min-width: 550px; }
   .homepage-activity-frame .homepage-heatmap-range::after { content: "Deslize para ver todos os meses →"; flex-basis: 100%; font-size: 10px; color: var(--muted-foreground); }
+  .homepage-rework #atividade { margin-bottom: 70px; }
 }
