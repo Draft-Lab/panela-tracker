@@ -1,5 +1,9 @@
 import type { createClient } from "@/lib/supabase/server";
 import type { PlayerAggregateStats } from "@/lib/fetch-all-jogatina-players";
+import {
+  fetchCurrentJogatinas as fetchCurrentJogatinasShared,
+  type LandingCurrentJogatina,
+} from "@/lib/fetch-current-jogatinas";
 import { buildLandingPlayerCardStatsFromSummary } from "@/lib/player-profile-helpers";
 import {
   getCachedPlaytimeDurationTotals,
@@ -10,11 +14,12 @@ import { buildWeeklySummary, type WeeklySummary } from "@/lib/landing-weekly-sum
 import type {
   Game,
   Jogatina,
-  JogatinaEvent,
   JogatinaPlayer,
   Player,
   SeasonParticipant,
 } from "@/lib/types";
+
+export type { LandingCurrentJogatina } from "@/lib/fetch-current-jogatinas";
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -29,12 +34,6 @@ function normalizeGameRelation<T extends Pick<Game, "is_app">>(
 function isNonAppGame(game: Pick<Game, "is_app"> | null | undefined): boolean {
   return Boolean(game && !game.is_app);
 }
-
-export type LandingCurrentJogatina = Jogatina & {
-  game: Game;
-  jogatina_players?: (JogatinaPlayer & { player: Player })[];
-  jogatina_events?: Pick<JogatinaEvent, "player_id" | "event_type" | "timestamp">[];
-};
 
 export type LandingHeatmapJogatina = Jogatina & {
   game: Pick<Game, "id" | "is_app">;
@@ -143,29 +142,9 @@ export async function fetchLandingPlayers(
 export async function fetchCurrentJogatinas(
   supabase: SupabaseClient,
 ): Promise<LandingCurrentJogatina[]> {
-  const { data, error } = await supabase
-    .from("jogatinas")
-    .select(
-      `
-      *,
-      game:games(*),
-      jogatina_players(*, player:players(*)),
-      jogatina_events(player_id, event_type, timestamp)
-    `,
-    )
-    .eq("is_current", true)
-    .order("date", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  return (data ?? [])
-    .map((j) => ({
-      ...j,
-      game: normalizeGameRelation(j.game as Game | Game[] | null),
-    }))
-    .filter((j) => isNonAppGame(j.game)) as LandingCurrentJogatina[];
+  return fetchCurrentJogatinasShared(
+    supabase as unknown as Parameters<typeof fetchCurrentJogatinasShared>[0],
+  );
 }
 
 type HeroWeekJogatina = {

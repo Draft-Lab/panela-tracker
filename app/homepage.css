@@ -431,6 +431,12 @@ html:has(.homepage-rework)::-webkit-scrollbar-track,html:has(.homepage-rework) *
 .homepage-lobby-empty .homepage-lobby-tag { position:static; font-size:10px; margin-bottom:15px; }
 .homepage-lobby-empty h3 { font-family:var(--font-homepage-display),serif; font-size:30px; }
 .homepage-lobby-empty p { margin-top:10px; font-size:12px; line-height:1.8; color:var(--muted-foreground); }
+.homepage-live-toast { display:flex; min-width:260px; max-width:340px; align-items:flex-start; gap:12px; padding:12px 14px; background:#eadfbe url('/panela-paper-wear.webp') center / 700px; color:#23352f; border:3px solid #23352f; box-shadow:4px 5px 0 #0c1d1e; transform:rotate(-1deg); }
+.homepage-live-toast-icon { display:flex; height:32px; width:32px; flex-shrink:0; align-items:center; justify-content:center; border:2px solid #23352f; background:#f49b58; color:#172c29; }
+.homepage-live-toast-icon[data-kind='leave'] { background:#a7d3ce; }
+.homepage-live-toast-eyebrow { font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#53634e; }
+.homepage-live-toast-text { margin-top:2px; font-size:14px; line-height:1.35; color:#23352f; }
+.homepage-live-toast-text .font-semibold { font-weight:800; }
 .homepage-event-feed { min-width:0; }
 .homepage-event-date { margin-bottom:12px; }
 .homepage-event-date > div { display:none; }

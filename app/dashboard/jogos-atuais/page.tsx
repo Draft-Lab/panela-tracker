@@ -2,34 +2,13 @@ import { createClient } from "@/lib/supabase/server"
 import { AddGameButton } from "@/components/add-game-button"
 import { DashboardPageHeader } from "@/components/dashboard/dashboard-page-header"
 import { LandingCurrentGamesSection } from "@/components/landing-current-games-section"
-import type { Jogatina, Game, JogatinaPlayer, Player } from "@/lib/types"
+import { fetchCurrentJogatinas } from "@/lib/fetch-current-jogatinas"
 
 export default async function JogosAtuaisPage() {
   const supabase = await createClient()
-
-  const { data: currentJogatinas } = await supabase
-    .from("jogatinas")
-    .select(
-      `
-      *,
-      game:games(*),
-      jogatina_players(
-        *,
-        player:players(*)
-      )
-    `,
-    )
-    .eq("is_current", true)
-    .order("date", { ascending: false })
-
-  const formattedJogatinas = (currentJogatinas || []).map((jogatina) => ({
-    ...jogatina,
-    game: jogatina.game as Game,
-    jogatina_players: jogatina.jogatina_players as (JogatinaPlayer & { player: Player })[],
-  })) as (Jogatina & {
-    game: Game
-    jogatina_players?: (JogatinaPlayer & { player: Player })[]
-  })[]
+  const formattedJogatinas = await fetchCurrentJogatinas(
+    supabase as unknown as Parameters<typeof fetchCurrentJogatinas>[0],
+  )
 
   return (
     <div className="flex flex-col gap-10">
@@ -40,7 +19,10 @@ export default async function JogosAtuaisPage() {
         actions={<AddGameButton />}
       />
 
-      <LandingCurrentGamesSection currentGames={formattedJogatinas} isInteractive={true} />
+      <LandingCurrentGamesSection
+        currentGames={formattedJogatinas}
+        isInteractive={true}
+      />
     </div>
   )
 }
